@@ -3,6 +3,7 @@ package scripts.slayer;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.HashMap;
+
 import org.tribot.api2007.Prayer;
 import org.tribot.api.General;
 import org.tribot.api.Timing;
@@ -43,7 +44,7 @@ import org.tribot.script.ScriptManifest;
 import org.tribot.script.interfaces.Painting;
 import org.tribot.script.interfaces.Pausing;
 
-@ScriptManifest(authors = { "Yaw hide" }, category = "ranged", name = "Yaw hide's BDK", version = 0.57, description="Local version")
+@ScriptManifest(authors = { "Yaw hide" }, category = "ranged", name = "Yaw hide's BDK", version = 0.58, description="Local version")
 public class BDK extends Script implements Painting, Pausing {
 	  
 	// loot
@@ -819,24 +820,36 @@ public class BDK extends Script implements Painting, Pausing {
 	public void prayerflick(){//RSNPC drag) {
 		
 		while (getHp() > 30 &&	Prayer.getPrayerPoints() > 5 && isRanging() && inSafeSpot() && !isLoot()) {
-			fightStatus="flicking now!";
+			fightStatus = "flicking now!";
+			if(!Prayer.isTabOpen()){
+				GameTab.open(TABS.PRAYERS);
+			}
 			Timer t = new Timer(1100L);
 			do {
-				if (Player.getAnimation() != 4230){
-					sleep(400,450);
-					Options.setQuickPrayersOn(true);
+				if (Player.getAnimation() != 4230) {
+					sleep(250, 300);
+					Prayer.enable(PRAYERS.EAGLE_EYE);
+					//Options.setQuickPrayersOn(true);
+				} else if (Prayer.isPrayerEnabled(PRAYERS.EAGLE_EYE)){//.isQuickPrayerEnabled(PRAYERS.EAGLE_EYE)) {
+					//Options.setQuickPrayersOn(false);
+					Prayer.disable(PRAYERS.EAGLE_EYE);
+					sleep(350, 400);
+				} else {
+					sleep(400, 450);
 				}
-				else if (Prayer.isQuickPrayerEnabled(PRAYERS.EAGLE_EYE)){
-						Options.setQuickPrayersOn(false);
-						sleep(350,400);
-				}
-				else{
-					sleep(250,300);
-				}
-			} while(t.getRemaining() > 0);
+			} while (t.getRemaining() > 0);
 		}
-		
 		turnOffPrayer();
+	}
+	
+	public void turnOffPrayer(){
+		if (Prayer.isPrayerEnabled(PRAYERS.EAGLE_EYE)){//.isQuickPrayerEnabled(PRAYERS.EAGLE_EYE)){
+			//Options.setQuickPrayersOn(false);
+			if(!Prayer.isTabOpen()) GameTab.open(TABS.PRAYERS);
+			sleep(200,250);
+			Prayer.disable(PRAYERS.EAGLE_EYE);
+			sleep(800,1000);
+		}
 	}
 	
 	public int getStackBolts() {
@@ -965,11 +978,6 @@ public class BDK extends Script implements Painting, Pausing {
 		}
 	}
 	
-	public void turnOffPrayer(){
-		if (Prayer.isQuickPrayerEnabled(PRAYERS.EAGLE_EYE)){
-			Options.setQuickPrayersOn(false);
-			sleep(400,500);
-		}
-	}
+	
 	
 }

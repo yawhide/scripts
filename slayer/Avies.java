@@ -2,6 +2,8 @@ package scripts.slayer;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.HashMap;
 
 import org.tribot.api.Clicking;
@@ -10,6 +12,7 @@ import org.tribot.api.Timing;
 import org.tribot.api.input.Mouse;
 import org.tribot.api.interfaces.Positionable;
 import org.tribot.api.types.generic.Condition;
+import org.tribot.api2007.ChooseOption;
 import org.tribot.api2007.Combat;
 import org.tribot.api2007.Equipment;
 import org.tribot.api2007.Equipment.SLOTS;
@@ -40,22 +43,23 @@ import org.tribot.api2007.types.RSItem;
 import org.tribot.api2007.types.RSNPC;
 import org.tribot.api2007.types.RSObject;
 import org.tribot.api2007.types.RSTile;
+import org.tribot.api2007.util.ThreadSettings;
 import org.tribot.script.Script;
 import org.tribot.script.ScriptManifest;
 import org.tribot.script.interfaces.MessageListening07;
 import org.tribot.script.interfaces.Painting;
 import org.tribot.script.interfaces.Pausing;
 
-@ScriptManifest(authors = { "Yaw hide" }, category = "ranged", version=0.13, name = "Yaw hide's Ava Killer", description="Local version")
+@ScriptManifest(authors = { "Yaw hide" }, category = "ranged", version=0.2, name = "Yaw hide's Ava Killer", description="Local version")
 public class Avies extends Script implements Painting, Pausing, MessageListening07{
 
 	// loot
 	int[] junk = { 886, 1539, 9003, 229, 1623, 1355, 440, 7767, 117, 6963, 
 			556, 829, 1971, 687, 464, 1973, 1917, 808, 1454, 6180, 6965, 1969,
-			6183, 6181, 6962, 449, 1197, 243 };
+			6183, 6181, 6962, 449, 1197, 243, 314, 526 };
 
 	int[] loot = { 9142, 1615, 1247, 1303, 1249, 1149, 2361, 2366, 1462, 985,
-			987, 2363, 1617, 1213, 2363, 207, 1229, 5678, 9431,
+			987, 2363, 1617, 1213, 2363, 207, 1229, 5678, 9431, 561, 
 			/* clue scroll id starts */
 			2722, 2723, 2725, 2727, 2729, 2731, 2733, 2725, 2737, 2739, 2741,
 			2743, 2745, 2747, 2773, 2774, 2776, 2778, 2780, 2782, 2783, 2785,
@@ -70,7 +74,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 			13036, 13038, 13040, 13041, 13042, 13044, 13046, 13048, 13049 };
 
 	int[] loot2 = { 1615, 1247, 1303, 1249, 1149, 2361, 2366, 1462, 985, 987,
-			2363, 1617, 1213, 2363, 207, 1229, 5678, 9431,
+			2363, 1617, 1213, 2363, 207, 1229, 5678, 9431, 561,
 			/* clue scroll id starts */
 			2722, 2723, 2725, 2727, 2729, 2731, 2733, 2725, 2737, 2739, 2741,
 			2743, 2745, 2747, 2773, 2774, 2776, 2778, 2780, 2782, 2783, 2785,
@@ -93,7 +97,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 			"Adamantite bar", "Shield left half", "Nature talisman",
 			"Tooth half of key", "Loop half of key", "Runite bar",
 			"Uncut diamond", "Rune dagger", "Rune bar", "Herb",
-			"Rune dagger(p)", "Rune dagger(p+)", "Runite limbs",
+			"Rune dagger(p)", "Rune dagger(p+)", "Runite limbs", "Nature rune",
 			"Clue scroll (hard)" };
 	
 	// RSPaths
@@ -101,8 +105,21 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	private RSTile[] beforePrayerRange = { new RSTile(2878, 3664, 0), new RSTile(2876, 3667, 0), new RSTile(2873, 3669, 0), new RSTile(2872, 3672, 0), new RSTile(2872, 3676, 0), new RSTile(2871, 3679, 0), new RSTile(2871, 3682, 0), new RSTile(2870, 3686, 0), new RSTile(2872, 3689, 0), new RSTile(2873, 3691, 0) };
 	private RSTile[] beforeRock = { new RSTile(2876, 3693, 0), new RSTile(2879, 3695, 0), new RSTile(2881, 3698, 0), new RSTile(2883, 3701, 0), new RSTile(2887, 3702, 0), new RSTile(2891, 3703, 0), new RSTile(2895, 3703, 0), new RSTile(2897, 3701, 0), new RSTile(2899, 3702, 0), new RSTile(2899, 3705, 0), new RSTile(2899, 3708, 0), new RSTile(2899, 3711, 0), new RSTile(2899, 3713, 0) };
 	private RSTile[] toGW = { new RSTile(2899, 3721, 0), new RSTile(2902, 3724, 0), new RSTile(2904, 3726, 0), new RSTile(2906, 3729, 0), new RSTile(2907, 3731, 0), new RSTile(2908, 3732, 0), new RSTile(2908, 3733, 0), new RSTile(2909, 3734, 0), new RSTile(2909, 3735, 0), new RSTile(2910, 3738, 0), new RSTile(2912, 3742, 0), new RSTile(2915, 3742, 0), new RSTile(2913, 3744, 0), new RSTile(2916, 3746, 0) };
-	private RSTile[] toAvies = { new RSTile(2880, 5308, 2), new RSTile(2881, 5304, 2), new RSTile(2881, 5297, 2), new RSTile(2881, 5292, 2), new RSTile(2880, 5287, 2), new RSTile(2876, 5306, 2), new RSTile(2870, 5305, 2), new RSTile(2864, 5303, 2), new RSTile(2864, 5299, 2), new RSTile(2869, 5295, 2), new RSTile(2874, 5291, 2), new RSTile(2888, 5308, 2), new RSTile(2895, 5304, 2), new RSTile(2895, 5297, 2), new RSTile(2891, 5292, 2), new RSTile(2886, 5289, 2), new RSTile(2880, 5287, 2), new RSTile(2875, 5285, 2) };	
-	
+	private RSTile[] toAvies = { new RSTile(2883, 5311, 2),
+			new RSTile(2879, 5310, 2), new RSTile(2873, 5309, 2),
+			new RSTile(2867, 5307, 2), new RSTile(2861, 5307, 2),
+			new RSTile(2856, 5304, 2), new RSTile(2857, 5299, 2),
+			new RSTile(2861, 5295, 2), new RSTile(2865, 5294, 2),
+			new RSTile(2871, 5293, 2), new RSTile(2885, 5309, 2),
+			new RSTile(2890, 5309, 2), new RSTile(2893, 5308, 2),
+			new RSTile(2896, 5304, 2), new RSTile(2896, 5298, 2),
+			new RSTile(2896, 5296, 2), new RSTile(2896, 5294, 2),
+			new RSTile(2892, 5291, 2), new RSTile(2888, 5291, 2),
+			new RSTile(2881, 5307, 2), new RSTile(2881, 5304, 2),
+			new RSTile(2882, 5300, 2), new RSTile(2880, 5298, 2),
+			new RSTile(2880, 5295, 2), new RSTile(2878, 5291, 2),
+			new RSTile(2878, 5288, 2) };
+
 	//Positionables
 	Positionable firstSlide = new RSTile(2879, 3668, 0);
 	String firstSlideAction = "Climb"; // object is Rocks
@@ -135,6 +152,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	final int LAW = 563;
 	final int FTAB = 8009;
 	final int VTAB = 8007;
+	final int HTAB = 8013;
 	int mbolts = 9142;
 	long antiban = System.currentTimeMillis();
 	int startXp = Skills.getXP(SKILLS.HITPOINTS) + Skills.getXP(SKILLS.RANGED);
@@ -165,6 +183,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	int addyprice = 2800;
 	int ranarrprice = 6400;
 	boolean moveRandom = false;
+	boolean useHouse = true;
 
 	String fightStatus;
 	
@@ -180,9 +199,13 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 			println("You must be at least 44 prayer to use this script");
 			scriptStatus = false;
 		}
-		else if (Skills.getActualLevel(SKILLS.AGILITY) < 60 || Skills.getActualLevel(SKILLS.STRENGTH) < 60){
+		else if (Skills.getActualLevel(SKILLS.AGILITY) < 60 && Skills.getActualLevel(SKILLS.STRENGTH) < 60){
 			println("You must be at least 60 agility or strength to use this script");
 			scriptStatus = false;
+		}
+		if(Skills.getActualLevel(SKILLS.CONSTRUCTION) < 50){
+			useHouse = false;
+			println("You do not have 50 con for varrock portal focus, you must use varrock teletabs");
 		}
 		
 		if(!Combat.isAutoRetaliateOn()){
@@ -199,15 +222,16 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		ranarrprice = Zybez.getPrice("Clean ranarr");
 		
 		sleep(250);
-		Mouse.setSpeed(General.random(175,190));
+		
 		Walking.setWalkingTimeout(5000L);
 		Walking.setControlClick(true);
+		
 		
 		while(scriptStatus){
 			current_xp = Skills.getXP(SKILLS.RANGED) + Skills.getXP(SKILLS.HITPOINTS);
 			XpToLVrange = Skills.getXPToNextLevel(SKILLS.RANGED);
 			XpToLVhp = Skills.getXPToNextLevel(SKILLS.HITPOINTS);
-			
+			Mouse.setSpeed(General.random(175,190));
 			
 			addybars = Inventory.getCount(ADDY) - addyIni;
 			coins = Inventory.getCount(COIN) - coinsIni;
@@ -216,9 +240,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 			if(Game.getRunEnergy() > 20) {
 			    Options.setRunOn(true);
 			}
-			if(getHp() <= 30 && Inventory.getCount(foodIDs) == 0){
-				emergTele();
-			}
+			
 			if(moveRandom){
 				if(pos().distanceTo(randomEastT) > pos().distanceTo(randomWestT)){
 					Walking.walkPath(Walking.generateStraightPath(randomEastT));
@@ -278,21 +300,22 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 			for(RSNPC a : avies){
 				if(aviesArea.contains(a.getPosition())){
 					if (a.isOnScreen()) {
-						if (Clicking.click(avies)) {
+						clickObject(a, "Attack");//Clicking.click(avies)) {
 							fightStatus = "killing an avie";
-							sleep(500, 700);
-							final RSNPC tmp_blkdrag = a;
-							Timing.waitCondition(new Condition() {
-								public boolean active() {
-									return Player.getAnimation() == 4230
-											|| inCombat()
-											|| tmp_blkdrag.isInCombat();
-								}
-							}, General.random(2200, 2400));
-						} 
-						else {
-							sleep(200, 400);
-						}
+							
+							sleep(300, 500);
+//							final RSNPC tmp_blkdrag = a;
+//							Timing.waitCondition(new Condition() {
+//								public boolean active() {
+//									return Player.getAnimation() == 4230
+//											|| inCombat()
+//											|| tmp_blkdrag.isInCombat();
+//								}
+//							}, General.random(2200, 2400));
+//						} 
+//						else {
+//							sleep(200, 400);
+//						}
 					} 
 					else {
 						println("running to closest avie");
@@ -312,9 +335,49 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	
 		if (inArea(aviesArea) && pos().getPlane() == 2)
 			return true;
+		else if(!inArea(varrockArea) && Objects.findNearest(50, "Portal").length > 0){
+			fightStatus = "in house...";
+			RSObject[] alter = Objects.findNearest(50, "Altar");
+			RSObject[] portal = Objects.findNearest(50, "Varrock Portal");
+			if(alter.length == 0 && portal.length == 0){
+				println("Could not determine where you are, are you outside of the house???");
+				scriptStatus = false;
+			}
+			
+			if (Skills.getCurrentLevel(SKILLS.PRAYER) == Skills.getActualLevel(SKILLS.PRAYER)) {
+				if(portal.length > 0){
+					if (portal[0].isOnScreen()) {
+						if (portal[0].click("Enter")) {
+							sleep(500, 700);
+						} else {
+							sleep(500, 700);
+						}
+					} else {
+						Positionable temp = new RSTile(portal[0].getPosition().getX(), portal[0].getPosition().getY()-2, 0);
+						Walking.walkTo(temp);
+						waitIsMovin();
+					}
+				}
+			} else {
+				if (alter.length > 0) {
+					if (alter[0].isOnScreen()) {
+						if (alter[0].click("Pray")) {
+							sleep(500, 700);
+
+						} else {
+							sleep(500, 700);
+						}
+					} else {
+						Walking.walkTo(alter[0].getPosition());
+						waitIsMovin();
+					}
+				}
+			}
+		}
 		else if(inGW()){
 			fightStatus = "walking to avies spot";
-			Walking.walkPath(toAvies);
+			Walking.walkPath(Walking.generateStraightPath(toAvies[toAvies.length-1]));
+			//Walking.walkPath(toAvies);
 			waitIsMovin();
 		}
 		else if (pos().distanceTo(toGW[toGW.length - 1]) <= 5) {
@@ -445,8 +508,6 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	}
 	
 	public void bank(){
-		println("banking...");
-		
 		if(Banking.openBankBooth()){
 			if(Banking.isPinScreenOpen())
 				Banking.inPin();
@@ -502,9 +563,18 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 				sleep(600, 650);
 				Banking.withdraw(foodNum+((Combat.getMaxHP() - Combat.getHP()) / 12), foodIDs);
 				sleep(600,650);
-				Banking.withdraw(1, VTAB);
-				sleep(500,650);
-				
+				if(useHouse){
+					if(lootCountStack(HTAB) < 5){
+						Banking.withdraw(10, HTAB);
+						sleep(500,650);
+					}
+				}
+				else{
+					if(lootCountStack(HTAB) < 5){
+						Banking.withdraw(10, VTAB);
+						sleep(500,650);
+					}
+				}
 				if(getStackBolts() < 500){
 					Banking.withdraw(1000, boltsID);
 					sleep(600, 650);
@@ -541,7 +611,8 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	
 	public boolean gotEquipment(){
 		println(lootCountStack(NAT));
-		if(lootCountStack(VTAB) > 0 && lootCountStack(NAT) >= 10 && lootCountStack(FIRE) >= 52
+		if( ((!useHouse && lootCountStack(VTAB) > 0) || (useHouse && lootCountStack(HTAB) > 0))
+				&& lootCountStack(NAT) >= 10 && lootCountStack(FIRE) >= 52
 				&& lootCountStack(LAW) == 2 && Inventory.find(rangepots).length == 1
 				&& Inventory.find(foodIDs).length == foodNum){
 			return true;
@@ -558,6 +629,8 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 
 	@Override
 	public void onPaint(Graphics g) {
+		Rectangle hideZone = new Rectangle(342, 369, 542, 500);
+		Point p = Mouse.getPos();
 		
 		int xpGained = current_xp - startXp;
 		long timeRan = System.currentTimeMillis() - start_time;
@@ -610,24 +683,38 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		dh = addybars + addycount;
 		db = coins + coinscount;
 		ran = ranarrs + ranarrcount;
-		g.setColor(new Color(60, 60, 60));
-		g.fillRect(340, 370, 200, 150);
-
-		g.setColor(Color.WHITE);
-		g.drawString("Yawhide's BDK", 345, 385);
-		g.drawString("Version :" + version + "   Curr world: " + Game.getCurrentWorld(), 345, 405);
-		g.drawString("Running for: " + Timing.msToString(timeRan), 345, 420);
-		g.drawString("Total XP ganed: " + xpGained + " (" + xpPerHour
-				+ "/h)", 345, 435);
-		g.drawString("State: " + fightStatus, 345, 450);
-		g.drawString("Addy bars: " + dh + "       GP: " + db/1000 + " K", 345, 465);
-		g.drawString("Gp/hr: " + (int) ((dh*addyprice + db + ran*ranarrprice)/hoursRan/1000) + " K   Total: " + (int)(dh*addyprice + db + ran*ranarrprice)/1000 + " K", 345, 480);
 		
 		g.setColor(Color.RED);
 		RSNPC[] avv = NPCs.findNearest(avaIDs);
 		for(int i = 0; i < avv.length; i++){
 			drawTile(avv[i].getPosition(), g, false);
-		}			
+		}
+		g.setColor(Color.GREEN);
+		RSNPC[] o = NPCs.findNearest(avaIDs);
+		if(o.length > 0){
+			int x2 = (int) o[0].getModel().getEnclosedArea().getBounds()
+					.getCenterX();
+			int y2 = (int) o[0].getModel().getEnclosedArea().getBounds()
+					.getCenterY();
+			g.drawRect(x2, y2, 1, 1);
+			g.drawRect(x2-4, y2-4, 1, 1);
+			g.drawRect(x2+4, y2+4, 1, 1);
+		}
+		if (!hideZone.contains(p)) {
+			g.setColor(new Color(60, 60, 60)); 
+			g.fillRect(340, 370, 200, 150);
+
+			g.setColor(Color.WHITE);
+			g.drawString("Yawhide's BDK", 345, 385);
+			g.drawString("Version :" + version + "   Curr world: " + Game.getCurrentWorld(), 345, 405);
+			g.drawString("Running for: " + Timing.msToString(timeRan), 345, 420);
+			g.drawString("Total XP ganed: " + xpGained + " (" + xpPerHour
+					+ "/h)", 345, 435);
+			g.drawString("State: " + fightStatus, 345, 450);
+			g.drawString("Addy bars: " + dh + "       GP: " + db/1000 + " K", 345, 465);
+			g.drawString("Gp/hr: " + (int) ((dh*addyprice + db + ran*ranarrprice)/hoursRan/1000) + " K   Total: " + (int)(dh*addyprice + db + ran*ranarrprice)/1000 + " K", 345, 480);
+			
+		}
 	}
 	
 	public void teleToTroll(){
@@ -674,16 +761,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	public int lootCountStack(int ID) { return Inventory.getCount(ID); }
 	public boolean isMovin() { return Player.isMoving();}
 	public boolean inCombat() { return Player.getRSPlayer().isInCombat(); }
-	
-	@Override
-	public void onPause() {
-		
-	}
-
-	@Override
-	public void onResume() {
-		
-	}
+	public int getStackBolts() { return Equipment.getItem(SLOTS.ARROW).getID() == boltsID ? Equipment.getItem(SLOTS.ARROW).getStack() : 0;}
 	
 	public void putMap() {
 		for (int i = 0; i < loot.length; i++) {
@@ -712,15 +790,17 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	public void emergTele(){
 		fightStatus = "tele tabbing";
 		RSItem[] tab = Inventory.find(VTAB);
+		if(useHouse)
+			tab = Inventory.find(HTAB);
 		GameTab.open(TABS.INVENTORY);
 		sleep(100, 150);
 		if(tab.length > 0){
 			if(tab[0].click("Break")){
-				sleep(General.random(4000,  5000));
+				sleep(General.random(5000,  6000));
 			}
 		}
 		else{
-			println("Out of f tabs");
+			println("Out of tabs");
 			scriptStatus = false;
 		}
 	}
@@ -741,24 +821,26 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 			emergTele();
 	}
 	
-	public int getStackBolts() {
-		return Equipment.getItem(SLOTS.ARROW).getID() == boltsID ? Equipment.getItem(SLOTS.ARROW).getStack() : 0;
-	}
 	
 	public void prayerflick() {// RSNPC drag) {
 
 		while (!moveRandom && getHp() > 30 && Skills.getCurrentLevel(SKILLS.PRAYER) > 5 && isRanging() && inAviesSpot() && !isLoot()) {
 			fightStatus = "flicking now!";
+			if(!Prayer.isTabOpen()){
+				GameTab.open(TABS.PRAYERS);
+			}
 			Timer t = new Timer(1100L);
 			do {
 				if (Player.getAnimation() != 4230) {
-					sleep(400, 450);
-					Options.setQuickPrayersOn(true);
-				} else if (Prayer.isQuickPrayerEnabled(PRAYERS.EAGLE_EYE)) {
-					Options.setQuickPrayersOn(false);
+					sleep(250, 300);
+					Prayer.enable(PRAYERS.EAGLE_EYE);
+					//Options.setQuickPrayersOn(true);
+				} else if (Prayer.isPrayerEnabled(PRAYERS.EAGLE_EYE)){//.isQuickPrayerEnabled(PRAYERS.EAGLE_EYE)) {
+					//Options.setQuickPrayersOn(false);
+					Prayer.disable(PRAYERS.EAGLE_EYE);
 					sleep(350, 400);
 				} else {
-					sleep(250, 300);
+					sleep(400, 450);
 				}
 			} while (t.getRemaining() > 0);
 		}
@@ -768,10 +850,21 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	
 	public void waitForLoot(){
 		fightStatus = "prayerflicking";
-		while(!isLoot() && isRanging() && inAviesSpot() && !isMovin() && getHp() > 30){
+		if(!isLoot() && isRanging() && inAviesSpot() && getHp() > 30){
 			prayerflick();
+			//sleep(500, 600);
 		}
 		turnOffPrayerEagle();
+	}
+	
+	public void turnOffPrayerEagle(){
+		if (Prayer.isPrayerEnabled(PRAYERS.EAGLE_EYE)){//.isQuickPrayerEnabled(PRAYERS.EAGLE_EYE)){
+			//Options.setQuickPrayersOn(false);
+			if(!Prayer.isTabOpen()) GameTab.open(TABS.PRAYERS);
+			sleep(200,250);
+			Prayer.disable(PRAYERS.EAGLE_EYE);
+			sleep(800,1000);
+		}
 	}
 	
 	public String underAttack(){
@@ -808,13 +901,6 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		}
 	}
 	
-	public void turnOffPrayerEagle(){
-		if (Prayer.isQuickPrayerEnabled(PRAYERS.EAGLE_EYE)){
-			Options.setQuickPrayersOn(false);
-			sleep(800,1000);
-		}
-	}
-	
 	public void turnOffPrayerProtectionMissles(){
 		if (Prayer.isPrayerEnabled(PRAYERS.PROTECT_FROM_MISSILES)){
 			if(!Prayer.isTabOpen()){
@@ -829,7 +915,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	private void waitForInv(int lootID, int lootNum) {
 		fightStatus = "waiting for loot";
 		int k = 0;
-		while (lootCount(lootID) == lootNum && k < 200
+		while (lootCount(lootID) == lootNum && k < 70
 				&& Player.isMoving()) {
 			sleep(80);
 			k++;
@@ -886,4 +972,66 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	public void tradeRequestReceived(String arg0) {
 		
 	}
+	
+	@Override
+	public void onPause() {
+		
+	}
+
+	@Override
+	public void onResume() {
+		
+	}
+	
+	private boolean checkActions(RSNPC object, String action) {
+		if (object.getActions() != null) {
+			for (String s : object.getActions())
+				return s.contains(action);
+		}
+		return false;
+	}
+
+	public void clickObject(RSNPC a, String option) {
+		RSNPC object = a;
+		if (object != null) {
+			int x = (int) object.getModel().getEnclosedArea().getBounds()
+					.getCenterX();
+			int y = (int) object.getModel().getEnclosedArea().getBounds()
+					.getCenterY();
+			Point p = new Point(x + General.random(-4, 4), y
+					+ General.random(-4, 0));
+			if (object.getPosition().isOnScreen()) {
+				if(ChooseOption.isOpen()){
+					ChooseOption.close();
+				}
+				Mouse.move(p);
+//				if(ChooseOption.isOpen()){
+//					ChooseOption.close();
+//				}
+				if (Game.getUptext().contains(option)
+						&& (checkActions(object, option)) && Game.getUptext().contains("Aviansie")) {
+					Mouse.click(1);
+				}
+				else if (!Game.getUptext().contains(option)) {
+					Mouse.click(3);
+					if (ChooseOption.isOpen()
+							&& ChooseOption.isOptionValid(option))
+						ChooseOption.select(option);
+					if (ChooseOption.isOpen()
+							&& !ChooseOption.isOptionValid(option)){
+						ChooseOption.close();
+						Camera.turnToTile(object.getPosition());
+					}
+				}
+			} else {
+				if (Player.getPosition().distanceTo(object.getPosition()) > 4)
+					WebWalking.walkTo(object.getPosition());
+				if (!object.getPosition().isOnScreen())
+					Camera.turnToTile(object.getPosition());
+				while (Player.isMoving()) {
+					sleep(50, 80);
+				}
+			}
+		}
+    }
 }
