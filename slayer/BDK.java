@@ -44,7 +44,7 @@ import org.tribot.script.ScriptManifest;
 import org.tribot.script.interfaces.Painting;
 import org.tribot.script.interfaces.Pausing;
 
-@ScriptManifest(authors = { "Yaw hide" }, category = "ranged", name = "Yaw hide's BDK", version = 0.58, description="Local version")
+@ScriptManifest(authors = { "Yaw hide" }, category = "ranged", name = "Yaw hide's BDK", version = 0.6, description="Local version")
 public class BDK extends Script implements Painting, Pausing {
 	  
 	// loot
@@ -132,8 +132,8 @@ public class BDK extends Script implements Painting, Pausing {
 	RSTile[] toTavLadderDown = { new RSTile(2877, 3403, 0), 
 			new RSTile(2935, 3346, 0) };
 	RSTile[] fallyA = {new RSTile(2936, 3390, 0), new RSTile(3030, 3323, 0) };
-	RSTile[] bankA = {new RSTile(2946, 3368, 0), new RSTile(2943, 3368, 0), new RSTile(2943, 3371, 0),
-			new RSTile(2947, 3371, 0)};
+	RSTile[] bankA = {new RSTile(2949, 3368, 0), new RSTile(2943, 3368, 0), new RSTile(2943, 3371, 0),
+			new RSTile(2947, 3371, 0), new RSTile(2947, 3369, 0), new RSTile(2949, 3369, 0)};
 	RSTile[] lowWallA = {new RSTile(2936, 3358, 0), new RSTile(2940, 3358, 0), new RSTile(2940, 3352, 0),
 			new RSTile(2936, 3352, 0)};
 	RSTile[] tavLadderA = {new RSTile(2881, 3400, 0), new RSTile(2888, 3393, 0)};

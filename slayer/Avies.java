@@ -123,7 +123,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	//Positionables
 	Positionable firstSlide = new RSTile(2879, 3668, 0);
 	String firstSlideAction = "Climb"; // object is Rocks
-	Positionable bankT = new RSTile(3185, 3436, 0);
+	Positionable bankT = new RSTile(3185, 3438, 0);
 	Positionable gwCenter = new RSTile(2901, 5283, 2);
 	Positionable holeT = new RSTile(2918, 3746, 0);
 	Positionable randomEastT = new RSTile(2862, 5287, 2);
@@ -481,7 +481,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 			if(Nests[i].getID() == 9142){
 				if (Nests[i].getStack() > 9) {
 					if (!Nests[i].isOnScreen()) {
-						Walking.clickTileMM(Nests[i].getPosition(), 1);
+						Walking.walkPath(Walking.generateStraightPath(Nests[i].getPosition()));
 						Camera.turnToTile(Nests[i].getPosition());
 						Camera.setCameraAngle(General.random(90, 100));
 						waitIsMovin();
@@ -494,7 +494,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 			}
 			else{
 				if (!Nests[i].isOnScreen()) {
-					Walking.clickTileMM(Nests[i].getPosition(), 1);
+					Walking.walkPath(Walking.generateStraightPath(Nests[i].getPosition()));
 					Camera.turnToTile(Nests[i].getPosition());
 					Camera.setCameraAngle(General.random(90, 100));
 					waitIsMovin();
@@ -683,7 +683,14 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		dh = addybars + addycount;
 		db = coins + coinscount;
 		ran = ranarrs + ranarrcount;
+		g.setColor(Color.CYAN);
+		RSGroundItem[] Nests = GroundItems.findNearest(loot2);
 		
+		for(int i = 0; i < Nests.length; i++){
+			if(aviesArea.contains(Nests[i].getPosition())){
+				drawTile(Nests[i].getPosition(), g, false);
+			}
+		}
 		g.setColor(Color.RED);
 		RSNPC[] avv = NPCs.findNearest(avaIDs);
 		for(int i = 0; i < avv.length; i++){
