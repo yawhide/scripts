@@ -4,7 +4,10 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.tribot.api.Clicking;
 import org.tribot.api.General;
@@ -50,7 +53,7 @@ import org.tribot.script.interfaces.MessageListening07;
 import org.tribot.script.interfaces.Painting;
 import org.tribot.script.interfaces.Pausing;
 
-@ScriptManifest(authors = { "Yaw hide" }, category = "ranged", version=0.2, name = "Yaw hide's Ava Killer", description="Local version")
+@ScriptManifest(authors = { "Yaw hide" }, category = "ranged", version=0.23, name = "Yaw hide's Ava Killer", description="Local version")
 public class Avies extends Script implements Painting, Pausing, MessageListening07{
 
 	// loot
@@ -144,7 +147,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	
 	// Variables
 	final int[] avaIDs = { 5750, 5758, 5753 }; //69, 71, 83
-	final int[] foodIDs = { 333, 329, 379 };// , 385, 7946, 1897 };
+	int[] foodIDs; // , 385, 7946, 1897 };
 	final int[] ppot = { 2434, 139, 141, 143 };
 	final int[] rangepots = { 169, 2444, 171, 173 };
 	final int NAT = 561;
@@ -184,13 +187,14 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	int ranarrprice = 6400;
 	boolean moveRandom = false;
 	boolean useHouse = true;
+	boolean waitGUI = true;
 
 	String fightStatus;
 	
 	@Override
 	public void run() {
 		
-		boltsID = mbolts;
+		boltsID = Equipment.getItem(SLOTS.ARROW).getID();
 		if(Skills.getActualLevel(SKILLS.RANGED) < 70){
 			println("You must be at least 70 range to use this script");
 			scriptStatus = false;
@@ -207,6 +211,11 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 			useHouse = false;
 			println("You do not have 50 con for varrock portal focus, you must use varrock teletabs");
 		}
+		
+		AvieGUI g = new AvieGUI();
+		g.setVisible(true);
+		while(waitGUI) sleep(500);
+		g.setVisible(false);
 		
 		if(!Combat.isAutoRetaliateOn()){
 			Combat.setAutoRetaliate(true);
@@ -337,14 +346,29 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 			return true;
 		else if(!inArea(varrockArea) && Objects.findNearest(50, "Portal").length > 0){
 			fightStatus = "in house...";
-			RSObject[] alter = Objects.findNearest(50, "Altar");
-			RSObject[] portal = Objects.findNearest(50, "Varrock Portal");
-			if(alter.length == 0 && portal.length == 0){
+			RSObject[] alter = Objects.findNearest(20, "Altar");
+			RSObject[] portal = Objects.findNearest(20, "Varrock Portal");
+			RSObject[] portal2 = Objects.findNearest(30, "Portal");
+			
+			if(alter.length == 0 || portal.length == 0){
+				fightStatus = "not inside house...";
+				if(portal2.length > 0){
+					if(portal2[0].isOnScreen()){
+						if(portal2[0].click("Enter")){
+							NPCChat.selectOption("Go to your house", true);
+						}
+					}
+					else{
+						Walking.walkPath(Walking.generateStraightPath(portal2[0].getPosition()));
+						waitIsMovin();
+					}
+				}
+				
 				println("Could not determine where you are, are you outside of the house???");
-				scriptStatus = false;
+				//scriptStatus = false;
 			}
 			
-			if (Skills.getCurrentLevel(SKILLS.PRAYER) == Skills.getActualLevel(SKILLS.PRAYER)) {
+			else if (Skills.getCurrentLevel(SKILLS.PRAYER) == Skills.getActualLevel(SKILLS.PRAYER)) {
 				if(portal.length > 0){
 					if (portal[0].isOnScreen()) {
 						if (portal[0].click("Enter")) {
@@ -354,7 +378,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 						}
 					} else {
 						Positionable temp = new RSTile(portal[0].getPosition().getX(), portal[0].getPosition().getY()-2, 0);
-						Walking.walkTo(temp);
+						Walking.walkPath(Walking.generateStraightPath(temp));
 						waitIsMovin();
 					}
 				}
@@ -368,7 +392,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 							sleep(500, 700);
 						}
 					} else {
-						Walking.walkTo(alter[0].getPosition());
+						Walking.walkPath(Walking.generateStraightPath(alter[0].getPosition()));
 						waitIsMovin();
 					}
 				}
@@ -382,8 +406,6 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		}
 		else if (pos().distanceTo(toGW[toGW.length - 1]) <= 5) {
 			fightStatus = "walking to GW hole";
-			//TODO fix this 
-			
 			if (Walking.clickTileMS(holeT, 1)) {
 				Timing.waitCondition(new Condition() {
 					public boolean active() {
@@ -478,6 +500,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 				HEAL();
 		}
 		for(int i = 0; i < Nests.length; i++){
+			Walking.setWalkingTimeout(1000L);
 			if(Nests[i].getID() == 9142){
 				if (Nests[i].getStack() > 9) {
 					if (!Nests[i].isOnScreen()) {
@@ -522,7 +545,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 				
 				Banking.depositAll();
 				sleep(100,150);
-								
+				
 				int pt = Skills.getActualLevel(SKILLS.PRAYER) / 3;
 				int currP = Skills.getCurrentLevel(SKILLS.PRAYER);
 				
@@ -556,13 +579,14 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 				Banking.withdraw(1, rangepots);
 				sleep(600, 650);
 				Banking.withdraw(10, NAT);
-				sleep(600, 650);				
+				sleep(600, 650);	
 				Banking.withdraw(52, FIRE);
 				sleep(600, 650);
 				Banking.withdraw(2, LAW);
 				sleep(600, 650);
 				Banking.withdraw(foodNum+((Combat.getMaxHP() - Combat.getHP()) / 12), foodIDs);
 				sleep(600,650);
+				
 				if(useHouse){
 					if(lootCountStack(HTAB) < 5){
 						Banking.withdraw(10, HTAB);
@@ -685,6 +709,22 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		ran = ranarrs + ranarrcount;
 		g.setColor(Color.CYAN);
 		RSGroundItem[] Nests = GroundItems.findNearest(loot2);
+		
+		Map<Integer, Integer> items = new HashMap<Integer, Integer>();
+		RSItem[] item = Inventory.getAll();
+		for(int i = 0; i < item.length; i++){
+			int count = items.containsKey(item[i].getID()) ? items.get(item[i].getID()) : 0;
+			items.put(item[i].getID(), count + 1);
+		}
+		Iterator it = items.entrySet().iterator();
+		int k = 0;
+	    while (it.hasNext()) {
+	        Map.Entry pairs = (Map.Entry)it.next();
+	        g.drawString((map.get(pairs.getKey()) != null ? map.get(pairs.getKey()) : pairs.getKey()) 
+	        		+ " = " + pairs.getValue(), 5, 100+k);
+	        it.remove(); // avoids a ConcurrentModificationException
+	        k+=15;
+	    }
 		
 		for(int i = 0; i < Nests.length; i++){
 			if(aviesArea.contains(Nests[i].getPosition())){
@@ -1041,4 +1081,186 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 			}
 		}
     }
+	
+	public class AvieGUI extends javax.swing.JFrame {
+
+	    /**
+	     * Creates new form AvieGUI
+	     */
+	    public AvieGUI() {
+	        initComponents();
+	    }
+
+	    /**
+	     * This method is called from within the constructor to initialize the form.
+	     * WARNING: Do NOT modify this code. The content of this method is always
+	     * regenerated by the Form Editor.
+	     */
+	    @SuppressWarnings("unchecked")
+	    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+	    private void initComponents() {
+
+	        jPanel1 = new javax.swing.JPanel();
+	        jLabel1 = new javax.swing.JLabel();
+	        jLabel2 = new javax.swing.JLabel();
+	        foodamount = new javax.swing.JTextField();
+	        jLabel3 = new javax.swing.JLabel();
+	        foodusing = new javax.swing.JComboBox();
+	        jButton1 = new javax.swing.JButton();
+	        jLabel4 = new javax.swing.JLabel();
+	        telemethod = new javax.swing.JComboBox();
+
+	        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+	        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+	        jLabel1.setText("Yaw hide's Avies Killer");
+
+	        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+	        jLabel2.setText("Food Amount");
+
+	        foodamount.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                foodamountActionPerformed(evt);
+	            }
+	        });
+
+	        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+	        jLabel3.setText("Food Using");
+
+	        foodusing.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "lobster", "salmon", "trout", "shark" }));
+	        foodusing.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                foodusingActionPerformed(evt);
+	            }
+	        });
+
+	        jButton1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+	        jButton1.setText("Start");
+	        jButton1.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                jButton1ActionPerformed(evt);
+	            }
+	        });
+
+	        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+	        jLabel4.setText("Tele method");
+
+	        telemethod.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "house", "varrock" }));
+	        telemethod.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                telemethodActionPerformed(evt);
+	            }
+	        });
+
+	        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+	        jPanel1.setLayout(jPanel1Layout);
+	        jPanel1Layout.setHorizontalGroup(
+	            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+	            .addGroup(jPanel1Layout.createSequentialGroup()
+	                .addGap(105, 105, 105)
+	                .addComponent(jButton1)
+	                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+	            .addGroup(jPanel1Layout.createSequentialGroup()
+	                .addContainerGap(40, Short.MAX_VALUE)
+	                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+	                    .addComponent(jLabel1)
+	                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+	                        .addGroup(jPanel1Layout.createSequentialGroup()
+	                            .addComponent(jLabel4)
+	                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+	                            .addComponent(telemethod, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+	                        .addGroup(jPanel1Layout.createSequentialGroup()
+	                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+	                                .addComponent(jLabel2)
+	                                .addComponent(jLabel3))
+	                            .addGap(63, 63, 63)
+	                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+	                                .addComponent(foodamount, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+	                                .addComponent(foodusing, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+	                .addContainerGap(52, Short.MAX_VALUE))
+	        );
+	        jPanel1Layout.setVerticalGroup(
+	            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+	            .addGroup(jPanel1Layout.createSequentialGroup()
+	                .addContainerGap()
+	                .addComponent(jLabel1)
+	                .addGap(33, 33, 33)
+	                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+	                    .addComponent(jLabel2)
+	                    .addComponent(foodamount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+	                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+	                    .addComponent(jLabel3)
+	                    .addComponent(foodusing, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+	                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+	                    .addComponent(jLabel4)
+	                    .addComponent(telemethod, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+	                .addComponent(jButton1))
+	        );
+
+	        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+	        getContentPane().setLayout(layout);
+	        layout.setHorizontalGroup(
+	            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+	            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+	                .addContainerGap()
+	                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+	                .addContainerGap())
+	        );
+	        layout.setVerticalGroup(
+	            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+	            .addGroup(layout.createSequentialGroup()
+	                .addContainerGap()
+	                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+	                .addContainerGap())
+	        );
+
+	        pack();
+	    }// </editor-fold>                        
+
+	    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {                                         
+	        // TODO add your handling code here:
+	    	String food = foodusing.getSelectedItem().toString();
+	    	switch(food){
+	    	case "lobster":
+	    		foodIDs = new int[] {379}; break;
+	    	case "trout":
+	    		foodIDs = new int[] {333}; break;
+	    	case "salmon":
+	    		foodIDs = new int[] {329}; break;
+	    	case "shark":
+	    		foodIDs = new int[] {385}; break;
+	    	}
+	    	foodNum = Integer.parseInt(foodamount.getText());
+	    	useHouse = telemethod.getSelectedItem().toString().equals("house") ? true : false;
+	        waitGUI = false;
+	    }                                       
+
+	    private void foodamountActionPerformed(java.awt.event.ActionEvent evt) {                                           
+	        // TODO add your handling code here:
+	    }                                          
+
+	    private void foodusingActionPerformed(java.awt.event.ActionEvent evt) {                                          
+	        // TODO add your handling code here:
+	    }                                         
+
+	    private void telemethodActionPerformed(java.awt.event.ActionEvent evt) {                                           
+	        // TODO add your handling code here:
+	    }
+
+	    // Variables declaration - do not modify                     
+	    private javax.swing.JTextField foodamount;
+	    private javax.swing.JComboBox foodusing;
+	    private javax.swing.JButton jButton1;
+	    private javax.swing.JLabel jLabel1;
+	    private javax.swing.JLabel jLabel2;
+	    private javax.swing.JLabel jLabel3;
+	    private javax.swing.JLabel jLabel4;
+	    private javax.swing.JPanel jPanel1;
+	    private javax.swing.JComboBox telemethod;
+	    // End of variables declaration                   
+	}
+
 }

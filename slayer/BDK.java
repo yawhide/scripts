@@ -3,6 +3,8 @@ package scripts.slayer;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.tribot.api2007.Prayer;
 import org.tribot.api.General;
@@ -44,7 +46,7 @@ import org.tribot.script.ScriptManifest;
 import org.tribot.script.interfaces.Painting;
 import org.tribot.script.interfaces.Pausing;
 
-@ScriptManifest(authors = { "Yaw hide" }, category = "ranged", name = "Yaw hide's BDK", version = 0.6, description="Local version")
+@ScriptManifest(authors = { "Yaw hide" }, category = "ranged", name = "Yaw hide's BDK", version = 0.61, description="Local version")
 public class BDK extends Script implements Painting, Pausing {
 	  
 	// loot
@@ -133,7 +135,7 @@ public class BDK extends Script implements Painting, Pausing {
 			new RSTile(2935, 3346, 0) };
 	RSTile[] fallyA = {new RSTile(2936, 3390, 0), new RSTile(3030, 3323, 0) };
 	RSTile[] bankA = {new RSTile(2949, 3368, 0), new RSTile(2943, 3368, 0), new RSTile(2943, 3371, 0),
-			new RSTile(2947, 3371, 0), new RSTile(2947, 3369, 0), new RSTile(2949, 3369, 0)};
+			new RSTile(2949, 3371, 0)};
 	RSTile[] lowWallA = {new RSTile(2936, 3358, 0), new RSTile(2940, 3358, 0), new RSTile(2940, 3352, 0),
 			new RSTile(2936, 3352, 0)};
 	RSTile[] tavLadderA = {new RSTile(2881, 3400, 0), new RSTile(2888, 3393, 0)};
@@ -278,6 +280,7 @@ public class BDK extends Script implements Painting, Pausing {
 			}
 		}
 		else if (inArea(fallyArea)){
+			Walking.setWalkingTimeout(1000L);
 			if(Inventory.find(foodIDs).length == foodNum && Inventory.find("Falador teleport").length > 0
 					&& Inventory.find(loot).length == 0 && Inventory.find(rangepots).length > 0) {
 				fightStatus = "walking to low wall";
@@ -694,6 +697,22 @@ public class BDK extends Script implements Painting, Pausing {
 			}
 		}
 		
+		Map<Integer, Integer> items = new HashMap<Integer, Integer>();
+		RSItem[] item = Inventory.getAll();
+		for(int i = 0; i < item.length; i++){
+			int count = items.containsKey(item[i].getID()) ? items.get(item[i].getID()) : 0;
+			items.put(item[i].getID(), count + 1);
+		}
+		Iterator it = items.entrySet().iterator();
+		int k = 0;
+	    while (it.hasNext()) {
+	        Map.Entry pairs = (Map.Entry)it.next();
+	        g.drawString((map.get(pairs.getKey()) != null ? map.get(pairs.getKey()) : pairs.getKey()) 
+	        		+ " = " + pairs.getValue(), 5, 100+k);
+	        it.remove(); // avoids a ConcurrentModificationException
+	        k+=15;
+	    }
+		
 		int dh, db;
 		dh = dhides + dhidecount;
 		db = dbones + dbonecount;
@@ -722,12 +741,6 @@ public class BDK extends Script implements Painting, Pausing {
 		for(int i = 0; i < neSSA.length; i++){
 			drawTile(neSSA[i], g, false);
 		}
-		g.setColor(Color.GRAY);
-		g.fillRect(0,136,60,50);
-		g.setColor(Color.WHITE);
-		g.drawString("PP: " + Prayer.getPrayerPoints(), 2, 150);
-		g.drawString("SS? " + inSafeSpot(), 2, 165);
-		g.drawString("Rng? " + isRanging(), 2, 180);
 			
 	}
 	
