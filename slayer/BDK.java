@@ -48,7 +48,7 @@ import org.tribot.script.interfaces.Pausing;
 
 import scripts.slayer.Avies.AvieGUI;
 
-@ScriptManifest(authors = { "Yaw hide" }, category = "ranged", name = "Yaw hide's BDK", version = 0.62, description="Local version")
+@ScriptManifest(authors = { "Yaw hide" }, category = "ranged", name = "Yaw hide's BDK", version = 0.63, description="Local version")
 public class BDK extends Script implements Painting, Pausing {
 	  
 	// loot
