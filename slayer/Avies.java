@@ -148,7 +148,8 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	RSArea aviesArea = new RSArea(AviesA[0], AviesA[1]);
 	
 	// Variables
-	final int[] avaIDs = { 5750, 5758, 5753 }; //69, 71, 83
+	final int[] avaIDs = { 5750, 5758, 5753,
+			5700, 5708 , 5703}; //69, 71, 83
 	int[] foodIDs; // , 385, 7946, 1897 };
 	final int[] ppot = { 2434, 139, 141, 143 };
 	final int[] rangepots = { 169, 2444, 171, 173 };
@@ -214,7 +215,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 			println("You do not have 50 con for varrock portal focus, you must use varrock teletabs");
 		}
 		
-		boolean devmode = true;
+		boolean devmode = false;
 		
 		if(devmode){
 			foodNum = 9;

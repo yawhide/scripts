@@ -46,7 +46,6 @@ import org.tribot.script.ScriptManifest;
 import org.tribot.script.interfaces.Painting;
 import org.tribot.script.interfaces.Pausing;
 
-import scripts.slayer.Avies.AvieGUI;
 
 @ScriptManifest(authors = { "Yaw hide" }, category = "ranged", name = "Yaw hide's BDK", version = 0.63, description="Local version")
 public class BDK extends Script implements Painting, Pausing {
@@ -181,7 +180,8 @@ public class BDK extends Script implements Painting, Pausing {
 	
 	// Variables
 	final int[] dragIDs = {2964, 2961, 250, 247, 335, 332, 288, 285};
-	final int[] dragWithBabyArr = {2964, 2961, 2938, 2939, 2937, 250, 247, 249, 224, 225, 223, 308, 309, 310, 334, 335, 332, 288, 285, 262, 261,263 };
+	final int[] dragWithBabyArr = {2964, 2961, 2938, 2939, 2937, 250, 247, 249, 224, 225, 223, 308, 309, 310, 334, 335, 332, 
+			288, 285, 262, 261,263 };
 	final int drag247 = 285; // east drag
 	int[] foodIDs  = { };//, 385, 7946, 1897 };
 	int[] ppot = { 2434, 139, 141, 143 }; 
