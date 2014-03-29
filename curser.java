@@ -21,12 +21,13 @@ import org.tribot.api2007.Walking;
 import org.tribot.api2007.types.RSNPC;
 import org.tribot.api2007.types.RSTile;
 import org.tribot.script.Script;
+import org.tribot.script.ScriptManifest;
 import org.tribot.script.interfaces.MessageListening07;
 import org.tribot.script.interfaces.Painting;
 
-public class alcher extends Script implements Painting, MessageListening07 {
+@ScriptManifest(authors = { "Yaw hide" }, category = "Magic", name = "Yawhide's Curser", description="local version")
+public class curser extends Script implements Painting, MessageListening07 {
 
-	
 	boolean scriptStatus = true;
 	boolean switchMon = true;
 	int confusedAnim = 1163;

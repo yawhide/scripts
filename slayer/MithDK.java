@@ -11,6 +11,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
+
 import org.tribot.api.DynamicClicking;
 import org.tribot.api.General;
 import org.tribot.api.Timing;
@@ -29,6 +30,8 @@ import org.tribot.api2007.GroundItems;
 import org.tribot.api2007.Interfaces;
 import org.tribot.api2007.Magic;
 import org.tribot.api2007.NPCs;
+import org.tribot.api2007.Prayer;
+import org.tribot.api2007.Prayer.PRAYERS;
 import org.tribot.api2007.Projection;
 import org.tribot.api2007.GameTab.TABS;
 import org.tribot.api2007.Inventory;
@@ -233,9 +236,9 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 				if(Camera.getCameraAngle() < 90)
 					Camera.setCameraAngle(General.random(90,  100));
 				if(Skills.getCurrentLevel(SKILLS.PRAYER) < Skills.getActualLevel(SKILLS.PRAYER)){
-					if(!PrayerBook.getActive().isEmpty()){
-						turnOffAllPrayers();
-					}
+					
+					turnOffAllPrayers();
+					
 					if (pos().distanceTo(altar) <= 3){
 						println("near altar");
 						prayAtAltar();
@@ -881,10 +884,8 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 	
 	public void prayerflick(RSNPC drag) {
 
-		if (GameTab.getOpen() != GameTab.TABS.PRAYERS) {
-			GameTab.open(org.tribot.api2007.GameTab.TABS.PRAYERS);
-			sleep(80, 100);
-		}
+		openPrayers();
+		
 		while (drag != null && drag.isInteractingWithMe() && getHp() > 50 &&
 				Skills.getCurrentLevel(SKILLS.PRAYER) > 10 && pottedAntiFire
 				&& Player.getRSPlayer().getInteractingCharacter() != null) {
@@ -895,33 +896,31 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 			
 			Timer t = new Timer(1100L);
 			do {
-				if (!PrayerBook.isOpen()) {
-					PrayerBook.open();
-					sleep(50, 100);
+				if (Player.getAnimation() != 4230) {
+					sleep(250, 300);
+					Prayer.enable(PRAYERS.EAGLE_EYE);
+					//Options.setQuickPrayersOn(true);
+				} else if (Prayer.isPrayerEnabled(PRAYERS.EAGLE_EYE)){//.isQuickPrayerEnabled(PRAYERS.EAGLE_EYE)) {
+					//Options.setQuickPrayersOn(false);
+					Prayer.disable(PRAYERS.EAGLE_EYE);
+					sleep(350, 400);
+				} else {
+					sleep(400, 450);
 				}
-				if (Player.getAnimation() != 4230){
-					sleep(700,750);
-					PrayerBook.activate(Prayer.EAGLE_EYE);
-				}
-				else{
-					if (Prayer.EAGLE_EYE.isActive()){
-						sleep(50,150);
-						Prayer.EAGLE_EYE.click();
-						sleep(450,510);
-					}
-				}
-				
-			} while(t.getRemaining() > 0);
+			} while (t.getRemaining() > 0);
 		}
 		
-		if (!PrayerBook.isOpen()) {
-			PrayerBook.open();
-			sleep(80, 100);
+		turnOffPrayerEagle();
+	}
+	
+	public void turnOffPrayerEagle(){
+		if (Prayer.isPrayerEnabled(PRAYERS.EAGLE_EYE)){//.isQuickPrayerEnabled(PRAYERS.EAGLE_EYE)){
+			//Options.setQuickPrayersOn(false);
+			if(!Prayer.isTabOpen()) GameTab.open(TABS.PRAYERS);
+			sleep(200,250);
+			Prayer.disable(PRAYERS.EAGLE_EYE);
+			sleep(800,1000);
 		}
-		if (PrayerBook.activate(Prayer.EAGLE_EYE, PrayerState.DEACTIVATED));
-			sleep(80, 100);
-		
-		
 	}
 	
 	public boolean checkRare() {
@@ -1195,12 +1194,8 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 	}
 	
 	public void turnOffAllPrayers(){
-		while (!PrayerBook.getActive().isEmpty()){
-			if(GameTab.getOpen() != GameTab.TABS.PRAYERS){
-				GameTab.open(TABS.PRAYERS);
-				sleep(200,300);
-			}
-			PrayerBook.getActive().get(0).click();
+		while (Prayer.getCurrentPrayers().length > 0){
+			Prayer.disable(Prayer.getCurrentPrayers()[0]);
 			sleep(200,300);
 		}
 	}
@@ -1333,34 +1328,22 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 	}
 	
 	public void activateProtectMage(){
-		
-		ArrayList<Prayer> list = PrayerBook.getActive();
-		if(list.isEmpty()){
-			gotoTab(GameTab.TABS.PRAYERS);
-			PrayerBook.activate(Prayer.PROTECT_FROM_MAGIC);
-		}
-		else if (list.size() == 1 && list.get(0) != Prayer.PROTECT_FROM_MAGIC){
-			turnOffAllPrayers();
-			gotoTab(GameTab.TABS.PRAYERS);
-			PrayerBook.activate(Prayer.PROTECT_FROM_MAGIC);
+		openPrayers();
+		Prayer.enable(PRAYERS.PROTECT_FROM_MAGIC);
+		sleep(200,300);
+	}
+	
+	public void openPrayers(){
+		if(!Prayer.isTabOpen()){
+			GameTab.open(TABS.PRAYERS);
+			sleep(200,250);
 		}
 	}
 	
 	public void activateProtectRanged(){
-		
-		ArrayList<Prayer> list = PrayerBook.getActive();
-		if(list.isEmpty()){
-			gotoTab(GameTab.TABS.PRAYERS);
-			PrayerBook.activate(Prayer.PROTECT_FROM_MISSILES);
-		}
-		else if (list.size() == 1 && list.get(0) != Prayer.PROTECT_FROM_MISSILES){
-			turnOffAllPrayers();
-			gotoTab(GameTab.TABS.PRAYERS);
-			PrayerBook.activate(Prayer.PROTECT_FROM_MISSILES);
-		}
-		
-		//PrayerBook.activate(Prayer.PROTECT_FROM_MISSILES);
-		//sleep(200,300);
+		openPrayers();
+		Prayer.enable(PRAYERS.PROTECT_FROM_MISSILES);
+		sleep(200,300);
 	}
 	
 	public void reactivatePrayer(int option){

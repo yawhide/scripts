@@ -575,6 +575,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 					if (currP < pt * 2) {
 						println("potting prayer, pt is: " + pt);
 
+						Clicking.hover(Banking.find(ppot));
 						Banking.withdraw(1, ppot);
 						sleep(600, 640);
 						Banking.close();

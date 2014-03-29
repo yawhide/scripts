@@ -9,12 +9,13 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Locale;
+
 import org.tribot.api.interfaces.Positionable;
+import org.tribot.api.Clicking;
 import org.tribot.api.DynamicClicking;
 import org.tribot.api.General;
 import org.tribot.api.Timing;
@@ -58,11 +59,9 @@ import org.tribot.script.ScriptManifest;
 import org.tribot.script.interfaces.Ending;
 import org.tribot.script.interfaces.MessageListening07;
 import org.tribot.script.interfaces.Painting;
-import org.tribot.script.interfaces.EventBlockingOverride;
 import org.tribot.api2007.ext.Doors;
-import org.tribot.api.types.generic.KillLoopException;
 
-@ScriptManifest(authors = { "Yaw hide" }, version = 0.58, category = "Slayer", name = "Yaw hide's Easy Slayer")
+@ScriptManifest(authors = { "Yaw hide" }, version = 0.6, category = "Slayer", name = "Yaw hide's Easy Slayer", description="local version")
 public class TuraelSlayer extends Script implements MessageListening07, Painting, Ending{
 	
 	//food Ids
@@ -408,30 +407,35 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 			switch(destination){
 			case 0:
 				if(vtab.length == 0){
+					Clicking.hover(Banking.find(VTAB));
 					Banking.withdraw(10, VTAB);
 					sleep(200,300);
 				}
 				break;
 			case 1:
 				if(ftab.length == 0){
+					Clicking.hover(Banking.find(FTAB));
 					Banking.withdraw(10, FTAB);
 					sleep(200,300);
 				}
 				break;
 			case 2:
 				if(ctab.length == 0){
+					Clicking.hover(Banking.find(CTAB));
 					Banking.withdraw(10, CTAB);
 					sleep(200,300);
 				}
 				break;
 			case 3:
 				if(ltab.length == 0){
+					Clicking.hover(Banking.find(LTAB));
 					Banking.withdraw(10, LTAB);
 					sleep(200,300);
 				}
 				break;
 			case 4:
 				if(atab.length == 0){
+					Clicking.hover(Banking.find(ATAB));
 					Banking.withdraw(10, ATAB);
 					sleep(200,300);
 				}
@@ -443,20 +447,24 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 			case 0:
 				if(useTabV){
 					if(vtab.length == 0){
+						Clicking.hover(Banking.find(VTAB));
 						Banking.withdraw(10, VTAB);
 						sleep(200,300);
 					}
 				}
 				else {
 					if(!haveRune(1)){
+						Clicking.hover(Banking.find(LAW));
 						Banking.withdraw(10, LAW);
 						sleep(200,300);
 					}
 					if(!haveRune(2)){
+						Clicking.hover(Banking.find(AIR));
 						Banking.withdraw(30, AIR);
 						sleep(200,300);
 					}
 					if(!haveRune(3)){
+						Clicking.hover(Banking.find(FIRE));
 						Banking.withdraw(10, FIRE);
 						sleep(200,300);
 					}
@@ -465,20 +473,24 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 			case 1: 
 				if(useTabF){
 				if(ftab.length == 0){
+					Clicking.hover(Banking.find(FTAB));
 					Banking.withdraw(10, FTAB);
 					sleep(200,300);
 				}
 				}
 				else{
 					if(!haveRune(1)){
+						Clicking.hover(Banking.find(LAW));
 						Banking.withdraw(10, LAW);
 						sleep(200,300);
 					}
 					if(!haveRune(2)){
+						Clicking.hover(Banking.find(AIR));
 						Banking.withdraw(10, AIR);
 						sleep(200,300);
 					}
 					if(!haveRune(4)){
+						Clicking.hover(Banking.find(WATER));
 						Banking.withdraw(10, WATER);
 						sleep(200,300);
 					}
@@ -487,16 +499,19 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 			case 2:
 				if(useTabC){
 				if(ctab.length == 0){
+					Clicking.hover(Banking.find(CTAB));
 					Banking.withdraw(10, CTAB);
 					sleep(200,300);
 				}
 				}
 				else {
 					if(!haveRune(1)){
+						Clicking.hover(Banking.find(LAW));
 						Banking.withdraw(10, LAW);
 						sleep(200,300);
 					}
 					if (!haveRune(2)){
+						Clicking.hover(Banking.find(AIR));
 						Banking.withdraw(10, AIR);
 						sleep(200,300);	
 					}
@@ -511,15 +526,15 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 				}
 				else{ 
 					if(!haveRune(1)){ 
-						Banking.withdraw(10, LAW);
+						Clicking.hover(Banking.find(LAW));Banking.withdraw(10, LAW);
 						sleep(200,300);
 					}
 					if(!haveRune(2)){
-						Banking.withdraw(10, AIR);
+						Clicking.hover(Banking.find(AIR));Banking.withdraw(10, AIR);
 						sleep(200,300);
 					}
 					if(!haveRune(0)){
-						Banking.withdraw(10, EARTH);
+						Clicking.hover(Banking.find(EARTH));Banking.withdraw(10, EARTH);
 						sleep(200,300);
 					}
 				}
@@ -528,17 +543,17 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 				
 				if(useTabA){
 					if (atab.length == 0) {
-						Banking.withdraw(10, ATAB);
+						Clicking.hover(Banking.find(ATAB));Banking.withdraw(10, ATAB);
 						sleep(200, 300);
 					}
 				}
 				else{ 
 					if(!haveRune(1)){ 
-						Banking.withdraw(10, LAW);
+						Clicking.hover(Banking.find(LAW));Banking.withdraw(10, LAW);
 						sleep(200,300);
 					}
 					if (!haveRune(4)){
-						Banking.withdraw(10, WATER);
+						Clicking.hover(Banking.find(WATER));Banking.withdraw(10, WATER);
 						sleep(200,300);	
 					}
 				}
@@ -1238,17 +1253,17 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 		sleep(200,300);
 		println("step 1");
 		if (games.length == 0){
-			Banking.withdraw(1, gamesNecklace);
+			Clicking.hover(Banking.find(gamesNecklace));Banking.withdraw(1, gamesNecklace);
 			sleep(200,300);
 		}
 		if (food.length < 10){
 			println("step 2");
-			Banking.withdraw(10-food.length, foodID);
+			Clicking.hover(Banking.find(foodID));Banking.withdraw(10-food.length, foodID);
 			sleep(200,300);
 		}
 		
 		if(gem.length == 0){
-			Banking.withdraw(1, slayGem);
+			Clicking.hover(Banking.find(slayGem));Banking.withdraw(1, slayGem);
 			sleep(200,300);
 		}
 		
@@ -1260,11 +1275,11 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 			
 			if(ecto.length == 0){
 				
-				Banking.withdraw(1, ECTO);
+				Clicking.hover(Banking.find(ECTO));Banking.withdraw(1, ECTO);
 				sleep(200,300);
 			}
 			if(!checkForHelm(1) && earmuffs.length == 0){
-				Banking.withdraw(1, EARMUFFS);
+				Clicking.hover(Banking.find(EARMUFFS));Banking.withdraw(1, EARMUFFS);
 				sleep(200,300);
 			}
 				
@@ -1286,11 +1301,11 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 		else if (currTask.equals("cave_bugs")){
 			if(tinder.length == 0 && lightsource.length == 0 && spiny.length == 0){
 				
-				Banking.withdraw(1, lightsources);
+				Clicking.hover(Banking.find(lightsources));Banking.withdraw(1, lightsources);
 				sleep(200,300);
-				Banking.withdraw(1, SPINY);
+				Clicking.hover(Banking.find(SPINY));Banking.withdraw(1, SPINY);
 				sleep(200,300);
-				Banking.withdraw(1, TINDER);
+				Clicking.hover(Banking.find(TINDER));Banking.withdraw(1, TINDER);
 				sleep(200,300);
 			}
 			withdrawTabOrRune(3);
@@ -1303,24 +1318,24 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 			
 			if (anti.length < 2 ){
 				
-				Banking.withdraw(1, antiPoison);
+				Clicking.hover(Banking.find(antiPoison));Banking.withdraw(1, antiPoison);
 				sleep(200,300);
-				Banking.withdraw(1, antiPoison);
+				Clicking.hover(Banking.find(antiPoison));Banking.withdraw(1, antiPoison);
 				sleep(200,300);
 			}
 		}
 		else if (currTask.equals( "cave_slimes")){
 			if(tinder.length == 0 && lightsource.length == 0 && anti.length == 0 && spiny.length == 0){
 				
-				Banking.withdraw(1, lightsources);
+				Clicking.hover(Banking.find(lightsources));Banking.withdraw(1, lightsources);
 				sleep(200,300);
-				Banking.withdraw(1, antiPoison);
+				Clicking.hover(Banking.find(antiPoison));Banking.withdraw(1, antiPoison);
 				sleep(200,300);
-				Banking.withdraw(1, antiPoison);
+				Clicking.hover(Banking.find(antiPoison));Banking.withdraw(1, antiPoison);
 				sleep(200,300);
-				Banking.withdraw(1, SPINY);
+				Clicking.hover(Banking.find(SPINY));Banking.withdraw(1, SPINY);
 				sleep(200,300);
-				Banking.withdraw(1, TINDER);
+				Clicking.hover(Banking.find(TINDER));Banking.withdraw(1, TINDER);
 				sleep(200,300);
 			}
 			withdrawTabOrRune(3);
@@ -1334,7 +1349,7 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 		}
 		else if (currTask.equals( "crawling_hands")){ 
 			if(ecto.length == 0){
-				Banking.withdraw(1, ECTO);
+				Clicking.hover(Banking.find(ECTO));Banking.withdraw(1, ECTO);
 				sleep(200,300);
 			}
 				
@@ -1376,13 +1391,13 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 		}
 		else if (currTask.equals("kalphite")){ 
 			if(ROPE.length == 0 && waterskin.length == 0 && shanty.length == 0){
-				Banking.withdraw(1, rope);
+				Clicking.hover(Banking.find(rope));Banking.withdraw(1, rope);
 				sleep(200,300);
-				Banking.withdraw(1, WATERSKIN);
+				Clicking.hover(Banking.find(WATERSKIN));Banking.withdraw(1, WATERSKIN);
 				sleep(200,300);
-				Banking.withdraw(5, SHANTY);
+				Clicking.hover(Banking.find(SHANTY));Banking.withdraw(5, SHANTY);
 				sleep(200,300);
-				Banking.withdraw(1, rod);
+				Clicking.hover(Banking.find(rod));Banking.withdraw(1, rod);
 				sleep(200,300);
 			}
 				
@@ -1401,12 +1416,12 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 			
 			if (coins.length > 0){
 				if(coins[0].getStack() < 10000){
-					Banking.withdraw(10000, COINS);
+					Clicking.hover(Banking.find(COINS));Banking.withdraw(10000, COINS);
 					sleep(200,300);
 				}
 			}
 			else{
-				Banking.withdraw(10000, COINS);
+				Clicking.hover(Banking.find(COINS));Banking.withdraw(10000, COINS);
 				sleep(200,300);
 			}
 				
@@ -1420,7 +1435,7 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 		}
 		else if (currTask.equals( "scorpions")){
 			if(ROD.length == 0){
-				Banking.withdraw(1, rod);
+				Clicking.hover(Banking.find(rod));Banking.withdraw(1, rod);
 				sleep(200,300);
 			}
 			
@@ -1441,7 +1456,7 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 		}
 		else if (currTask.equals( "werewolves")){
 			if(ecto.length == 0){
-				Banking.withdraw(1, ECTO);
+				Clicking.hover(Banking.find(ECTO));Banking.withdraw(1, ECTO);
 				sleep(200,300);
 			}
 				
@@ -1455,13 +1470,13 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 		}
 		else if (currTask.equals( "desert_lizards")){
 			if(ROD.length == 0 && waterskin.length == 0 && shanty.length == 0 && cooler.length < numLeftToKill+10){
-				Banking.withdraw(1, rod);
+				Clicking.hover(Banking.find(rod));Banking.withdraw(1, rod);
 				sleep(200,300);
-				Banking.withdraw(8, WATERSKIN);
+				Clicking.hover(Banking.find(WATERSKIN));Banking.withdraw(8, WATERSKIN);
 				sleep(200,300);
-				Banking.withdraw(5, SHANTY);
+				Clicking.hover(Banking.find(SHANTY));Banking.withdraw(5, SHANTY);
 				sleep(200,300);
-				Banking.withdraw(numLeftToKill + 30, COOLER);
+				Clicking.hover(Banking.find(COOLER));Banking.withdraw(numLeftToKill + 30, COOLER);
 				sleep(200,300);
 			}
 				
@@ -4671,10 +4686,6 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 	
 	class EasySlayerGui extends javax.swing.JFrame {
 
-	    /**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
 		/**
 	     * Creates new form EasySlayerGui
 	     */
@@ -4942,41 +4953,6 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 	    	sleep(200,300);
 	    }                                             
 
-	    /**
-	     * @param args the command line arguments
-	     */
-	    /*
-	    public static void main(String args[]) {
-	        /* Set the Nimbus look and feel */
-	        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-	        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-	         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-	         
-	        try {
-	            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-	                if ("Nimbus".equals(info.getName())) {
-	                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-	                    break;
-	                }
-	            }
-	        } catch (ClassNotFoundException ex) {
-	            java.util.logging.Logger.getLogger(EasySlayerGui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-	        } catch (InstantiationException ex) {
-	            java.util.logging.Logger.getLogger(EasySlayerGui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-	        } catch (IllegalAccessException ex) {
-	            java.util.logging.Logger.getLogger(EasySlayerGui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-	        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-	            java.util.logging.Logger.getLogger(EasySlayerGui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-	        }
-	        //</editor-fold>
-
-	        /* Create and display the form 
-	        java.awt.EventQueue.invokeLater(new Runnable() {
-	            public void run() {
-	                new EasySlayerGui().setVisible(true);
-	            }
-	        });
-	    }*/
 	    // Variables declaration - do not modify     
 	    private javax.swing.ButtonGroup buttonGroup1;
 	    private javax.swing.JRadioButton doNotLoot;
