@@ -274,6 +274,12 @@ public class BDK extends Script implements Painting, Pausing {
 				scriptStatus = false;
 			}
 			
+			if(Equipment.getItem(SLOTS.ARROW).getStack() < 100){
+				println("Ran out of bolts");
+				emergTele();
+				scriptStatus = false;
+			}
+			
 			if(Game.getRunEnergy() > 50) {
 			    Options.setRunOn(true);
 			}
