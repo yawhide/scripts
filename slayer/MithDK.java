@@ -146,10 +146,8 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 			};
 	int[] badLoot = {443, 1462,
 			892, 811, 817, };
-	
 	int[] conditionalLoot = { 385, 11497, 11499, 11465, 
 			11467, 11465, 11467 };
-	
 	int[] clue = {2722, 2723, 2725, 2727, 2729, 2731, 2733, 2725, 2737, 2739, 2741,
 			2743, 2745, 2747, 2773, 2774, 2776, 2778, 2780, 2782, 2783, 2785,
 			2786, 2788, 2790, 2792, 2793, 2794, 2796, 2797, 2799, 3520, 3522,
@@ -217,6 +215,8 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 		WebWalking.setUseRun(true);
 		
 		useSpecialBolts = false;
+		addyBolt = 11875; // broad bolts
+		diamondEBolt = 11875;
 		
 		if((!lumbyArea.contains(pos()) || !chestA.contains(pos())) && haveGear()){
 			bankStatus = false;
@@ -421,11 +421,7 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 		for(int i = 0; i < 4; i++){
 			g.drawString(type[i] + ": " + Skills.getCurrentLevel(Names[i]) 
 					+ "/" + Skills.getActualLevel(Names[i]),  x,  y-(i*15));
-		}
-		
-		
-        
-		
+		}		
 		int x1 = 0;
 		for (int i = 0; i < XP.length; i++) {
 			if (XP[i] != Skills.getXP(Names[i])) {
@@ -452,23 +448,16 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 			
 			g.setColor(new Color(0, 0, 0));
 			g.drawString(Percentage + "% to " + NXT_LVL, x2+25, y1 + 9);
-			
-
-			
 			x1 += 15;
 			}
 		}
-		
 	}
-
-	  
 	
 	@Override
 	public void onEnd() {
 		// TODO onEnd()
-		
 	}
-
+	
 	public void stepDownToGD(){
 		if(Camera.getCameraAngle() < 90){
 			Camera.setCameraAngle(General.random(90, 100));
@@ -583,7 +572,6 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 	}
 	
 	public void useWhirpool(){
-		//RSObject[] WHIRLPOOL = Objects.getAt(whirlpoolT);//.findNearest(10, "Whirlpool");
 		Point p = Projection.tileToScreen(whirlpoolT, 0);
 		
 		Camera.turnToTile(whirlpoolT);
@@ -604,34 +592,6 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 			}, General.random(5000, 6000));
 			sleep(5000,6200);
 		}
-		/*for(int i = 0; i < 50; i++){
-			if(Player.getAnimation() == 6723){
-				
-			}
-			sleep(200);
-		}*/
-		
-		
-		/*
-		if(WHIRLPOOL.length > 0){
-			if(WHIRLPOOL[0].isOnScreen()){
-				if(DynamicClicking.clickRSObject(WHIRLPOOL[0],  "Dive in")){
-					Timing.waitCondition(new Condition() {
-						;
-						@Override
-						public boolean active() {
-							return !afterWhirlpool.contains(pos());
-						}
-					}, General.random(16000, 17000));
-					sleep(5000,6200);
-				}
-			}
-			else{
-				Camera.turnToTile(whirlpoolT);
-				sleep(200,300);
-				Camera.setCameraAngle(Camera.getTileAngle(whirlpoolT));
-			}
-		}*/
 	}
 	
 	public void openChest(){
