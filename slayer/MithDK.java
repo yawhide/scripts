@@ -568,7 +568,7 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 	public void gotoMith(){
 		
 		Walking.walkPath(toMith);
-			waitIsMovin();
+		waitIsMovin();
 	}
 	
 	public void useWhirpool(){

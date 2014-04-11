@@ -16,6 +16,7 @@ import org.tribot.api.Timing;
 import org.tribot.api.input.Mouse;
 import org.tribot.api.interfaces.Positionable;
 import org.tribot.api.types.generic.Condition;
+import org.tribot.api.util.ABCUtil;
 import org.tribot.api2007.ChooseOption;
 import org.tribot.api2007.Combat;
 import org.tribot.api2007.Equipment;
@@ -196,6 +197,10 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	
 	@Override
 	public void run() {
+		
+		//General.useAntiBanCompliance(true);
+		//ABCUtil abc = new ABCUtil();
+		
 		
 		boltsID = Equipment.getItem(SLOTS.ARROW).getID();
 		if(Skills.getActualLevel(SKILLS.RANGED) < 70){
@@ -928,9 +933,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 				if (Player.getAnimation() != 4230) {
 					sleep(250, 300);
 					Prayer.enable(PRAYERS.EAGLE_EYE);
-					//Options.setQuickPrayersOn(true);
-				} else if (Prayer.isPrayerEnabled(PRAYERS.EAGLE_EYE)){//.isQuickPrayerEnabled(PRAYERS.EAGLE_EYE)) {
-					//Options.setQuickPrayersOn(false);
+				} else if (Prayer.isPrayerEnabled(PRAYERS.EAGLE_EYE)){
 					Prayer.disable(PRAYERS.EAGLE_EYE);
 					sleep(350, 400);
 				} else {
@@ -946,14 +949,12 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		fightStatus = "prayerflicking";
 		if(!isLoot() && isRanging() && inAviesSpot() && getHp() > 30){
 			prayerflick();
-			//sleep(500, 600);
 		}
 		turnOffPrayerEagle();
 	}
 	
 	public void turnOffPrayerEagle(){
-		if (Prayer.isPrayerEnabled(PRAYERS.EAGLE_EYE)){//.isQuickPrayerEnabled(PRAYERS.EAGLE_EYE)){
-			//Options.setQuickPrayersOn(false);
+		if (Prayer.isPrayerEnabled(PRAYERS.EAGLE_EYE)){
 			if(!Prayer.isTabOpen()) GameTab.open(TABS.PRAYERS);
 			sleep(200,250);
 			Prayer.disable(PRAYERS.EAGLE_EYE);
@@ -970,7 +971,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	}
 	
 	public boolean inAviesSpot(){
-		return inArea(aviesArea);// || inArea(neSSArea);//inArea(sSSArea) || 
+		return inArea(aviesArea);
 	}
 	
 	public boolean inArea(RSArea a) {

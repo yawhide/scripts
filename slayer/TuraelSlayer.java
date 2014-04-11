@@ -13,7 +13,6 @@ import java.awt.image.BufferedImage;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Locale;
-
 import org.tribot.api.interfaces.Positionable;
 import org.tribot.api.Clicking;
 import org.tribot.api.DynamicClicking;
@@ -61,10 +60,11 @@ import org.tribot.script.interfaces.MessageListening07;
 import org.tribot.script.interfaces.Painting;
 import org.tribot.api2007.ext.Doors;
 
-@ScriptManifest(authors = { "Yaw hide" }, version = 0.6, category = "Slayer", name = "Yaw hide's Easy Slayer", description="local version")
-public class TuraelSlayer extends Script implements MessageListening07, Painting, Ending{
+@ScriptManifest(authors = { "Yaw hide" }, version = 0.61, category = "Slayer", name = "Yaw hide's Easy Slayer", description="local version easy")
+public class TuraelSlayer extends Script implements MessageListening07, Painting{
 	
 	//food Ids
+	
 	//int[] foodID = {333, 379};
 	int[] foodID = { 333, 329, 379, 361, 7946, 1897 };
 	int[] junk = { 886, 1539, 9003, 229, 1623, 1355, 440, 7767, 117,
@@ -130,25 +130,7 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 	};
 	
 	
-	//TODO LOOT()
-	public void LOOT(){
-		RSGroundItem[] Nests = GroundItems.findNearest(loot);
-		
-		if (!Inventory.isFull() && Nests.length > 0) {
-			if(checkLootInArea(Nests[0])){
-				if (!Nests[0].isOnScreen()) {
-					Walking.clickTileMM(Nests[0].getPosition(), 1);
-					sleep(100, 150);
-					Camera.turnToTile(Nests[0].getPosition());
-					sleep(200, 300);
-					waitIsMovin();
-				}
-				String str = map.get(Nests[0].getID());
-				Nests[0].click("Take " + str);
-				waitForInv(Nests[0].getID());
-			}
-		}
-	}
+	
 	
 	
 	HashMap<Integer, String> map = new HashMap<Integer, String>(loot.length);
@@ -156,30 +138,33 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 	//slayer items
 	int slayGem = 4155;
 	int COINS = 995;
-	int VTAB = 8007;
-	int FTAB = 8009;
-	int CTAB = 8010;
-	int LTAB = 8008;
-	int ATAB = 8011;
+	static int VTAB = 8007;
+	static int FTAB = 8009;
+	static int CTAB = 8010;
+	static int LTAB = 8008;
+	static int ATAB = 8011;
 	int EARMUFFS = 4166;
 	int TINDER = 590;
 	int SALT = 4161;
 	int SPINY = 4551;
-	int LAW = 563;
-	int EARTH = 557;
-	int AIR = 556;
-	int WATER = 555;
-	int FIRE = 554;
+	static int LAW = 563;
+	static int EARTH = 557;
+	static int AIR = 556;
+	static int WATER = 555;
+	static int FIRE = 554;
 	int[] WATERSKIN = {1823, 1825, 1827, 1829};
 	int COOLER = 6696;
 	int ECTO = 4251;
 	int rope = 954;
 	int SHANTY = 1854;
-	
-	//kalphites 40exp
-	
-	
-	
+	boolean waitGUI = true;
+	boolean LootEverythingIncludingNonStacks = true;
+	boolean LootOnlyStacksAndHighValueDrops = false;
+	boolean LootOnlyHighValueDrops = false;
+	boolean DoNotLoot = false;
+	boolean UseRunesToTele = false;
+	boolean PureMode = false;
+		
 	RSTile shantyBankTile = new RSTile(3309, 3120, 0);
 	
 	//antiban stuff
@@ -201,7 +186,7 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 
 	@Override
 	public void run() {
-		
+		println("before onstart");
 		onStart();
 		
 		
@@ -309,21 +294,35 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 			sleep(50,100);
 		}
 		
+		
 	}
 
+	//TODO LOOT()
+		public void LOOT(){
+			RSGroundItem[] Nests = GroundItems.findNearest(loot);
+			
+			if (!Inventory.isFull() && Nests.length > 0) {
+				if(checkLootInArea(Nests[0])){
+					if (!Nests[0].isOnScreen()) {
+						Walking.clickTileMM(Nests[0].getPosition(), 1);
+						sleep(100, 150);
+						Camera.turnToTile(Nests[0].getPosition());
+						sleep(200, 300);
+						waitIsMovin();
+					}
+					String str = map.get(Nests[0].getID());
+					Nests[0].click("Take " + str);
+					waitForInv(Nests[0].getID());
+				}
+			}
+		}
 	
-	public boolean waitGUI = true;
-	public boolean LootEverythingIncludingNonStacks = true;
-	public boolean LootOnlyStacksAndHighValueDrops = false;
-	public boolean LootOnlyHighValueDrops = false;
-	public boolean DoNotLoot = false;
-	public boolean UseRunesToTele = false;
-	public boolean PureMode = false;
 	
 	//TODO onStart
 	public void onStart(){
 		println("Before gui");
-		EasySlayerGui g = new EasySlayerGui();
+		
+		TuraelSlayerGUI g = new TuraelSlayerGUI();
 		
 		g.setVisible(true);
 		println("After gui");
@@ -332,8 +331,8 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 			println("waiting for gui to close");
 		}
 		g.setVisible(false);
-		useTabs = !UseRunesToTele;
 		
+		useTabs = !UseRunesToTele;
 		
 		Mouse.setSpeed(General.random(150, 170));
 		sleep(200,300);
@@ -343,260 +342,22 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 		sleep(200, 250);
 		
 		
-		checkMagicLevel();
+		TabChecking.checkMagicLevel();
 		sleep(100, 150);
 		
 		getNumSlayTask();
 		sleep(500,600);
 		
 		YawhideHelper.setupYawhideHelper();
-		sleep(500,600);
-		
-		
+		sleep(500,600);		
 	}
 	
-	boolean useTabV = true;
-	boolean useTabF = true;
-	boolean useTabC = true;
-	boolean useTabL = true;
-	boolean useTabA = true;
-	boolean useTabs;
-	//TODO checkMagicLevel
-	public void checkMagicLevel(){
-		int lv = Skills.getCurrentLevel(SKILLS.MAGIC);
-		if(!useTabs){
-			if (lv < 31 && lv >= 25){
-				useTabV = false;
-			}
-			else if (lv < 37){
-				useTabV = false;
-				useTabL = false;
-			}
-			else if (lv < 45){
-				useTabV = false;
-				useTabL = false;
-				useTabF = false;
-			}
-			else if (lv < 51){
-				useTabV = false;
-				useTabL = false;
-				useTabF = false;
-				useTabC = false;
-			}
-			else if (lv >= 51){
-				useTabV = false;
-				useTabL = false;
-				useTabF = false;
-				useTabC = false;
-				useTabA = false;
-			}
-			else
-				useTabs = true;
-		}
-	}
-
-	public void withdrawTabOrRune(int destination){ // 0 is V, 1 is F, 2 is C, 3 is L, 4 is A
-		
-		RSItem[] vtab = Inventory.find(VTAB);
-		RSItem[] ftab = Inventory.find(FTAB);
-		RSItem[] ctab = Inventory.find(CTAB);
-		RSItem[] ltab = Inventory.find(LTAB);
-		RSItem[] atab = Inventory.find(ATAB);
-		
-		if(useTabs){
-			switch(destination){
-			case 0:
-				if(vtab.length == 0){
-					Clicking.hover(Banking.find(VTAB));
-					Banking.withdraw(10, VTAB);
-					sleep(200,300);
-				}
-				break;
-			case 1:
-				if(ftab.length == 0){
-					Clicking.hover(Banking.find(FTAB));
-					Banking.withdraw(10, FTAB);
-					sleep(200,300);
-				}
-				break;
-			case 2:
-				if(ctab.length == 0){
-					Clicking.hover(Banking.find(CTAB));
-					Banking.withdraw(10, CTAB);
-					sleep(200,300);
-				}
-				break;
-			case 3:
-				if(ltab.length == 0){
-					Clicking.hover(Banking.find(LTAB));
-					Banking.withdraw(10, LTAB);
-					sleep(200,300);
-				}
-				break;
-			case 4:
-				if(atab.length == 0){
-					Clicking.hover(Banking.find(ATAB));
-					Banking.withdraw(10, ATAB);
-					sleep(200,300);
-				}
-				break;
-			}
-		}
-		else{
-			switch(destination){
-			case 0:
-				if(useTabV){
-					if(vtab.length == 0){
-						Clicking.hover(Banking.find(VTAB));
-						Banking.withdraw(10, VTAB);
-						sleep(200,300);
-					}
-				}
-				else {
-					if(!haveRune(1)){
-						Clicking.hover(Banking.find(LAW));
-						Banking.withdraw(10, LAW);
-						sleep(200,300);
-					}
-					if(!haveRune(2)){
-						Clicking.hover(Banking.find(AIR));
-						Banking.withdraw(30, AIR);
-						sleep(200,300);
-					}
-					if(!haveRune(3)){
-						Clicking.hover(Banking.find(FIRE));
-						Banking.withdraw(10, FIRE);
-						sleep(200,300);
-					}
-				}
-				break;
-			case 1: 
-				if(useTabF){
-				if(ftab.length == 0){
-					Clicking.hover(Banking.find(FTAB));
-					Banking.withdraw(10, FTAB);
-					sleep(200,300);
-				}
-				}
-				else{
-					if(!haveRune(1)){
-						Clicking.hover(Banking.find(LAW));
-						Banking.withdraw(10, LAW);
-						sleep(200,300);
-					}
-					if(!haveRune(2)){
-						Clicking.hover(Banking.find(AIR));
-						Banking.withdraw(10, AIR);
-						sleep(200,300);
-					}
-					if(!haveRune(4)){
-						Clicking.hover(Banking.find(WATER));
-						Banking.withdraw(10, WATER);
-						sleep(200,300);
-					}
-				}
-				break;
-			case 2:
-				if(useTabC){
-				if(ctab.length == 0){
-					Clicking.hover(Banking.find(CTAB));
-					Banking.withdraw(10, CTAB);
-					sleep(200,300);
-				}
-				}
-				else {
-					if(!haveRune(1)){
-						Clicking.hover(Banking.find(LAW));
-						Banking.withdraw(10, LAW);
-						sleep(200,300);
-					}
-					if (!haveRune(2)){
-						Clicking.hover(Banking.find(AIR));
-						Banking.withdraw(10, AIR);
-						sleep(200,300);	
-					}
-				}
-				break;
-			case 3:
-				if(useTabL){
-				if(ltab.length == 0){
-					Banking.withdraw(10, LTAB);
-					sleep(200,300);
-				}
-				}
-				else{ 
-					if(!haveRune(1)){ 
-						Clicking.hover(Banking.find(LAW));Banking.withdraw(10, LAW);
-						sleep(200,300);
-					}
-					if(!haveRune(2)){
-						Clicking.hover(Banking.find(AIR));Banking.withdraw(10, AIR);
-						sleep(200,300);
-					}
-					if(!haveRune(0)){
-						Clicking.hover(Banking.find(EARTH));Banking.withdraw(10, EARTH);
-						sleep(200,300);
-					}
-				}
-				break;
-			case 4:
-				
-				if(useTabA){
-					if (atab.length == 0) {
-						Clicking.hover(Banking.find(ATAB));Banking.withdraw(10, ATAB);
-						sleep(200, 300);
-					}
-				}
-				else{ 
-					if(!haveRune(1)){ 
-						Clicking.hover(Banking.find(LAW));Banking.withdraw(10, LAW);
-						sleep(200,300);
-					}
-					if (!haveRune(4)){
-						Clicking.hover(Banking.find(WATER));Banking.withdraw(10, WATER);
-						sleep(200,300);	
-					}
-				}
-				break;
-			}
-		}
-	}
-	
-	public boolean haveRune(int option){ 
-		
-		int earth = Inventory.getCount(EARTH);
-		int law = Inventory.getCount(LAW);
-		int air = Inventory.getCount(AIR);
-		int fire = Inventory.getCount(FIRE);
-		int water = Inventory.getCount(WATER);
-		
-		switch(option){
-		case 0:
-			if(earth < 10)
-				return false;
-			break;
-		case 1:
-			if(law < 10)
-				return false;
-			break;
-		case 2:
-			if(air < 10)
-				return false;
-			break;
-		case 3:
-			if(fire < 10)
-				return false;
-			break;
-		case 4:
-			if(water < 10)
-				return false;
-			break;
-		}
-		return true;
-		
-	}
-	
-	
+	static boolean useTabV = true;
+	static boolean useTabF = true;
+	static boolean useTabC = true;
+	static boolean useTabL = true;
+	static boolean useTabA = true;
+	static boolean useTabs;
 	
 	public void useGameNeck(){
 		state="Using games Neck";
@@ -1230,14 +991,11 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 		
 		
 		RSItem[] coins = Inventory.find(COINS);
-		//RSItem[] ltab = Inventory.find(LTAB);
-		//RSItem[] atab = Inventory.find(ATAB);
 		RSItem[] gem = Inventory.find(slayGem);
 		RSItem[] earmuffs = Inventory.find(EARMUFFS);
 		RSItem[] lightsource = Inventory.find(lightsources);
 		
 		RSItem[] tinder = Inventory.find(TINDER);
-		//RSItem[] salt = Inventory.find(SALT);
 		RSItem[] spiny = Inventory.find(SPINY);
 		RSItem[] waterskin = Inventory.find(WATERSKIN);
 		RSItem[] cooler = Inventory.find(COOLER);
@@ -1249,25 +1007,22 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 		RSItem[] anti = Inventory.find(antiPoison);
 		RSItem[] shanty = Inventory.find(SHANTY);
 		
-		Mouse.clickBox(471, 78, 478, 84, 1);
-		sleep(200,300);
-		println("step 1");
+			
 		if (games.length == 0){
-			Clicking.hover(Banking.find(gamesNecklace));Banking.withdraw(1, gamesNecklace);
+			Banking.withdraw(1, gamesNecklace);
 			sleep(200,300);
 		}
 		if (food.length < 10){
-			println("step 2");
-			Clicking.hover(Banking.find(foodID));Banking.withdraw(10-food.length, foodID);
+			Banking.withdraw(10-food.length, foodID);
 			sleep(200,300);
 		}
 		
 		if(gem.length == 0){
-			Clicking.hover(Banking.find(slayGem));Banking.withdraw(1, slayGem);
+			Banking.withdraw(1, slayGem);
 			sleep(200,300);
 		}
 		
-		withdrawTabOrRune(0);
+		TabChecking.withdrawTabOrRune(0);
 		sleep(200,300);
 		
 		
@@ -1275,215 +1030,215 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 			
 			if(ecto.length == 0){
 				
-				Clicking.hover(Banking.find(ECTO));Banking.withdraw(1, ECTO);
+				Banking.withdraw(1, ECTO);
 				sleep(200,300);
 			}
 			if(!checkForHelm(1) && earmuffs.length == 0){
-				Clicking.hover(Banking.find(EARMUFFS));Banking.withdraw(1, EARMUFFS);
+				Banking.withdraw(1, EARMUFFS);
 				sleep(200,300);
 			}
 				
 		}
 		else if (currTask.equals( "bats")){
-			withdrawTabOrRune(1);
+			TabChecking.withdrawTabOrRune(1);
 			sleep(200,300);
 		}
 		else if (currTask.equals( "bears")){
-			withdrawTabOrRune(4);
+			TabChecking.withdrawTabOrRune(4);
 			sleep(200,300);
 			
 				
 		}
 		else if (currTask.equals( "birds")){ // no idea atm
-				withdrawTabOrRune(4);
+				TabChecking.withdrawTabOrRune(4);
 				sleep(200,300);
 		}
 		else if (currTask.equals("cave_bugs")){
 			if(tinder.length == 0 && lightsource.length == 0 && spiny.length == 0){
 				
-				Clicking.hover(Banking.find(lightsources));Banking.withdraw(1, lightsources);
+				Banking.withdraw(1, lightsources);
 				sleep(200,300);
-				Clicking.hover(Banking.find(SPINY));Banking.withdraw(1, SPINY);
+				Banking.withdraw(1, SPINY);
 				sleep(200,300);
-				Clicking.hover(Banking.find(TINDER));Banking.withdraw(1, TINDER);
+				Banking.withdraw(1, TINDER);
 				sleep(200,300);
 			}
-			withdrawTabOrRune(3);
+			TabChecking.withdrawTabOrRune(3);
 			sleep(200,300);
 		}
 		else if (currTask.equals( "cave_crawlers")){
 			
-				withdrawTabOrRune(2);
+				TabChecking.withdrawTabOrRune(2);
 				sleep(200,300);
 			
 			if (anti.length < 2 ){
 				
-				Clicking.hover(Banking.find(antiPoison));Banking.withdraw(1, antiPoison);
+				Banking.withdraw(1, antiPoison);
 				sleep(200,300);
-				Clicking.hover(Banking.find(antiPoison));Banking.withdraw(1, antiPoison);
+				Banking.withdraw(1, antiPoison);
 				sleep(200,300);
 			}
 		}
 		else if (currTask.equals( "cave_slimes")){
 			if(tinder.length == 0 && lightsource.length == 0 && anti.length == 0 && spiny.length == 0){
 				
-				Clicking.hover(Banking.find(lightsources));Banking.withdraw(1, lightsources);
+				Banking.withdraw(1, lightsources);
 				sleep(200,300);
-				Clicking.hover(Banking.find(antiPoison));Banking.withdraw(1, antiPoison);
+				Banking.withdraw(1, antiPoison);
 				sleep(200,300);
-				Clicking.hover(Banking.find(antiPoison));Banking.withdraw(1, antiPoison);
+				Banking.withdraw(1, antiPoison);
 				sleep(200,300);
-				Clicking.hover(Banking.find(SPINY));Banking.withdraw(1, SPINY);
+				Banking.withdraw(1, SPINY);
 				sleep(200,300);
-				Clicking.hover(Banking.find(TINDER));Banking.withdraw(1, TINDER);
+				Banking.withdraw(1, TINDER);
 				sleep(200,300);
 			}
-			withdrawTabOrRune(3);
+			TabChecking.withdrawTabOrRune(3);
 			sleep(200,300);
 		}
 		else if (currTask.equals( "cows")){
 			
-				withdrawTabOrRune(1);
+				TabChecking.withdrawTabOrRune(1);
 				sleep(200,300);
 			
 		}
 		else if (currTask.equals( "crawling_hands")){ 
 			if(ecto.length == 0){
-				Clicking.hover(Banking.find(ECTO));Banking.withdraw(1, ECTO);
+				Banking.withdraw(1, ECTO);
 				sleep(200,300);
 			}
 				
 		}
 		else if (currTask.equals( "dogs")){
 		
-				withdrawTabOrRune(4);
+				TabChecking.withdrawTabOrRune(4);
 				sleep(200,300);
 			
 				
 		}
 		else if (currTask.equals( "dwarves")){ 
 			
-				withdrawTabOrRune(0);
+				TabChecking.withdrawTabOrRune(0);
 				sleep(200,300);
 			
 				
 		}
 		else if (currTask.equals( "ghosts")){
 	
-				withdrawTabOrRune(1);
+				TabChecking.withdrawTabOrRune(1);
 				sleep(200,300);
 			
 				
 		}
 		else if (currTask.equals( "goblins")){
 	
-				withdrawTabOrRune(3);
+				TabChecking.withdrawTabOrRune(3);
 				sleep(200,300);
 			
 				
 		}
 		else if (currTask.equals( "icefiends")){
 		
-				withdrawTabOrRune(1);
+				TabChecking.withdrawTabOrRune(1);
 				sleep(200,300);
 			
 				
 		}
 		else if (currTask.equals("kalphite")){ 
 			if(ROPE.length == 0 && waterskin.length == 0 && shanty.length == 0){
-				Clicking.hover(Banking.find(rope));Banking.withdraw(1, rope);
+				Banking.withdraw(1, rope);
 				sleep(200,300);
-				Clicking.hover(Banking.find(WATERSKIN));Banking.withdraw(1, WATERSKIN);
+				Banking.withdraw(1, WATERSKIN);
 				sleep(200,300);
-				Clicking.hover(Banking.find(SHANTY));Banking.withdraw(5, SHANTY);
+				Banking.withdraw(5, SHANTY);
 				sleep(200,300);
-				Clicking.hover(Banking.find(rod));Banking.withdraw(1, rod);
+				Banking.withdraw(1, rod);
 				sleep(200,300);
 			}
 				
 		}
 		else if (currTask.equals( "minotaurs")){ 
 			
-				withdrawTabOrRune(0);
+				TabChecking.withdrawTabOrRune(0);
 				sleep(200,300);
 			
 				
 		}
 		else if (currTask.equals( "monkeys")){
 			
-			withdrawTabOrRune(1);
+			TabChecking.withdrawTabOrRune(1);
 			sleep(200,300);
 			
 			if (coins.length > 0){
 				if(coins[0].getStack() < 10000){
-					Clicking.hover(Banking.find(COINS));Banking.withdraw(10000, COINS);
+					Banking.withdraw(10000, COINS);
 					sleep(200,300);
 				}
 			}
 			else{
-				Clicking.hover(Banking.find(COINS));Banking.withdraw(10000, COINS);
+				Banking.withdraw(10000, COINS);
 				sleep(200,300);
 			}
 				
 		}
 		else if (currTask.equals( "rats")){
 			
-				withdrawTabOrRune(0);
+				TabChecking.withdrawTabOrRune(0);
 				sleep(200,300);
 			
 				
 		}
 		else if (currTask.equals( "scorpions")){
 			if(ROD.length == 0){
-				Clicking.hover(Banking.find(rod));Banking.withdraw(1, rod);
+				Banking.withdraw(1, rod);
 				sleep(200,300);
 			}
 			
 		}
 		else if (currTask.equals( "skeletons")){
 			
-				withdrawTabOrRune(0);
+				TabChecking.withdrawTabOrRune(0);
 				sleep(200,300);
 			
 			
 		}
 		else if (currTask.equals( "spiders")){
 		
-				withdrawTabOrRune(3);
+				TabChecking.withdrawTabOrRune(3);
 				sleep(200,300);
 			
 			
 		}
 		else if (currTask.equals( "werewolves")){
 			if(ecto.length == 0){
-				Clicking.hover(Banking.find(ECTO));Banking.withdraw(1, ECTO);
+				Banking.withdraw(1, ECTO);
 				sleep(200,300);
 			}
 				
 		}
 		else if (currTask.equals( "wolves")){ 
 		
-				withdrawTabOrRune(2);
+				TabChecking.withdrawTabOrRune(2);
 				sleep(200,300);
 			
 				
 		}
 		else if (currTask.equals( "desert_lizards")){
 			if(ROD.length == 0 && waterskin.length == 0 && shanty.length == 0 && cooler.length < numLeftToKill+10){
-				Clicking.hover(Banking.find(rod));Banking.withdraw(1, rod);
+				Banking.withdraw(1, rod);
 				sleep(200,300);
-				Clicking.hover(Banking.find(WATERSKIN));Banking.withdraw(8, WATERSKIN);
+				Banking.withdraw(8, WATERSKIN);
 				sleep(200,300);
-				Clicking.hover(Banking.find(SHANTY));Banking.withdraw(5, SHANTY);
+				Banking.withdraw(5, SHANTY);
 				sleep(200,300);
-				Clicking.hover(Banking.find(COOLER));Banking.withdraw(numLeftToKill + 30, COOLER);
+				Banking.withdraw(numLeftToKill + 30, COOLER);
 				sleep(200,300);
 			}
 				
 		}
 		else if (currTask.equals( "zombies")){ 
 	
-				withdrawTabOrRune(0);
+				TabChecking.withdrawTabOrRune(0);
 				sleep(200,300);
 			
 		}		
@@ -4070,7 +3825,7 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 				} 
 				else if (rightClick) {
 					Mouse.click(3);
-					scripts.slayer.Timer t = new Timer(500);
+					Timer t = new Timer(500);
 					while (t.isRunning() && !ChooseOption.isOpen())
 						sleep(50, 100);
 					if (!ChooseOption.isOpen())
@@ -4683,15 +4438,14 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 	 * 
 	 */
 	
-	
-	class EasySlayerGui extends javax.swing.JFrame {
+	public class TuraelSlayerGUI extends javax.swing.JFrame {
 
-		/**
-	     * Creates new form EasySlayerGui
+	    /**
+	     * Creates new form TuraelSlayerGUI
 	     */
-	    public EasySlayerGui() {
+	    public TuraelSlayerGUI() {
 	        initComponents();
-	        lootEverythingIncludingNonStacks.setSelected(true);
+	        jRadioButton1.setSelected(true);
 	    }
 
 	    /**
@@ -4703,80 +4457,122 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 	    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
 	    private void initComponents() {
 
-	        jPanel1 = new javax.swing.JPanel();
-	        buttonGroup1 = new javax.swing.ButtonGroup();
-	        jLabel1 = new javax.swing.JLabel();
+	        buttonGroup4 = new javax.swing.ButtonGroup();
 	        jTabbedPane1 = new javax.swing.JTabbedPane();
-	        jPanel2 = new javax.swing.JPanel();
-	        lootEverythingIncludingNonStacks = new javax.swing.JRadioButton();
-	        lootOnlyStacksAndHighValueDrops = new javax.swing.JRadioButton();
-	        lootOnlyHighValueDrops = new javax.swing.JRadioButton();
-	        doNotLoot = new javax.swing.JRadioButton();
+	        jPanel1 = new javax.swing.JPanel();
+	        jRadioButton1 = new javax.swing.JRadioButton();
+	        jRadioButton2 = new javax.swing.JRadioButton();
+	        jRadioButton3 = new javax.swing.JRadioButton();
+	        jRadioButton4 = new javax.swing.JRadioButton();
 	        jLabel2 = new javax.swing.JLabel();
-	        jPanel3 = new javax.swing.JPanel();
-	        useRunesToTele = new javax.swing.JRadioButton();
+	        jPanel2 = new javax.swing.JPanel();
+	        jRadioButton5 = new javax.swing.JRadioButton();
+	        jRadioButton6 = new javax.swing.JRadioButton();
 	        jLabel3 = new javax.swing.JLabel();
 	        jLabel4 = new javax.swing.JLabel();
-	        pureMode = new javax.swing.JRadioButton();
 	        jLabel5 = new javax.swing.JLabel();
-	        startTheMagic = new javax.swing.JButton();
+	        jButton1 = new javax.swing.JButton();
+	        jLabel1 = new javax.swing.JLabel();
+
+	        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+	        buttonGroup4.add(jRadioButton1);
+	        jRadioButton1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+	        jRadioButton1.setText("Loot Everything Including Non-Stackables");
+	        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                jRadioButton1ActionPerformed(evt);
+	            }
+	        });
+
+	        buttonGroup4.add(jRadioButton2);
+	        jRadioButton2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+	        jRadioButton2.setText("Loot Only Stackables and High Value Drops");
+	        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                jRadioButton2ActionPerformed(evt);
+	            }
+	        });
+
+	        buttonGroup4.add(jRadioButton3);
+	        jRadioButton3.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+	        jRadioButton3.setText("Loot Only High Value Drops");
+	        jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                jRadioButton3ActionPerformed(evt);
+	            }
+	        });
+
+	        buttonGroup4.add(jRadioButton4);
+	        jRadioButton4.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+	        jRadioButton4.setText("Do Not Loot");
+	        jRadioButton4.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                jRadioButton4ActionPerformed(evt);
+	            }
+	        });
+
+	        jLabel2.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
+	        jLabel2.setText("Only rune items, dragon items, etc");
 
 	        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
 	        jPanel1.setLayout(jPanel1Layout);
 	        jPanel1Layout.setHorizontalGroup(
 	            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	            .addGap(0, 100, Short.MAX_VALUE)
+	            .addGroup(jPanel1Layout.createSequentialGroup()
+	                .addContainerGap()
+	                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+	                    .addComponent(jRadioButton1)
+	                    .addComponent(jRadioButton2)
+	                    .addGroup(jPanel1Layout.createSequentialGroup()
+	                        .addComponent(jRadioButton3)
+	                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+	                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE))
+	                    .addComponent(jRadioButton4))
+	                .addContainerGap(20, Short.MAX_VALUE))
 	        );
 	        jPanel1Layout.setVerticalGroup(
 	            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	            .addGap(0, 100, Short.MAX_VALUE)
+	            .addGroup(jPanel1Layout.createSequentialGroup()
+	                .addGap(15, 15, 15)
+	                .addComponent(jRadioButton1)
+	                .addGap(18, 18, 18)
+	                .addComponent(jRadioButton2)
+	                .addGap(18, 18, 18)
+	                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+	                    .addComponent(jRadioButton3)
+	                    .addComponent(jLabel2))
+	                .addGap(18, 18, 18)
+	                .addComponent(jRadioButton4)
+	                .addContainerGap(17, Short.MAX_VALUE))
 	        );
 
-	        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+	        jTabbedPane1.addTab("Looting", jPanel1);
 
-	        jLabel1.setFont(new java.awt.Font("Times New Roman", 3, 24)); // NOI18N
-	        jLabel1.setText("Yaw hide's Easy Slayer");
-
-	        jTabbedPane1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-
-	        buttonGroup1.add(lootEverythingIncludingNonStacks);
-	        lootEverythingIncludingNonStacks.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-	        lootEverythingIncludingNonStacks.setText("Loot Everything Including Non-Stackables");
-	        lootEverythingIncludingNonStacks.addActionListener(new java.awt.event.ActionListener() {
+	        jRadioButton5.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+	        jRadioButton5.setText("Use Runes to Teleport");
+	        jRadioButton5.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	                lootEverythingIncludingNonStacksActionPerformed(evt);
+	                jRadioButton5ActionPerformed(evt);
 	            }
 	        });
 
-	        buttonGroup1.add(lootOnlyStacksAndHighValueDrops);
-	        lootOnlyStacksAndHighValueDrops.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-	        lootOnlyStacksAndHighValueDrops.setText("Loot Only Stackables and High Value Drops");
-	        lootOnlyStacksAndHighValueDrops.addActionListener(new java.awt.event.ActionListener() {
+	        jRadioButton6.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+	        jRadioButton6.setText("Pure Mode");
+	        jRadioButton6.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	                lootOnlyStacksAndHighValueDropsActionPerformed(evt);
+	                jRadioButton6ActionPerformed(evt);
 	            }
 	        });
 
-	        buttonGroup1.add(lootOnlyHighValueDrops);
-	        lootOnlyHighValueDrops.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-	        lootOnlyHighValueDrops.setText("Loot Only High Value Drops");
-	        lootOnlyHighValueDrops.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	                lootOnlyHighValueDropsActionPerformed(evt);
-	            }
-	        });
+	        jLabel3.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
+	        jLabel3.setText("If you don't have the required magic level");
 
-	        buttonGroup1.add(doNotLoot);
-	        doNotLoot.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-	        doNotLoot.setText("Do Not Loot");
-	        doNotLoot.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	                doNotLootActionPerformed(evt);
-	            }
-	        });
+	        jLabel4.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
+	        jLabel4.setText(" to use runes, it will use Tabs instead. Default");
 
-	        jLabel2.setFont(new java.awt.Font("Tahoma", 2, 12)); // NOI18N
-	        jLabel2.setText("Only rune items, dragon items, special drops, etc");
+	        jLabel5.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
+	        jLabel5.setText(" is to use tabs.");
 
 	        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
 	        jPanel2.setLayout(jPanel2Layout);
@@ -4785,177 +4581,112 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 	            .addGroup(jPanel2Layout.createSequentialGroup()
 	                .addContainerGap()
 	                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	                    .addComponent(lootEverythingIncludingNonStacks)
-	                    .addComponent(doNotLoot)
-	                    .addComponent(lootOnlyStacksAndHighValueDrops)
+	                    .addComponent(jRadioButton6)
 	                    .addGroup(jPanel2Layout.createSequentialGroup()
-	                        .addComponent(lootOnlyHighValueDrops)
+	                        .addComponent(jRadioButton5)
 	                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-	                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)))
+	                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+	                            .addComponent(jLabel4)
+	                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
+	                            .addComponent(jLabel5))))
 	                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 	        );
 	        jPanel2Layout.setVerticalGroup(
 	            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 	            .addGroup(jPanel2Layout.createSequentialGroup()
-	                .addGap(23, 23, 23)
-	                .addComponent(lootEverythingIncludingNonStacks)
-	                .addGap(18, 18, 18)
-	                .addComponent(lootOnlyStacksAndHighValueDrops)
-	                .addGap(12, 12, 12)
+	                .addGap(16, 16, 16)
 	                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-	                    .addComponent(lootOnlyHighValueDrops)
-	                    .addComponent(jLabel2))
-	                .addGap(18, 18, 18)
-	                .addComponent(doNotLoot)
-	                .addContainerGap(80, Short.MAX_VALUE))
-	        );
-
-	        jTabbedPane1.addTab("Looting", jPanel2);
-
-	        useRunesToTele.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-	        useRunesToTele.setText("Use Runes to Teleport");
-	        useRunesToTele.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	                useRunesToTeleActionPerformed(evt);
-	            }
-	        });
-
-	        jLabel3.setFont(new java.awt.Font("Tahoma", 2, 12)); // NOI18N
-	        jLabel3.setText("If you don't have the required magic level to use runes,");
-
-	        jLabel4.setFont(new java.awt.Font("Tahoma", 2, 12)); // NOI18N
-	        jLabel4.setText("it will use Tabs instead. Default is to use tabs");
-
-	        pureMode.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-	        pureMode.setText("Pure Mode");
-	        pureMode.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	                pureModeActionPerformed(evt);
-	            }
-	        });
-
-	        jLabel5.setFont(new java.awt.Font("Tahoma", 2, 12)); // NOI18N
-	        jLabel5.setText("If you are below 5 defense, you MUST use this option ");
-
-	        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-	        jPanel3.setLayout(jPanel3Layout);
-	        jPanel3Layout.setHorizontalGroup(
-	            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	            .addGroup(jPanel3Layout.createSequentialGroup()
-	                .addContainerGap()
-	                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	                    .addGroup(jPanel3Layout.createSequentialGroup()
-	                        .addComponent(useRunesToTele)
-	                        .addGap(18, 18, 18)
-	                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	                            .addComponent(jLabel3)
-	                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE)))
-	                    .addGroup(jPanel3Layout.createSequentialGroup()
-	                        .addComponent(pureMode)
-	                        .addGap(18, 18, 18)
-	                        .addComponent(jLabel5)))
-	                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-	        );
-	        jPanel3Layout.setVerticalGroup(
-	            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	            .addGroup(jPanel3Layout.createSequentialGroup()
-	                .addGap(20, 20, 20)
-	                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-	                    .addComponent(useRunesToTele)
+	                    .addComponent(jRadioButton5)
 	                    .addComponent(jLabel3))
 	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 	                .addComponent(jLabel4)
-	                .addGap(18, 18, 18)
-	                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-	                    .addComponent(pureMode)
-	                    .addComponent(jLabel5))
-	                .addContainerGap(158, Short.MAX_VALUE))
+	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+	                .addComponent(jLabel5)
+	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+	                .addComponent(jRadioButton6)
+	                .addContainerGap())
 	        );
 
-	        jTabbedPane1.addTab("Misc", jPanel3);
+	        jTabbedPane1.addTab("Misc", jPanel2);
 
-	        startTheMagic.setFont(new java.awt.Font("Tahoma", 2, 18)); // NOI18N
-	        startTheMagic.setText("Start the magic ");
-	        startTheMagic.addActionListener(new java.awt.event.ActionListener() {
+	        jButton1.setFont(new java.awt.Font("Tahoma", 3, 14)); // NOI18N
+	        jButton1.setText("Start the Magic");
+	        jButton1.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	                startTheMagicActionPerformed(evt);
+	                jButton1ActionPerformed(evt);
 	            }
 	        });
+
+	        jLabel1.setFont(new java.awt.Font("Tahoma", 3, 18)); // NOI18N
+	        jLabel1.setText("Yaw hide's Easy Slayer");
 
 	        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
 	        getContentPane().setLayout(layout);
 	        layout.setHorizontalGroup(
 	            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 	            .addGroup(layout.createSequentialGroup()
+	                .addContainerGap()
 	                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	                    .addGroup(layout.createSequentialGroup()
-	                        .addGap(161, 161, 161)
-	                        .addComponent(jLabel1))
-	                    .addGroup(layout.createSequentialGroup()
-	                        .addGap(189, 189, 189)
-	                        .addComponent(startTheMagic))
-	                    .addGroup(layout.createSequentialGroup()
-	                        .addContainerGap()
-	                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 544, javax.swing.GroupLayout.PREFERRED_SIZE)))
-	                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+	                    .addComponent(jTabbedPane1)
+	                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+	                        .addGap(0, 0, Short.MAX_VALUE)
+	                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+	                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+	                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
+	                                .addGap(93, 93, 93))
+	                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+	                                .addComponent(jButton1)
+	                                .addGap(130, 130, 130))))))
 	        );
 	        layout.setVerticalGroup(
 	            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 	            .addGroup(layout.createSequentialGroup()
-	                .addContainerGap()
+	                .addGap(16, 16, 16)
 	                .addComponent(jLabel1)
-	                .addGap(18, 18, 18)
-	                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 304, javax.swing.GroupLayout.PREFERRED_SIZE)
 	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-	                .addComponent(startTheMagic, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-	                .addContainerGap())
+	                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)
+	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+	                .addComponent(jButton1)
+	                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 	        );
 
 	        pack();
-	    }// </editor-fold>                        
+	    }// </editor-fold>                         
 
-	    private void lootEverythingIncludingNonStacksActionPerformed(java.awt.event.ActionEvent evt) {                                                                 
-	        // TODO add your handling code here:
-	    }                                                                
+	    private void jRadioButton5ActionPerformed(java.awt.event.ActionEvent evt) {    
+	    }                                             
 
-	    private void lootOnlyStacksAndHighValueDropsActionPerformed(java.awt.event.ActionEvent evt) {                                                                
-	        // TODO add your handling code here:
-	    }                                                               
-
-	    private void lootOnlyHighValueDropsActionPerformed(java.awt.event.ActionEvent evt) {                                                       
-	        // TODO add your handling code here:
-	    }                                                      
-
-	    private void doNotLootActionPerformed(java.awt.event.ActionEvent evt) {                                          
-	        // TODO add your handling code here:
-	    }                                         
-
-	    private void useRunesToTeleActionPerformed(java.awt.event.ActionEvent evt) {                                               
-	        // TODO add your handling code here:
-	    }                                              
-
-	    private void pureModeActionPerformed(java.awt.event.ActionEvent evt) {                                         
-	        // TODO add your handling code here:
-	    }                                        
-
-	    private void startTheMagicActionPerformed(java.awt.event.ActionEvent evt) {                                               
-	        // TODO add your handling code here:
-	    	
-	    	LootEverythingIncludingNonStacks = lootEverythingIncludingNonStacks.isSelected();
-	    	LootOnlyStacksAndHighValueDrops = lootOnlyStacksAndHighValueDrops.isSelected();
-	    	LootOnlyHighValueDrops = lootOnlyHighValueDrops.isSelected();
-	    	DoNotLoot = doNotLoot.isSelected();
-	    	UseRunesToTele = useRunesToTele.isSelected();
-	    	PureMode = pureMode.isSelected();
-	    	 
+	    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {      
+	    	LootEverythingIncludingNonStacks = jRadioButton1.isSelected();
+	    	LootOnlyStacksAndHighValueDrops = jRadioButton2.isSelected();
+	    	LootOnlyHighValueDrops = jRadioButton3.isSelected();
+	    	DoNotLoot = jRadioButton4.isSelected();
+	    	UseRunesToTele = jRadioButton5.isSelected();
+	    	PureMode = jRadioButton6.isSelected();
 	    	
 	    	waitGUI = false;
 	    	sleep(200,300);
+	    }                                        
+
+	    private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {  
 	    }                                             
 
-	    // Variables declaration - do not modify     
-	    private javax.swing.ButtonGroup buttonGroup1;
-	    private javax.swing.JRadioButton doNotLoot;
+	    private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {  
+	    }                                             
+
+	    private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) { 
+	    }                                             
+
+	    private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {   
+	    }                                             
+
+	    private void jRadioButton6ActionPerformed(java.awt.event.ActionEvent evt) {    
+	    	
+	    } 
+
+	    // Variables declaration - do not modify                     
+	    private javax.swing.ButtonGroup buttonGroup4;
+	    private javax.swing.JButton jButton1;
 	    private javax.swing.JLabel jLabel1;
 	    private javax.swing.JLabel jLabel2;
 	    private javax.swing.JLabel jLabel3;
@@ -4963,25 +4694,21 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 	    private javax.swing.JLabel jLabel5;
 	    private javax.swing.JPanel jPanel1;
 	    private javax.swing.JPanel jPanel2;
-	    private javax.swing.JPanel jPanel3;
+	    private javax.swing.JRadioButton jRadioButton1;
+	    private javax.swing.JRadioButton jRadioButton2;
+	    private javax.swing.JRadioButton jRadioButton3;
+	    private javax.swing.JRadioButton jRadioButton4;
+	    private javax.swing.JRadioButton jRadioButton5;
+	    private javax.swing.JRadioButton jRadioButton6;
 	    private javax.swing.JTabbedPane jTabbedPane1;
-	    private javax.swing.JRadioButton lootEverythingIncludingNonStacks;
-	    private javax.swing.JRadioButton lootOnlyHighValueDrops;
-	    private javax.swing.JRadioButton lootOnlyStacksAndHighValueDrops;
-	    private javax.swing.JRadioButton pureMode;
-	    private javax.swing.JButton startTheMagic;
-	    private javax.swing.JRadioButton useRunesToTele;
 	    // End of variables declaration                   
 	}
+
+	
 
 	/****dynamic sig stuff ****/
 	// Initialize variable
 	
-	
-	@Override
-	public void onEnd() {
-		
-	}
 
 	@Override
 	public void personalMessageReceived(String arg0, String arg1) {
@@ -4994,6 +4721,4 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 		// TODO Auto-generated method stub
 		
 	}
-	
-	
 }
