@@ -88,7 +88,7 @@ public class YawsGeneral {
 	}
 
 	public static boolean inAviesSpot() {
-		return inArea(Constants.AVIES_Area);
+		return inArea(Constants.AVIES_AREA);
 	}
 
 	public static boolean inArea(RSArea a) {
@@ -273,7 +273,7 @@ public class YawsGeneral {
 	public static boolean lootExists() {
 		RSGroundItem[] Nests = GroundItems.findNearest(Constants.LOOT2);
 		return Nests.length > 0
-				&& Constants.AVIES_Area.contains(Nests[0].getPosition());
+				&& Constants.AVIES_AREA.contains(Nests[0].getPosition());
 	}
 
 	public static void loot() {

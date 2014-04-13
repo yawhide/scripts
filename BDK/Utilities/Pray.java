@@ -9,7 +9,6 @@ import org.tribot.api2007.GameTab.TABS;
 import org.tribot.api2007.Prayer.PRAYERS;
 import org.tribot.api2007.Skills.SKILLS;
 
-import scripts.Avies.Main.Avies;
 
 public class Pray {
 	

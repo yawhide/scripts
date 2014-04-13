@@ -31,15 +31,10 @@ import org.tribot.api2007.types.RSModel;
 import org.tribot.api2007.types.RSNPC;
 import org.tribot.api2007.types.RSTile;
 
-import scripts.Avies.Data.Constants;
-import scripts.Avies.Main.Avies;
+import scripts.BDK.Data.Constants;
 
 public class YawsGeneral {
 
-	public static boolean inHouse() {
-		return !inArea(Constants.VARROCK_AREA)
-				&& Objects.findNearest(50, "Portal").length > 0;
-	}
 
 	public static RSTile pos() {
 		return Player.getPosition();
@@ -82,14 +77,6 @@ public class YawsGeneral {
 				SLOTS.ARROW).getStack() : 0;
 	}
 
-	public static boolean inGW() {
-		return pos().distanceTo(Constants.GWD_CENTER) <= 50
-				&& pos().getPlane() == 2;
-	}
-
-	public static boolean inAviesSpot() {
-		return inArea(Constants.AVIES_Area);
-	}
 
 	public static boolean inArea(RSArea a) {
 		return a.contains(pos());
@@ -120,14 +107,7 @@ public class YawsGeneral {
 		}
 		return false;
 	}
-
-	public static void teleToTroll() {
-		openTab(TABS.MAGIC);
-
-		Magic.selectSpell("Trollheim Teleport");
-		Conditionals.waitFor(inArea(Constants.TROLL_TELEPORT_AREA), 3500, 4500);
-	}
-
+	
 	public static String underAttack() {
 		RSCharacter[] mon = Combat.getAttackingEntities();
 		if (mon.length > 0) {
@@ -138,13 +118,13 @@ public class YawsGeneral {
 
 	public static void putMap() {
 		for (int i = 0; i < Constants.LOOT.length; i++) {
-			if (i >= Constants.LOOT_STRING_NAMES.length) {
-				Constants.LOOT_MAPPING
+			if (i >= Constants.LOOT_NAMES.length) {
+				Constants.LOOT_MAP
 						.put(Constants.LOOT[i],
-								Constants.LOOT_STRING_NAMES[Constants.LOOT_STRING_NAMES.length - 1]);
+								Constants.LOOT_NAMES[Constants.LOOT_NAMES.length - 1]);
 			} else
-				Constants.LOOT_MAPPING.put(Constants.LOOT[i],
-						Constants.LOOT_STRING_NAMES[i]);
+				Constants.LOOT_MAP.put(Constants.LOOT[i],
+						Constants.LOOT_NAMES[i]);
 		}
 	}
 
@@ -188,14 +168,11 @@ public class YawsGeneral {
 
 	public static void emergTele() {
 		Avies.FIGHT_STATUS = "tele tabbing";
-		RSItem[] tab = Inventory.find(Constants.VTAB);
-		if (Avies.USE_HOUSE)
-			tab = Inventory.find(Constants.HTAB);
+		RSItem[] tab = Inventory.find("Falador teleport");
 		openTab(TABS.INVENTORY);
 		if (tab.length > 0) {
 			if (Clicking.click("Break", tab[0])) {
-				Conditionals.waitFor(Avies.USE_HOUSE ? inHouse()
-						: inArea(Constants.VARROCK_AREA), 2500, 3000);
+				Conditionals.waitFor(inArea(Constants.FALLY_AREA), 2500, 3000);
 			}
 		} else {
 			General.println("Out of tabs");
@@ -261,11 +238,7 @@ public class YawsGeneral {
 				final int boltsCount = Equipment.getItem(SLOTS.ARROW)
 						.getStack();
 				if (Clicking.click("Wield", bolts[0])) {
-					Timing.waitCondition(new Condition() {
-						public boolean active() {
-							return Equipment.getItem(SLOTS.ARROW).getStack() > boltsCount;
-						}
-					}, General.random(400, 500));
+					Conditionals.waitFor(Equipment.getItem(SLOTS.ARROW).getStack() > boltsCount, 400, 500);
 				}
 			}
 			Inventory.drop(Constants.JUNK);
@@ -333,12 +306,7 @@ public class YawsGeneral {
 			RSItem[] potion = Inventory.find(pot);
 			if (potion.length > 0) {
 				if (Clicking.click("Drink", potion[0])) {
-					Timing.waitCondition(new Condition() {
-						public boolean active() {
-							return Skills.getCurrentLevel(SKILLS.RANGED) > Skills
-									.getActualLevel(SKILLS.RANGED);
-						}
-					}, General.random(1000, 1200));
+					Conditionals.waitFor(Skills.getCurrentLevel(SKILLS.RANGED) > Skills.getActualLevel(SKILLS.RANGED), 1000, 1200);
 				}
 			}
 		}

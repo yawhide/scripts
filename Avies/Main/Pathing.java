@@ -22,7 +22,7 @@ public class Pathing {
 	
 	public static boolean gotoAvies(){
 	
-		if (YawsGeneral.inArea(Constants.AVIES_Area) && YawsGeneral.pos().getPlane() == 2)
+		if (YawsGeneral.inArea(Constants.AVIES_AREA) && YawsGeneral.pos().getPlane() == 2)
 			return true;
 		else if(!YawsGeneral.inArea(Constants.VARROCK_AREA) && Objects.findNearest(50, "Portal").length > 0){
 			Avies.FIGHT_STATUS = "in house...";

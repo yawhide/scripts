@@ -442,28 +442,6 @@ public class BDK extends Script implements Painting, Pausing {
 		turnOffPrayer();
 	}
 	
-	public String underAttack(){
-		RSCharacter[] mon = Combat.getAttackingEntities();
-		if(mon.length > 0){
-			return mon[0].getName();
-		}
-		return null;
-	}
-	
-	public boolean inSafeSpot(){
-		return inArea(neSSArea);// || inArea(neSSArea);//inArea(sSSArea) || 
-	}
-	
-	public boolean inArea(RSArea a) {
-		return a.contains(pos());
-	}
-	
-	public void waitIsMovin(){ 
-		for(int i = 0; i < 57; i++, sleep(30, 40)){
-			if (!Player.isMoving())
-				break;
-		}
-	}
 	
 	public void prayerflick(){//RSNPC drag) {
 		
@@ -490,20 +468,7 @@ public class BDK extends Script implements Painting, Pausing {
 		turnOffPrayer();
 	}
 	
-	public void turnOffPrayer(){
-		if (Prayer.isPrayerEnabled(PRAYERS.EAGLE_EYE)){//.isQuickPrayerEnabled(PRAYERS.EAGLE_EYE)){
-			//Options.setQuickPrayersOn(false);
-			if(!Prayer.isTabOpen()) GameTab.open(TABS.PRAYERS);
-			sleep(200,250);
-			Prayer.disable(PRAYERS.EAGLE_EYE);
-			sleep(800,1000);
-		}
-	}
-	
-	public int getStackBolts() {
-		return Equipment.getItem(SLOTS.ARROW).getID() == BOLTS_ID ? Equipment.getItem(SLOTS.ARROW).getStack() : 0;
-	}
-	
+
 	public void emergTele(){
 		FIGHT_STATUS = "tele tabbing";
 		RSItem[] tab = Inventory.find("Falador teleport");

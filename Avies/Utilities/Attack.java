@@ -112,7 +112,7 @@ public class Attack {
 		} else {
 			RSNPC[] avies = NPCs.findNearest("Aviansie");
 			for (RSNPC a : avies) {
-				if (Constants.AVIES_Area.contains(a.getPosition())
+				if (Constants.AVIES_AREA.contains(a.getPosition())
 						&& (a.getCombatLevel() == 69
 								|| a.getCombatLevel() == 71 
 								|| a.getCombatLevel() == 83)) {

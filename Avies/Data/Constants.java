@@ -133,7 +133,7 @@ public class Constants {
 	public static RSArea ROCK_SLIDE_AREA = new RSArea(FIRST_SLIDE_POLYGON);
 	public static RSArea VARROCK_AREA = new RSArea(VARROCK_AREA_TILES[0], VARROCK_AREA_TILES[1]);
 	public static RSArea CW_AREA = new RSArea(CWA[0], CWA[1]);
-	public static RSArea AVIES_Area = new RSArea(AVIES_AREA_TILES[0], AVIES_AREA_TILES[1]);
+	public static RSArea AVIES_AREA = new RSArea(AVIES_AREA_TILES[0], AVIES_AREA_TILES[1]);
 
 	// Variables
 	public static final int[] PRAYER_POT = { 2434, 139, 141, 143 };

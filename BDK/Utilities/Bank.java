@@ -11,8 +11,6 @@ import org.tribot.api2007.Skills;
 import org.tribot.api2007.Skills.SKILLS;
 import org.tribot.api2007.types.RSItem;
 
-import scripts.Avies.Data.Constants;
-import scripts.Avies.Main.Avies;
 
 public class Bank {
 	 public static boolean withdraw(final int num, final int[] ids){

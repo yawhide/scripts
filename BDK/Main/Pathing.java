@@ -15,11 +15,6 @@ import org.tribot.api2007.Skills.SKILLS;
 import org.tribot.api2007.types.RSObject;
 import org.tribot.api2007.types.RSTile;
 
-import scripts.Avies.Data.Constants;
-import scripts.Avies.Utilities.Bank;
-import scripts.Avies.Utilities.Conditionals;
-import scripts.Avies.Utilities.Pray;
-import scripts.Avies.Utilities.YawsGeneral;
 
 public class Pathing {
 	

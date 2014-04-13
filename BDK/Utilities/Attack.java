@@ -24,8 +24,6 @@ import org.tribot.api2007.Prayer.PRAYERS;
 import org.tribot.api2007.Skills.SKILLS;
 import org.tribot.api2007.types.RSNPC;
 
-import scripts.Avies.Data.Constants;
-import scripts.Avies.Main.Avies;
 
 public class Attack {
 

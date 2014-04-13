@@ -233,7 +233,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	    }
 		
 		for(int i = 0; i < Nests.length; i++){
-			if(Constants.AVIES_Area.contains(Nests[i].getPosition())){
+			if(Constants.AVIES_AREA.contains(Nests[i].getPosition())){
 				RSTile t = Nests[i].getPosition();				
 				YawsGeneral.drawTile(t, g, false);
 			}
