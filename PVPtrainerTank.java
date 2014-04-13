@@ -35,6 +35,7 @@ public class PVPtrainerTank extends Script implements Painting{
 	@Override
 	public void run() {
 		
+		General.useAntiBanCompliance(true);
 		ThreadSettings.get().setAlwaysRightClick(true);
 		sleep(200);
 		abc_util = new ABCUtil();
@@ -55,14 +56,14 @@ public class PVPtrainerTank extends Script implements Painting{
 	}
 	
 	public void checkAntiBan(){
-		if (abc_util.TIME_TRACKER.ROTATE_CAMERA.next() != 0){
+		if (abc_util.TIME_TRACKER.ROTATE_CAMERA.next() != 0 && abc_util.TIME_TRACKER.ROTATE_CAMERA.next() <= System.currentTimeMillis()){
 			println("rotating camera");
 			Camera.setCameraRotation(General.random(0, 355));
 			abc_util.TIME_TRACKER.ROTATE_CAMERA.reset();
 		}
-		else if (abc_util.TIME_TRACKER.EXAMINE_OBJECT.next() != 0){
+		else if (abc_util.TIME_TRACKER.EXAMINE_OBJECT.next() != 0 && abc_util.TIME_TRACKER.EXAMINE_OBJECT.next() <= System.currentTimeMillis()){
 			println("Examining a random object");
-			RSObject[] random = Objects.getAll(10);
+			RSObject[] random = Objects.getAll(4);
 			if(random.length > 0){
 				Clicking.click("Examine", random);
 			}

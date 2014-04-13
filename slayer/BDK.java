@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.tribot.api2007.Prayer;
+import org.tribot.api.Clicking;
 import org.tribot.api.General;
 import org.tribot.api.Timing;
 import org.tribot.api.input.Mouse;
@@ -258,6 +259,7 @@ public class BDK extends Script implements Painting, Pausing {
 		sleep(250);
 		Mouse.setSpeed(General.random(175,190));
 		Walking.setWalkingTimeout(5000L);
+		General.useAntiBanCompliance(true);
 		
 		while(scriptStatus){
 			current_xp = Skills.getXP(SKILLS.RANGED) + Skills.getXP(SKILLS.HITPOINTS);
@@ -1008,10 +1010,42 @@ public class BDK extends Script implements Painting, Pausing {
 			Inventory.open();
 			RSItem[] potion = Inventory.find(pot);
 			if (potion.length > 0) {
-				potion[0].click("Drink");
-				General.sleep(1100, 1300);
+				if(Clicking.click("Drink", potion[0])){
+					Timing.waitCondition(new Condition() {
+						public boolean active() {
+							return Skills.getCurrentLevel(SKILLS.RANGED) > Skills.getActualLevel(SKILLS.RANGED);
+						}
+					}, General.random(1000, 1200));
+				}
 			}
 		}
+	}
+
+	public void waitForItem(int[] i) {
+		final int[] item = i;
+		Timing.waitCondition(new Condition() {
+			public boolean active() {
+				return Inventory.getCount(item) > 0;
+			}
+		}, General.random(500, 1000));
+	}
+
+	public void waitForItem(int i) {
+		final int item = i;
+		Timing.waitCondition(new Condition() {
+			public boolean active() {
+				return Inventory.getCount(item) > 0;
+			}
+		}, General.random(500, 1000));
+	}
+
+	public void waitForTab(TABS t) {
+		final TABS tab = t;
+		Timing.waitCondition(new Condition() {
+			public boolean active() {
+				return GameTab.getOpen() == tab;
+			}
+		}, General.random(500, 1000));
 	}
 	
 	public class AvieGUI extends javax.swing.JFrame {

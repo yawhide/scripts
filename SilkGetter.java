@@ -56,17 +56,17 @@ public class SilkGetter extends Script implements Painting{
 			} 
 			
 			//println(abc_util.TIME_TRACKER.CHECK_XP.next() + " " + abc_util.TIME_TRACKER.ROTATE_CAMERA.next());
-			if(abc_util.TIME_TRACKER.CHECK_XP.next() <= System.currentTimeMillis()){
+			if(abc_util.TIME_TRACKER.CHECK_XP.next() <= System.currentTimeMillis() && abc_util.TIME_TRACKER.CHECK_XP.next() != 0){
 				println("checking xp");
 				checkXp();
 				abc_util.TIME_TRACKER.CHECK_XP.reset();
 			}
-			else if (abc_util.TIME_TRACKER.ROTATE_CAMERA.next() != 0){
+			else if (abc_util.TIME_TRACKER.ROTATE_CAMERA.next() != 0 && abc_util.TIME_TRACKER.ROTATE_CAMERA.next() <= System.currentTimeMillis()){
 				println("rotating camera");
 				Camera.setCameraRotation(General.random(0, 355));
 				abc_util.TIME_TRACKER.ROTATE_CAMERA.reset();
 			}
-			else if (abc_util.TIME_TRACKER.EXAMINE_OBJECT.next() != 0){
+			else if (abc_util.TIME_TRACKER.EXAMINE_OBJECT.next() != 0 && abc_util.TIME_TRACKER.EXAMINE_OBJECT.next() <= System.currentTimeMillis()){
 				println("Examining a random object");
 				RSObject[] random = Objects.getAll(10);
 				if(random.length > 0){

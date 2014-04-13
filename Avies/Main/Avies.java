@@ -1,4 +1,4 @@
-package scripts.slayer;
+package scripts.Avies.Main;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -56,181 +56,87 @@ import org.tribot.script.interfaces.MessageListening07;
 import org.tribot.script.interfaces.Painting;
 import org.tribot.script.interfaces.Pausing;
 
-@ScriptManifest(authors = { "Yaw hide" }, category = "ranged", version=0.24, name = "Yaw hide's Ava Killer", description="Local version")
+import scripts.Avies.Data.Constants;
+import scripts.slayer.Timer;
+import scripts.slayer.Zybez;
+
+@ScriptManifest(authors = { "Yaw hide" }, category = "ranged", version=0.3, name = "Yaw hide's Ava Killer", description="Local version")
 public class Avies extends Script implements Painting, Pausing, MessageListening07{
 
-	// loot
-	int[] junk = { 886, 1539, 9003, 229, 1623, 1355, 440, 7767, 117, 6963, 
-			556, 829, 1971, 687, 464, 1973, 1917, 808, 1454, 6180, 6965, 1969,
-			6183, 6181, 6962, 449, 1197, 243, 314, 526 };
-
-	int[] loot = { 9142, 1615, 1247, 1303, 1249, 1149, 2361, 2366, 1462, 985,
-			987, 2363, 1617, 1213, 2363, 207, 1229, 5678, 9431, 561, 
-			/* clue scroll id starts */
-			2722, 2723, 2725, 2727, 2729, 2731, 2733, 2725, 2737, 2739, 2741,
-			2743, 2745, 2747, 2773, 2774, 2776, 2778, 2780, 2782, 2783, 2785,
-			2786, 2788, 2790, 2792, 2793, 2794, 2796, 2797, 2799, 3520, 3522,
-			3524, 3525, 3526, 3528, 3530, 3532, 3534, 3536, 3538, 3540, 3542,
-			3544, 3546, 3548, 3560, 3562, 3564, 3566, 3568, 3570, 3272, 3573,
-			3574, 3575, 3577, 3579, 3580, 7239, 7241, 7243, 7245, 7247, 7248,
-			7249, 7250, 7251, 7252, 7253, 7254, 7255, 7256, 7258, 7260, 7262,
-			7264, 7266, 7268, 7270, 7272, 10234, 10236, 10238, 10240, 10242,
-			10244, 10426, 10428, 40250, 10252, 13010, 13012, 13014, 13016,
-			13018, 13020, 13022, 13024, 13026, 13028, 13030, 13032, 13034,
-			13036, 13038, 13040, 13041, 13042, 13044, 13046, 13048, 13049 };
-
-	int[] loot2 = { 1615, 1247, 1303, 1249, 1149, 2361, 2366, 1462, 985, 987,
-			2363, 1617, 1213, 2363, 207, 1229, 5678, 9431, 561,
-			/* clue scroll id starts */
-			2722, 2723, 2725, 2727, 2729, 2731, 2733, 2725, 2737, 2739, 2741,
-			2743, 2745, 2747, 2773, 2774, 2776, 2778, 2780, 2782, 2783, 2785,
-			2786, 2788, 2790, 2792, 2793, 2794, 2796, 2797, 2799, 3520, 3522,
-			3524, 3525, 3526, 3528, 3530, 3532, 3534, 3536, 3538, 3540, 3542,
-			3544, 3546, 3548, 3560, 3562, 3564, 3566, 3568, 3570, 3272, 3573,
-			3574, 3575, 3577, 3579, 3580, 7239, 7241, 7243, 7245, 7247, 7248,
-			7249, 7250, 7251, 7252, 7253, 7254, 7255, 7256, 7258, 7260, 7262,
-			7264, 7266, 7268, 7270, 7272, 10234, 10236, 10238, 10240, 10242,
-			10244, 10426, 10428, 40250, 10252, 13010, 13012, 13014, 13016,
-			13018, 13020, 13022, 13024, 13026, 13028, 13030, 13032, 13034,
-			13036, 13038, 13040, 13041, 13042, 13044, 13046, 13048, 13049 };
-
-	int[] alcLoot = { 1213, 1229, 5678, 9431 };
+	public static int addybars, coins, ranarrs = 0;
+	public static int addycount, coinscount, ranarrcount = 0;
+	public static int addyIni, coinsIni, ranarrIni = 0;
+	public static int MITHRIL_BOLTS = 9142;
+	public static int FOOD_NUMBER = 11;
+	public static int BOLTS_ID;
+	public static int[] FOOD_IDS; // , 385, 7946, 1897 };
+	public static int ADDY_PRICE = 2800;
+	public static int RANARR_PRICE = 6400;
 	
-	HashMap<Integer, String> map = new HashMap<Integer, String>(loot.length);
-
-	String[] names = { "Mithril bolts", "Dragonstone", "Rune spear",
-			"Rune longsword", "Dragon spear", "Dragon med helm",
-			"Adamantite bar", "Shield left half", "Nature talisman",
-			"Tooth half of key", "Loop half of key", "Runite bar",
-			"Uncut diamond", "Rune dagger", "Rune bar", "Herb",
-			"Rune dagger(p)", "Rune dagger(p+)", "Runite limbs", "Nature rune",
-			"Clue scroll (hard)" };
+	public static long ANTIBAN = System.currentTimeMillis();
 	
-	// RSPaths
-	private RSTile[] toFirstSlide = { new RSTile(2889, 3683, 0), new RSTile(2884, 3679, 0), new RSTile(2881, 3673, 0), new RSTile(2887, 3668, 0), new RSTile(2885, 3665, 0), new RSTile(2880, 3668, 0) };
-	private RSTile[] beforePrayerRange = { new RSTile(2878, 3664, 0), new RSTile(2876, 3667, 0), new RSTile(2873, 3669, 0), new RSTile(2872, 3672, 0), new RSTile(2872, 3676, 0), new RSTile(2871, 3679, 0), new RSTile(2871, 3682, 0), new RSTile(2870, 3686, 0), new RSTile(2872, 3689, 0), new RSTile(2873, 3691, 0) };
-	private RSTile[] beforeRock = { new RSTile(2876, 3693, 0), new RSTile(2879, 3695, 0), new RSTile(2881, 3698, 0), new RSTile(2883, 3701, 0), new RSTile(2887, 3702, 0), new RSTile(2891, 3703, 0), new RSTile(2895, 3703, 0), new RSTile(2897, 3701, 0), new RSTile(2899, 3702, 0), new RSTile(2899, 3705, 0), new RSTile(2899, 3708, 0), new RSTile(2899, 3711, 0), new RSTile(2899, 3713, 0) };
-	private RSTile[] toGW = { new RSTile(2899, 3721, 0), new RSTile(2902, 3724, 0), new RSTile(2904, 3726, 0), new RSTile(2906, 3729, 0), new RSTile(2907, 3731, 0), new RSTile(2908, 3732, 0), new RSTile(2908, 3733, 0), new RSTile(2909, 3734, 0), new RSTile(2909, 3735, 0), new RSTile(2910, 3738, 0), new RSTile(2912, 3742, 0), new RSTile(2915, 3742, 0), new RSTile(2913, 3744, 0), new RSTile(2916, 3746, 0) };
-	private RSTile[] toAvies = { new RSTile(2883, 5311, 2),
-			new RSTile(2879, 5310, 2), new RSTile(2873, 5309, 2),
-			new RSTile(2867, 5307, 2), new RSTile(2861, 5307, 2),
-			new RSTile(2856, 5304, 2), new RSTile(2857, 5299, 2),
-			new RSTile(2861, 5295, 2), new RSTile(2865, 5294, 2),
-			new RSTile(2871, 5293, 2), new RSTile(2885, 5309, 2),
-			new RSTile(2890, 5309, 2), new RSTile(2893, 5308, 2),
-			new RSTile(2896, 5304, 2), new RSTile(2896, 5298, 2),
-			new RSTile(2896, 5296, 2), new RSTile(2896, 5294, 2),
-			new RSTile(2892, 5291, 2), new RSTile(2888, 5291, 2),
-			new RSTile(2881, 5307, 2), new RSTile(2881, 5304, 2),
-			new RSTile(2882, 5300, 2), new RSTile(2880, 5298, 2),
-			new RSTile(2880, 5295, 2), new RSTile(2878, 5291, 2),
-			new RSTile(2878, 5288, 2) };
-
-	//Positionables
-	Positionable firstSlide = new RSTile(2879, 3668, 0);
-	String firstSlideAction = "Climb"; // object is Rocks
-	Positionable bankT = new RSTile(3185, 3438, 0);
-	Positionable gwCenter = new RSTile(2901, 5283, 2);
-	Positionable holeT = new RSTile(2918, 3746, 0);
-	Positionable randomEastT = new RSTile(2862, 5287, 2);
-	Positionable randomWestT = new RSTile(2887, 5283, 2);
+	public static boolean SCRIPT_STATUS = true;
+	public static String FIGHT_STATUS;
 	
-	//RSAreas
-	private RSTile[] teleSpotPoly = { new RSTile(2879, 3667, 0), new RSTile(2880, 3667, 0), new RSTile(2886, 3662, 0), new RSTile(2890, 3662, 0), new RSTile(2894, 3665, 0), new RSTile(2898, 3668, 0), new RSTile(2903, 3674, 0), new RSTile(2903, 3683, 0), new RSTile(2902, 3685, 0), new RSTile(2897, 3690, 0), new RSTile(2895, 3691, 0), new RSTile(2891, 3691, 0), new RSTile(2889, 3690, 0), new RSTile(2885, 3691, 0), new RSTile(2879, 3685, 0), new RSTile(2878, 3679, 0), new RSTile(2877, 3678, 0), new RSTile(2877, 3671, 0), new RSTile(2878, 3668, 0) };
-	private RSTile[] aroundFirstSlide = { new RSTile(2877, 3671, 0), new RSTile(2877, 3668, 0), new RSTile(2879, 3667, 0), new RSTile(2880, 3667, 0), new RSTile(2883, 3665, 0), new RSTile(2883, 3666, 0), new RSTile(2880, 3670, 0), new RSTile(2879, 3671, 0) };
-	RSTile[] varrockA = {new RSTile(3176, 3448, 0), new RSTile(3255, 3386, 0) };
-	RSTile[] CWA = {new RSTile(2436, 3095, 0), new RSTile(2443, 3082, 0)};
-	RSTile[] AviesA = {new RSTile(2847, 5307, 2), new RSTile(2901, 5281, 2)};
-		
-	RSArea teleSpotArea = new RSArea(teleSpotPoly);
-	RSArea aroundFirstSlideArea = new RSArea(aroundFirstSlide);
-	RSArea varrockArea = new RSArea(varrockA[0], varrockA[1]);
-	RSArea CWArea = new RSArea(CWA[0], CWA[1]);
-	RSArea aviesArea = new RSArea(AviesA[0], AviesA[1]);
+	//GUI
+	public static boolean MOVE_RANDOM = false;
+	public static boolean USE_HOUSE = true;
+	public static boolean WAIT_GUI = true;
 	
-	// Variables
-	final int[] avaIDs = { 5750, 5758, 5753,
-			5700, 5708 , 5703}; //69, 71, 83
-	int[] foodIDs; // , 385, 7946, 1897 };
-	final int[] ppot = { 2434, 139, 141, 143 };
-	final int[] rangepots = { 169, 2444, 171, 173 };
-	final int NAT = 561;
-	final int FIRE = 554;
-	final int LAW = 563;
-	final int FTAB = 8009;
-	final int VTAB = 8007;
-	final int HTAB = 8013;
-	int mbolts = 9142;
-	long antiban = System.currentTimeMillis();
-	int startXp = Skills.getXP(SKILLS.HITPOINTS) + Skills.getXP(SKILLS.RANGED);
-	double version;
-	int current_xp;
-	final long start_time = System.currentTimeMillis();
-	double XpToLVrange = Skills.getXPToNextLevel(SKILLS.RANGED);
-	double XpToLVhp = Skills.getXPToNextLevel(SKILLS.HITPOINTS);
-	int startLv = Skills.getActualLevel(SKILLS.RANGED)
+	//paint
+	public static int START_XP = Skills.getXP(SKILLS.HITPOINTS)
+			+ Skills.getXP(SKILLS.RANGED);
+	public static double VERSION;
+	public static int CURRENT_XP;
+	public static final long START_TIME = System.currentTimeMillis();
+	public static double XP_TO_LVL_RANGE = Skills.getXPToNextLevel(SKILLS.RANGED);
+	public static double XP_TO_LVL_HP = Skills.getXPToNextLevel(SKILLS.HITPOINTS);
+	public static int START_LV = Skills.getActualLevel(SKILLS.RANGED)
 			+ Skills.getActualLevel(SKILLS.HITPOINTS);
-	final String[] type = { "Defence", "Ranged", "Hitpoints" };
-	final SKILLS[] Names = { SKILLS.DEFENCE, SKILLS.RANGED, SKILLS.HITPOINTS, };
-	final int[] XP = { Skills.getXP(SKILLS.DEFENCE),
+	public static final String[] TYPE = { "Defence", "Ranged", "Hitpoints" };
+	public static final SKILLS[] SKILL = { SKILLS.DEFENCE, SKILLS.RANGED,
+			SKILLS.HITPOINTS, };
+	public static final int[] XP = { Skills.getXP(SKILLS.DEFENCE),
 			Skills.getXP(SKILLS.RANGED), Skills.getXP(SKILLS.HITPOINTS) };
-	int[] startLvs = { Skills.getActualLevel(SKILLS.DEFENCE),
+	public static int[] START_LVS = { Skills.getActualLevel(SKILLS.DEFENCE),
 			Skills.getActualLevel(SKILLS.RANGED),
 			Skills.getActualLevel(SKILLS.HITPOINTS) };
-	boolean scriptStatus = true;
-	int foodNum = 11;
-	int boltsID;
-	int ADDY = 2361;
-	int COIN = 995;
-	int RANARR = 207;
-	
-	int addybars, coins, ranarrs = 0;
-	int addycount, coinscount, ranarrcount = 0;
-	int addyIni, coinsIni, ranarrIni = 0;
-	int addyprice = 2800;
-	int ranarrprice = 6400;
-	boolean moveRandom = false;
-	boolean useHouse = true;
-	boolean waitGUI = true;
-
-	String fightStatus;
 	
 	@Override
 	public void run() {
 		
-		//General.useAntiBanCompliance(true);
+		General.useAntiBanCompliance(true);
 		//ABCUtil abc = new ABCUtil();
-		
-		
-		boltsID = Equipment.getItem(SLOTS.ARROW).getID();
+				
+		BOLTS_ID = Equipment.getItem(SLOTS.ARROW).getID();
 		if(Skills.getActualLevel(SKILLS.RANGED) < 70){
 			println("You must be at least 70 range to use this script");
-			scriptStatus = false;
+			SCRIPT_STATUS = false;
 		}
 		else if (Skills.getActualLevel(SKILLS.PRAYER) < 44){
 			println("You must be at least 44 prayer to use this script");
-			scriptStatus = false;
+			SCRIPT_STATUS = false;
 		}
 		else if (Skills.getActualLevel(SKILLS.AGILITY) < 60 && Skills.getActualLevel(SKILLS.STRENGTH) < 60){
 			println("You must be at least 60 agility or strength to use this script");
-			scriptStatus = false;
+			SCRIPT_STATUS = false;
 		}
 		if(Skills.getActualLevel(SKILLS.CONSTRUCTION) < 50){
-			useHouse = false;
+			USE_HOUSE = false;
 			println("You do not have 50 con for varrock portal focus, you must use varrock teletabs");
 		}
 		
-		boolean devmode = false;
+		boolean devmode = true;
 		
 		if(devmode){
-			foodNum = 9;
-			foodIDs = new int[] {379};
-			useHouse = true;
+			FOOD_NUMBER = 9;
+			FOOD_IDS = new int[] {379};
+			USE_HOUSE = true;
 		}
 		else{
 			AvieGUI g = new AvieGUI();
 			g.setVisible(true);
-			while (waitGUI)
+			while (WAIT_GUI)
 				sleep(500);
 			g.setVisible(false);
 		}
@@ -242,11 +148,11 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		
 		putMap();
 		
-		addyIni = Inventory.getCount(ADDY);
-		coinsIni = Inventory.getCount(COIN);
-		ranarrIni = Inventory.getCount(RANARR);
-		addyprice = Zybez.getPrice("Adamantite bar");
-		ranarrprice = Zybez.getPrice("Clean ranarr");
+		addyIni = Inventory.getCount(Constants.ADDY);
+		coinsIni = Inventory.getCount(Constants.COIN);
+		ranarrIni = Inventory.getCount(Constants.RANARR);
+		ADDY_PRICE = Zybez.getPrice("Adamantite bar");
+		RANARR_PRICE = Zybez.getPrice("Clean ranarr");
 		
 		sleep(250);
 		
@@ -254,30 +160,30 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		Walking.setControlClick(true);
 		
 		
-		while(scriptStatus){
-			current_xp = Skills.getXP(SKILLS.RANGED) + Skills.getXP(SKILLS.HITPOINTS);
-			XpToLVrange = Skills.getXPToNextLevel(SKILLS.RANGED);
-			XpToLVhp = Skills.getXPToNextLevel(SKILLS.HITPOINTS);
+		while(SCRIPT_STATUS){
+			CURRENT_XP = Skills.getXP(SKILLS.RANGED) + Skills.getXP(SKILLS.HITPOINTS);
+			XP_TO_LVL_RANGE = Skills.getXPToNextLevel(SKILLS.RANGED);
+			XP_TO_LVL_HP = Skills.getXPToNextLevel(SKILLS.HITPOINTS);
 			Mouse.setSpeed(General.random(175,190));
 			
-			addybars = Inventory.getCount(ADDY) - addyIni;
-			coins = Inventory.getCount(COIN) - coinsIni;
-			ranarrs = Inventory.getCount(RANARR) - ranarrIni;
+			addybars = Inventory.getCount(Constants.ADDY) - addyIni;
+			coins = Inventory.getCount(Constants.COIN) - coinsIni;
+			ranarrs = Inventory.getCount(Constants.RANARR) - ranarrIni;
 			
 			if(Game.getRunEnergy() > 20) {
 			    Options.setRunOn(true);
 			}
 			
-			if(moveRandom){
-				if(pos().distanceTo(randomEastT) > pos().distanceTo(randomWestT)){
-					Walking.walkPath(Walking.generateStraightPath(randomEastT));
+			if(MOVE_RANDOM){
+				if(pos().distanceTo(Constants.RANDOM_EAST_TILE) > pos().distanceTo(Constants.RANDOM_WEST_TILE)){
+					Walking.walkPath(Walking.generateStraightPath(Constants.RANDOM_EAST_TILE));
 					waitIsMovin();
 				}
 				else{
-					Walking.walkPath(Walking.generateStraightPath(randomWestT));
+					Walking.walkPath(Walking.generateStraightPath(Constants.RANDOM_WEST_TILE));
 					waitIsMovin();
 				}
-				moveRandom = false;
+				MOVE_RANDOM = false;
 			}
 			else if(gotoAvies()){
 				fight();
@@ -301,68 +207,66 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 			println("looting...");
 			LOOT();
 		}
-		else if (Inventory.getCount(rangepots) > 0
+		else if (Inventory.getCount(Constants.RANGE_POT) > 0
 				&& Skills.getCurrentLevel(SKILLS.RANGED) < Skills
 						.getActualLevel(SKILLS.RANGED) + 2) {
 
 			println(Skills.getCurrentLevel(SKILLS.RANGED) + "  "
 					+ Skills.getActualLevel(SKILLS.RANGED));
-			fightStatus = "Potting up";
-			drinkPotion(rangepots);
-			sleep(1000,1200);
+			FIGHT_STATUS = "Potting up";
 			println("Potted up");
+			drinkPotion(Constants.RANGE_POT);
 		}
 		else if (Prayer.getCurrentPrayers().length > 0){
 			PRAYERS[] p = Prayer.getCurrentPrayers();
-			if(!Prayer.isTabOpen())
+			if(!Prayer.isTabOpen()){
 				GameTab.open(TABS.PRAYERS);
-			sleep(300,500);
+				Timing.waitCondition(new Condition() {
+					public boolean active() {
+						return GameTab.getOpen() == TABS.PRAYERS;
+					}
+				}, General.random(400, 500));
+			}
 			for (int i = 0; i < p.length; i++) {
-				Prayer.disable(p[0]);
-				sleep(300,500);
+				final PRAYERS currentPrayer = p[i];
+				Prayer.disable(currentPrayer);
+				Timing.waitCondition(new Condition() {
+					public boolean active() {
+						return !Prayer.isPrayerEnabled(currentPrayer);
+					}
+				}, General.random(400, 500));
 			}
 		}
-//		else if (inCombat() && !underAttack().equals("Aviansie")){
-//			Walking.walkPath(Walking.generateStraightPath(toAvies[toAvies.length-1]));
-//			waitIsMovin();
-//		}
 		else if(isRanging()){
 			if(Combat.getTargetEntity() != null && !Combat.getTargetEntity().getName().equals("Aviansie")){
-				moveRandom = true;
-			}	
+				MOVE_RANDOM = true;
+			}
 			else
-				waitForLoot();
+				waitForLoot(Combat.getTargetEntity());
 		}
-		else if (Inventory.find(alcLoot).length > 0){
-			alc(alcLoot);
+		else if (Inventory.find(Constants.ALC_LOOT).length > 0){
+			alc(Constants.ALC_LOOT);
 		}
 		else{
-			RSNPC[] avies = NPCs.findNearest(avaIDs);
+			RSNPC[] avies = NPCs.findNearest("Aviansie");
 			for(RSNPC a : avies){
-				if(aviesArea.contains(a.getPosition())){
+				if(Constants.AVIES_Area.contains(a.getPosition()) && (a.getCombatLevel() == 69 || a.getCombatLevel() == 71 || a.getCombatLevel() == 83)){
 					if (a.isOnScreen()) {
-						clickObject(a, "Attack");//Clicking.click(avies)) {
-							fightStatus = "killing an avie";
+						if(clickObject(a, "Attack")){//Clicking.click(avies)) {
+							FIGHT_STATUS = "killing an avie";
 							
-							sleep(300, 500);
-//							final RSNPC tmp_blkdrag = a;
-//							Timing.waitCondition(new Condition() {
-//								public boolean active() {
-//									return Player.getAnimation() == 4230
-//											|| inCombat()
-//											|| tmp_blkdrag.isInCombat();
-//								}
-//							}, General.random(2200, 2400));
-//						} 
-//						else {
-//							sleep(200, 400);
-//						}
+							Timing.waitCondition(new Condition() {
+								public boolean active() {
+									return Player.getAnimation() == 4230;
+								}
+							}, General.random(3000, 3200));
+						}
 					} 
 					else {
 						println("running to closest avie");
 						Walking.clickTileMM(a.getAnimablePosition(), 1);
 						Camera.turnToTile(a.getPosition());
-						sleep(500,600);
+						sleep(300,400); // can't really put a conditional wait here cuz i can't get the rotation
 					}
 					break;
 				}
@@ -374,16 +278,16 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		RSObject[] boulder = Objects.findNearest(7, "Boulder");
 		RSObject[] hole = Objects.findNearest(7, "Hole");
 	
-		if (inArea(aviesArea) && pos().getPlane() == 2)
+		if (inArea(Constants.AVIES_Area) && pos().getPlane() == 2)
 			return true;
-		else if(!inArea(varrockArea) && Objects.findNearest(50, "Portal").length > 0){
-			fightStatus = "in house...";
+		else if(!inArea(Constants.VARROCK_AREA) && Objects.findNearest(50, "Portal").length > 0){
+			FIGHT_STATUS = "in house...";
 			RSObject[] alter = Objects.findNearest(20, "Altar");
 			RSObject[] portal = Objects.findNearest(20, "Varrock Portal");
 			RSObject[] portal2 = Objects.findNearest(30, "Portal");
 			
 			if(alter.length == 0 || portal.length == 0){
-				fightStatus = "not inside house...";
+				FIGHT_STATUS = "not inside house...";
 				if(portal2.length > 0){
 					if(portal2[0].isOnScreen()){
 						if(portal2[0].click("Enter")){
@@ -403,10 +307,12 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 			else if (Skills.getCurrentLevel(SKILLS.PRAYER) == Skills.getActualLevel(SKILLS.PRAYER)) {
 				if(portal.length > 0){
 					if (portal[0].isOnScreen()) {
-						if (portal[0].click("Enter")) {
-							sleep(500, 700);
-						} else {
-							sleep(500, 700);
+						if (Clicking.click("Enter", portal[0])) {
+							Timing.waitCondition(new Condition() {
+								public boolean active() {
+									return inArea(Constants.VARROCK_AREA);
+								}
+							}, General.random(1200, 2000));
 						}
 					} else {
 						Positionable temp = new RSTile(portal[0].getPosition().getX(), portal[0].getPosition().getY()-2, 0);
@@ -417,11 +323,12 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 			} else {
 				if (alter.length > 0) {
 					if (alter[0].isOnScreen()) {
-						if (alter[0].click("Pray")) {
-							sleep(500, 700);
-
-						} else {
-							sleep(500, 700);
+						if (Clicking.click("Pray", alter[0])) {
+							Timing.waitCondition(new Condition() {
+								public boolean active() {
+									return Skills.getCurrentLevel(SKILLS.PRAYER) == Skills.getActualLevel(SKILLS.PRAYER);
+								}
+							}, General.random(1500, 2300));
 						}
 					} else {
 						Walking.walkPath(Walking.generateStraightPath(alter[0].getPosition()));
@@ -431,80 +338,88 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 			}
 		}
 		else if(inGW()){
-			fightStatus = "walking to avies spot";
-			Walking.walkPath(Walking.generateStraightPath(toAvies[toAvies.length-1]));
+			FIGHT_STATUS = "walking to avies spot";
+			Walking.walkPath(Walking.generateStraightPath(Constants.TO_AVIES[Constants.TO_AVIES.length-1]));
 			//Walking.walkPath(toAvies);
 			waitIsMovin();
 		}
-		else if (pos().distanceTo(toGW[toGW.length - 1]) <= 5) {
-			fightStatus = "walking to GW hole";
-			if (Walking.clickTileMS(holeT, 1)) {
+		else if (pos().distanceTo(Constants.TO_GWD[Constants.TO_GWD.length - 1]) <= 5) {
+			FIGHT_STATUS = "walking to GW hole";
+			if (Clicking.click("Climb-down", Constants.HOLE_TILE.getPosition())) {
 				Timing.waitCondition(new Condition() {
 					public boolean active() {
 						return inGW();
 					}
-				}, General.random(5000, 7000));
+				}, General.random(2000, 3000));
 			}
 		}
-		else if (aroundPath(toGW)){
-			fightStatus = "walking before the range trolls";
-			Walking.walkPath(toGW);
+		else if (aroundPath(Constants.TO_GWD)){
+			FIGHT_STATUS = "walking before the range trolls";
+			Walking.walkPath(Constants.TO_GWD);
 			waitIsMovin();
 		}
-		else if (pos().distanceTo(beforeRock[beforeRock.length - 1]) <= 5) {
-			fightStatus = "prayer off, walking to boulder";
+		else if (pos().distanceTo(Constants.BEFORE_BOULDER[Constants.BEFORE_BOULDER.length - 1]) <= 5) {
+			FIGHT_STATUS = "prayer off, walking to boulder";
 			turnOffPrayerProtectionMissles();
 			if (Clicking.click(Objects.findNearest(7, "Boulder"))) {
 				Timing.waitCondition(new Condition() {
 					public boolean active() {
-						return aroundPath(toGW);
+						return aroundPath(Constants.TO_GWD);
 					}
 				}, General.random(7000, 8000));
 			}
 		}
-		else if (inArea(aroundFirstSlideArea)){
-			fightStatus = "near first slide";
+		else if (inArea(Constants.ROCK_SLIDE_AREA)){
+			FIGHT_STATUS = "near first slide";
 			if(Clicking.click(Objects.findNearest(7, "Rocks"))){
 				Timing.waitCondition(new Condition() {
 					public boolean active() {
-						return aroundPath(beforePrayerRange);
+						return aroundPath(Constants.BEFORE_PRAY_RANGE_SPOT);
 					}
-				}, General.random(4500, 5500));
+				}, General.random(3500, 4500));
 			}
 		}
-		else if (inArea(teleSpotArea)){
-			fightStatus = "walking to first slide";
-			Walking.walkPath(toFirstSlide);
+		else if (inArea(Constants.TROLL_TELEPORT_AREA)){
+			FIGHT_STATUS = "walking to first slide";
+			Walking.walkPath(Constants.TO_FIRST_SLIDE);
 			waitIsMovin();
 		}
-		else if (aroundPath(beforeRock)){
-			fightStatus = "walking by trolls";
+		else if (aroundPath(Constants.BEFORE_BOULDER)){
+			FIGHT_STATUS = "walking by trolls";
 			if(!Prayer.isPrayerEnabled(PRAYERS.PROTECT_FROM_MISSILES)){
 				if(!Prayer.isTabOpen()){
 					GameTab.open(TABS.PRAYERS);
-					sleep(300,350);
+					Timing.waitCondition(new Condition() {
+						public boolean active() {
+							return GameTab.getOpen() == TABS.PRAYERS;
+						}
+					}, General.random(400, 500));
 				}
 				Prayer.enable(PRAYERS.PROTECT_FROM_MISSILES);
-				sleep(200,250);
+				Timing.waitCondition(new Condition() {
+					public boolean active() {
+						return !Prayer.isPrayerEnabled(PRAYERS.PROTECT_FROM_MISSILES);
+					}
+				}, General.random(400, 500));
 			}
-			Walking.walkPath(beforeRock);
+			Walking.walkPath(Constants.BEFORE_BOULDER);
 			waitIsMovin();
 		}
-		else if (aroundPath(beforePrayerRange)){
-			fightStatus = "walking before the range trolls";
-			Walking.walkPath(beforePrayerRange);
+		else if (aroundPath(Constants.BEFORE_PRAY_RANGE_SPOT)){
+			FIGHT_STATUS = "walking before the range trolls";
+			Walking.walkPath(Constants.BEFORE_PRAY_RANGE_SPOT);
 			waitIsMovin();
 		}
-		else if (inArea(varrockArea)){
-			fightStatus = "in varrock, banking...";
+		else if (inArea(Constants.VARROCK_AREA)){
+			FIGHT_STATUS = "in varrock, banking...";
 			if(!gotEquipment()){
-				if (pos().distanceTo(bankT) <= 5){
+				if (pos().distanceTo(Constants.BANK_TILE) <= 5){
 					println("banking...");
 					bank();
 				}
 				else{
 					println("gonna web walk to bank");
-					WebWalking.walkTo(bankT);
+					WebWalking.walkTo(Constants.BANK_TILE);
 					waitIsMovin();
 				}
 			}
@@ -516,18 +431,18 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	}
 	
 	public boolean isLoot(){
-		RSGroundItem[] Nests = GroundItems.findNearest(loot2);
-		return Nests.length > 0 && aviesArea.contains(Nests[0].getPosition());
+		RSGroundItem[] Nests = GroundItems.findNearest(Constants.LOOT2);
+		return Nests.length > 0 && Constants.AVIES_Area.contains(Nests[0].getPosition());
 	}
 		
 	public void LOOT() {
-		fightStatus = "looting";
+		FIGHT_STATUS = "looting";
 		turnOffPrayerEagle();		
-		RSGroundItem[] Nests = GroundItems.findNearest(loot);
+		RSGroundItem[] Nests = GroundItems.findNearest(Constants.LOOT);
 		
 		for(int i = 0; i < Nests.length; i++){
 			Walking.setWalkingTimeout(1000L);
-			if(Nests[i].getID() == 9142){
+			if(Nests[i].getID() == BOLTS_ID){
 				if (Nests[i].getStack() > 9) {
 					if (!Nests[i].isOnScreen()) {
 						Walking.walkPath(Walking.generateStraightPath(Nests[i].getPosition()));
@@ -535,10 +450,10 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 						Camera.setCameraAngle(General.random(90, 100));
 						waitIsMovin();
 					}
-					String str = map.get(Nests[i].getID());
-					int tmpCount = lootCount(Nests[i].getID());
+					String str = Constants.LOOT_MAPPING.get(Nests[i].getID());
+					final int tmpCount = itemCount(Nests[i].getID());
 					if (Nests[i].click("Take " + str))
-						waitForInv(Nests[i].getID(), tmpCount);
+						waitForItem(tmpCount);
 				}
 			}
 			else{
@@ -548,10 +463,10 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 					Camera.setCameraAngle(General.random(90, 100));
 					waitIsMovin();
 				}
-				String str = map.get(Nests[i].getID());
-				int tmpCount = lootCount(Nests[i].getID());
+				String str = Constants.LOOT_MAPPING.get(Nests[i].getID());
+				final int tmpCount = itemCount(Nests[i].getID());
 				if(Nests[i].click("Take " + str))
-					waitForInv(Nests[i].getID(), tmpCount);
+					waitForItem(tmpCount);
 			}
 		}
 	}
@@ -570,9 +485,13 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 				ranarrIni = 0;
 				
 				Banking.depositAll();
-				sleep(100,150);
+				Timing.waitCondition(new Condition() {
+					public boolean active() {
+						return Inventory.getAll().length == 0;
+					}
+				}, General.random(400, 500));
 				
-				if(!useHouse){
+				if(!USE_HOUSE){
 					int pt = Skills.getActualLevel(SKILLS.PRAYER) / 3;
 					int currP = Skills.getCurrentLevel(SKILLS.PRAYER);
 
@@ -580,95 +499,117 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 					if (currP < pt * 2) {
 						println("potting prayer, pt is: " + pt);
 
-						Clicking.hover(Banking.find(ppot));
-						Banking.withdraw(1, ppot);
-						sleep(600, 640);
+						Banking.withdraw(1, Constants.PRAYER_POT);
+						waitForItem(Constants.PRAYER_POT);
 						Banking.close();
-						sleep(200, 230);
+						Timing.waitCondition(new Condition() {
+							public boolean active() {
+								return !Banking.isBankScreenOpen();
+							}
+						}, General.random(400, 500));
 
-						pPot = Inventory.find(ppot);
+						pPot = Inventory.find(Constants.PRAYER_POT);
 						if (pPot.length > 0) {
 							do {
-								pPot[0].click("Drink");
-								sleep(1000, 1200);
+								if(Clicking.click("Drink", pPot[0])){
+									sleep(500,1000);
+								}
+								sleep(50);
 							} while (Skills.getCurrentLevel(SKILLS.PRAYER) <= (pt * 2) - 2);
 						}
-						sleep(200, 250);
+						
 						if (!Banking.isBankScreenOpen()) {
 							if (Banking.openBankBanker()) {
-								sleep(200, 250);
-								Banking.deposit(1, ppot);
-								sleep(200, 250);
+								Timing.waitCondition(new Condition() {
+									public boolean active() {
+										return Banking.isBankScreenOpen();
+									}
+								}, General.random(400, 500));
+								
+								Banking.depositAll();
+								Timing.waitCondition(new Condition() {
+									public boolean active() {
+										return Inventory.getAll().length == 0;
+									}
+								}, General.random(400, 500));
 							}
 						}
 					}
-					sleep(200, 300);
 				}
 				
-				Clicking.hover(Banking.find(rangepots));
-				Banking.withdraw(1, rangepots);
-				sleep(600, 650);
-				Clicking.hover(Banking.find(NAT));
-				Banking.withdraw(10, NAT);
-				sleep(600, 650);	
-				Clicking.hover(Banking.find(FIRE));
-				Banking.withdraw(52, FIRE);
-				sleep(600, 650);
-				Clicking.hover(Banking.find(LAW));
-				Banking.withdraw(2, LAW);
-				sleep(600, 650);
-				Clicking.hover(Banking.find(foodIDs));
-				Banking.withdraw(foodNum+((Combat.getMaxHP() - Combat.getHP()) / 12), foodIDs);
-				sleep(600,650);
+				Banking.withdraw(1, Constants.RANGE_POT);
+				waitForItem(Constants.RANGE_POT);
+				Banking.withdraw(10, Constants.NAT);
+				waitForItem(Constants.NAT);
+				Banking.withdraw(52, Constants.FIRE);
+				waitForItem(Constants.FIRE);
+				Banking.withdraw(2, Constants.LAW);
+				waitForItem(Constants.LAW);
+				Banking.withdraw(FOOD_NUMBER+((Combat.getMaxHP() - Combat.getHP()) / 12), FOOD_IDS);
+				waitForItem(FOOD_IDS);
 				
-				if(useHouse){
-					if(lootCountStack(HTAB) < 5){
-						Clicking.hover(Banking.find(HTAB));
-						Banking.withdraw(10, HTAB);
-						sleep(500,650);
+				
+				
+				if(USE_HOUSE){
+					if(lootCountStack(Constants.HTAB) < 5){
+						Banking.withdraw(10, Constants.HTAB);
+						waitForItem(Constants.HTAB);
 					}
 				}
 				else{
-					if(lootCountStack(HTAB) < 5){
-						Clicking.hover(Banking.find(VTAB));
-						Banking.withdraw(10, VTAB);
-						sleep(500,650);
+					if(lootCountStack(Constants.HTAB) < 5){
+						Banking.withdraw(10, Constants.VTAB);
+						waitForItem(Constants.VTAB);
 					}
 				}
 				if(getStackBolts() < 500){
-					Clicking.hover(Banking.find(boltsID));
-					Banking.withdraw(1000, boltsID);
-					sleep(600, 650);
-				}
-				
-				if(Inventory.find(boltsID).length > 0){
-					Inventory.find(boltsID)[0].click("Equip");
-					sleep(500,600);
+					Banking.withdraw(1000, BOLTS_ID);
+					waitForItem(BOLTS_ID);
 				}
 				
 				Banking.close();
-				while(Inventory.find(foodIDs).length > foodNum){
-					Inventory.find(foodIDs)[0].click("Eat");
-					sleep(300);
+				Timing.waitCondition(new Condition() {
+					public boolean active() {
+						return !Banking.isBankScreenOpen();
+					}
+				}, General.random(400, 500));
+				
+				if(Inventory.find(BOLTS_ID).length > 0){
+					Clicking.click("Equip", Inventory.find(BOLTS_ID)[0]);
+				}
+				
+				while(Inventory.find(FOOD_IDS).length > FOOD_NUMBER){
+				    final int i = Inventory.find(FOOD_IDS).length;
+					if(Clicking.click("Eat", Inventory.find(FOOD_IDS)[0]))
+						waitForEating(i);
 				}
 			}
 		}
 	}
 
 	public void ifFull(){
-		RSItem[] food = Inventory.find(foodIDs);
-		RSItem[] bolts = Inventory.find(boltsID);
-		if(Inventory.find(junk).length > 0 || food.length > 0 || bolts.length > 0){
-			fightStatus = "dropping junk";
+		RSItem[] food = Inventory.find(FOOD_IDS);
+		RSItem[] bolts = Inventory.find(BOLTS_ID);
+		if(Inventory.find(Constants.JUNK).length > 0 || food.length > 0 || bolts.length > 0){
+			FIGHT_STATUS = "dropping junk";
 			if (food.length > 0){
-				food[0].click("Eat");
-				sleep(300,350);
+				final int count = Inventory.getCount(FOOD_IDS);
+				if(Clicking.click("Eat", food[0])){
+					waitForEating(count);
+				}
+					
 			}
 			else if (bolts.length > 0){
-				bolts[0].click("Wield");
-				sleep(300, 350);
+				final int boltsCount = Equipment.getItem(SLOTS.ARROW).getStack();
+				if(Clicking.click("Wield", bolts[0])){
+					Timing.waitCondition(new Condition() {
+						public boolean active() {
+							return Equipment.getItem(SLOTS.ARROW).getStack() > boltsCount;
+						}
+					}, General.random(400, 500));
+				}
 			}
-			Inventory.drop(junk);
+			Inventory.drop(Constants.JUNK);
 		}
 		else{
 			emergTele();
@@ -676,20 +617,17 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	}
 	
 	public boolean gotEquipment(){
-		println(lootCountStack(NAT));
-		if( ((!useHouse && lootCountStack(VTAB) > 0) || (useHouse && lootCountStack(HTAB) > 0))
-				&& lootCountStack(NAT) >= 10 && lootCountStack(FIRE) >= 52
-				&& lootCountStack(LAW) == 2 && Inventory.find(rangepots).length == 1
-				&& Inventory.find(foodIDs).length == foodNum){
-			return true;
-		}
-		return false;
+		println(lootCountStack(Constants.NAT));
+		return (((!USE_HOUSE && lootCountStack(Constants.VTAB) > 0) || (USE_HOUSE && lootCountStack(Constants.HTAB) > 0))
+				&& lootCountStack(Constants.NAT) >= 10 && lootCountStack(Constants.FIRE) >= 52
+				&& lootCountStack(Constants.LAW) == 2 && Inventory.find(Constants.RANGE_POT).length == 1
+				&& Inventory.find(FOOD_IDS).length == FOOD_NUMBER);
 	}
 
 	public void gotoAviesSpot(){
-		fightStatus = "going to avvieArea";
+		FIGHT_STATUS = "going to avvieArea";
 		Walking.setWalkingTimeout(1500L);
-		Walking.walkPath(toAvies);
+		Walking.walkPath(Constants.TO_AVIES);
 		waitIsMovin();
 	}
 
@@ -698,8 +636,8 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		Rectangle hideZone = new Rectangle(342, 369, 542, 500);
 		Point p = Mouse.getPos();
 		
-		int xpGained = current_xp - startXp;
-		long timeRan = System.currentTimeMillis() - start_time;
+		int xpGained = CURRENT_XP - START_XP;
+		long timeRan = System.currentTimeMillis() - START_TIME;
 		
 		double multiplier = timeRan / 3600000D;
 		int xpPerHour = (int) (xpGained / multiplier);
@@ -709,28 +647,28 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		double hoursRan = secondsRan/3600;
 		int x = 0;
 		for (int i = 0; i < XP.length; i++) {
-			if (XP[i] != Skills.getXP(Names[i])) {
+			if (XP[i] != Skills.getXP(SKILL[i])) {
 
-				double xp_per_hour = Math.round(((Skills.getXP(Names[i]) - XP[i])) / hoursRan);
+				double xp_per_hour = Math.round(((Skills.getXP(SKILL[i]) - XP[i])) / hoursRan);
 				if (!hideZone.contains(p)) {
 					g.setColor(new Color(0, 0, 0));
 					g.fillRect(2, 326 - x, 515, 12);
 
 					g.setColor(new Color(0, 255, 0, 255));
-					g.drawString(Names[i] + ": " + (int) xp_per_hour + " Xp/h",
+					g.drawString(SKILL[i] + ": " + (int) xp_per_hour + " Xp/h",
 							5, (337 - x));
 
 					int x1 = 125, y1 = 327 - x;
-					int CUR_LVL = Skills.getActualLevel(Names[i]);
+					int CUR_LVL = Skills.getActualLevel(SKILL[i]);
 					int NXT_LVL = (CUR_LVL + 1);
 					int Percentage = Skills
-							.getPercentToLevel(Names[i], NXT_LVL);
-					double nextLv = Skills.getXPToLevel(Names[i], NXT_LVL);
+							.getPercentToLevel(SKILL[i], NXT_LVL);
+					double nextLv = Skills.getXPToLevel(SKILL[i], NXT_LVL);
 
 					double hours = (nextLv / xp_per_hour);
 
 					g.drawString("Curr lv: " + CUR_LVL + " ("
-							+ (CUR_LVL - startLvs[i]) + ")  TTL " + (int) hours
+							+ (CUR_LVL - START_LVS[i]) + ")  TTL " + (int) hours
 							+ ":" + (int) ((hours - (int) hours) * 60)
 							+ " hr:min  Exp to lv: " + (int) nextLv, 235,
 							y1 + 10);
@@ -754,7 +692,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		db = coins + coinscount;
 		ran = ranarrs + ranarrcount;
 		g.setColor(Color.CYAN);
-		RSGroundItem[] Nests = GroundItems.findNearest(loot2);
+		RSGroundItem[] Nests = GroundItems.findNearest(Constants.LOOT2);
 		
 		Map<Integer, Integer> items = new HashMap<Integer, Integer>();
 		RSItem[] item = Inventory.getAll();
@@ -766,24 +704,26 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		int k = 0;
 	    while (it.hasNext()) {
 	        Map.Entry pairs = (Map.Entry)it.next();
-	        g.drawString((map.get(pairs.getKey()) != null ? map.get(pairs.getKey()) : pairs.getKey()) 
+	        g.drawString((Constants.LOOT_MAPPING.get(pairs.getKey()) != null ? Constants.LOOT_MAPPING.get(pairs.getKey()) : pairs.getKey()) 
 	        		+ " = " + pairs.getValue(), 5, 100+k);
 	        it.remove(); // avoids a ConcurrentModificationException
 	        k+=15;
 	    }
 		
 		for(int i = 0; i < Nests.length; i++){
-			if(aviesArea.contains(Nests[i].getPosition())){
+			if(Constants.AVIES_Area.contains(Nests[i].getPosition())){
 				RSTile t = Nests[i].getPosition();				
 				drawTile(t, g, false);
 			}
 		}
 		g.setColor(Color.RED);
-		RSNPC[] avv = NPCs.findNearest(avaIDs);
-		for(int i = 0; i < avv.length; i++){
-			drawTile(avv[i].getPosition(), g, false);			
+		RSNPC[] avv = NPCs.findNearest("Aviansie");
+		for(RSNPC a : avv){
+			if(a.getCombatLevel() == 69 || a.getCombatLevel() == 71 || a.getCombatLevel() == 83)
+				drawTile(a.getPosition(), g, false);			
 		}
 		g.drawString(Combat.getTargetEntity().getName(), 5, 50);
+		g.drawString(avv[0].getAnimation() + "", 5, 60);
 		g.setColor(Color.GREEN);
 //		RSNPC[] o = NPCs.findNearest(avaIDs);
 //		if(o.length > 0){
@@ -805,24 +745,24 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 
 			g.setColor(Color.WHITE);
 			g.drawString("Yawhide's BDK", 345, 385);
-			g.drawString("Version :" + version + "   Curr world: " + Game.getCurrentWorld(), 345, 405);
+			g.drawString("Version :" + VERSION + "   Curr world: " + Game.getCurrentWorld(), 345, 405);
 			g.drawString("Running for: " + Timing.msToString(timeRan), 345, 420);
 			g.drawString("Total XP ganed: " + xpGained + " (" + xpPerHour
 					+ "/h)", 345, 435);
-			g.drawString("State: " + fightStatus, 345, 450);
+			g.drawString("State: " + FIGHT_STATUS, 345, 450);
 			g.drawString("Addy bars: " + dh + "       GP: " + db/1000 + " K", 345, 465);
-			g.drawString("Gp/hr: " + (int) ((dh*addyprice + db + ran*ranarrprice)/hoursRan/1000) + " K   Total: " + (int)(dh*addyprice + db + ran*ranarrprice)/1000 + " K", 345, 480);
+			g.drawString("Gp/hr: " + (int) ((dh*ADDY_PRICE + db + ran*RANARR_PRICE)/hoursRan/1000) + " K   Total: " + (int)(dh*ADDY_PRICE + db + ran*RANARR_PRICE)/1000 + " K", 345, 480);
 			
 		}
 	}
 	
 	public void teleToTroll(){
 		GameTab.open(TABS.MAGIC);
-		sleep(200,250);
+		waitForTab(TABS.MAGIC);
 		Magic.selectSpell("Trollheim Teleport");
 		Timing.waitCondition(new Condition() {
 			public boolean active() {
-				return inArea(teleSpotArea);
+				return inArea(Constants.TROLL_TELEPORT_AREA);
 			}
 		}, General.random(3500, 4500));
 	}
@@ -831,15 +771,14 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		RSItem[] ROD = Equipment.find(SLOTS.RING);
 		
 		GameTab.open(TABS.EQUIPMENT);
-		sleep(200,250);
+		waitForTab(TABS.EQUIPMENT);
 		if(ROD.length > 0){
 			if(!inCombat()){
-				if (ROD[0].click("Operate")) {
-					sleep(500, 700);
+				if (Clicking.click("Operate", ROD[0])) {
 					if (NPCChat.selectOption("Castle Wars Arena.", true)) {
 						Timing.waitCondition(new Condition() {
 							public boolean active() {
-								return inArea(CWArea);
+								return inArea(Constants.CW_AREA);
 							}
 						}, General.random(4500, 5500));
 					}
@@ -856,18 +795,18 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	public int distanceTo(RSTile t){ return Math.max(pos().getX()-t.getX(), pos().getY() - t.getY()); }
 	public int getHp() { return Combat.getHPRatio(); }
 	public boolean isFull() { return Inventory.isFull(); }
-	public int lootCount(int ID) { return Inventory.find(ID).length; }
+	public int itemCount(int ID) { return Inventory.find(ID).length; }
 	public int lootCountStack(int ID) { return Inventory.getCount(ID); }
 	public boolean isMovin() { return Player.isMoving();}
 	public boolean inCombat() { return Player.getRSPlayer().isInCombat(); }
-	public int getStackBolts() { return Equipment.getItem(SLOTS.ARROW).getID() == boltsID ? Equipment.getItem(SLOTS.ARROW).getStack() : 0;}
+	public int getStackBolts() { return Equipment.getItem(SLOTS.ARROW).getID() == BOLTS_ID ? Equipment.getItem(SLOTS.ARROW).getStack() : 0;}
 	
 	public void putMap() {
-		for (int i = 0; i < loot.length; i++) {
-			if (i >= names.length) {
-				map.put(loot[i], names[names.length - 1]);
+		for (int i = 0; i < Constants.LOOT.length; i++) {
+			if (i >= Constants.LOOT_STRING_NAMES.length) {
+				Constants.LOOT_MAPPING.put(Constants.LOOT[i], Constants.LOOT_STRING_NAMES[Constants.LOOT_STRING_NAMES.length - 1]);
 			} else
-				map.put(loot[i], names[i]);
+				Constants.LOOT_MAPPING.put(Constants.LOOT[i], Constants.LOOT_STRING_NAMES[i]);
 		}
 	}
 	
@@ -882,49 +821,53 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	}
 	
 	public Avies() {
-		version = ((ScriptManifest) getClass().getAnnotation(
+		VERSION = ((ScriptManifest) getClass().getAnnotation(
 				ScriptManifest.class)).version();
 	}
 	
 	public void emergTele(){
-		fightStatus = "tele tabbing";
-		RSItem[] tab = Inventory.find(VTAB);
-		if(useHouse)
-			tab = Inventory.find(HTAB);
+		FIGHT_STATUS = "tele tabbing";
+		RSItem[] tab = Inventory.find(Constants.VTAB);
+		if(USE_HOUSE)
+			tab = Inventory.find(Constants.HTAB);
 		GameTab.open(TABS.INVENTORY);
-		sleep(100, 150);
+		waitForTab(TABS.INVENTORY);
 		if(tab.length > 0){
-			if(tab[0].click("Break")){
-				sleep(General.random(5000,  6000));
+			if(Clicking.click("Break", tab[0])){
+				Timing.waitCondition(new Condition() {
+					public boolean active() {
+						return USE_HOUSE ? inHouse() : inArea(Constants.VARROCK_AREA);
+					}
+				}, General.random(2500, 3000));
 			}
 		}
 		else{
 			println("Out of tabs");
-			scriptStatus = false;
+			SCRIPT_STATUS = false;
 		}
 	}
 	
 	public void HEAL() {
-		RSItem[] food = Inventory.find(foodIDs);
-		fightStatus = "eating food";
+		RSItem[] food = Inventory.find(FOOD_IDS);
+		FIGHT_STATUS = "eating food";
 		if(GameTab.getOpen() != TABS.INVENTORY){
 			GameTab.open(TABS.INVENTORY); 
-			sleep(100, 150);
+			waitForTab(TABS.INVENTORY);
 		}
 		
 		if (food.length > 0) {
-			if(food[0].click("Eat"))
-				sleep(300, 550);
+			final int count = Inventory.getCount(FOOD_IDS);
+			if(Clicking.click("Eat", food[0]))
+				waitForEating(count);
 		}
 		else
 			emergTele();
 	}
-	
-	
-	public void prayerflick() {// RSNPC drag) {
+		
+	public void prayerFlick() {
 
-		while (!moveRandom && getHp() > 30 && Skills.getCurrentLevel(SKILLS.PRAYER) > 5 && isRanging() && inAviesSpot() && !isLoot()) {
-			fightStatus = "flicking now!";
+		while (!MOVE_RANDOM && getHp() > 30 && Skills.getCurrentLevel(SKILLS.PRAYER) > 5 && isRanging() && inAviesSpot() && !isLoot()) {
+			FIGHT_STATUS = "flicking now!";
 			if(!Prayer.isTabOpen()){
 				GameTab.open(TABS.PRAYERS);
 			}
@@ -945,20 +888,28 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		turnOffPrayerEagle();
 	}
 	
-	public void waitForLoot(){
-		fightStatus = "prayerflicking";
+	//TODO fix waitForLoot
+	public void waitForLoot(RSCharacter avv){
+		FIGHT_STATUS = "prayerflicking";
 		if(!isLoot() && isRanging() && inAviesSpot() && getHp() > 30){
-			prayerflick();
+			prayerFlick();
 		}
 		turnOffPrayerEagle();
 	}
 	
 	public void turnOffPrayerEagle(){
 		if (Prayer.isPrayerEnabled(PRAYERS.EAGLE_EYE)){
-			if(!Prayer.isTabOpen()) GameTab.open(TABS.PRAYERS);
-			sleep(200,250);
+			if(!Prayer.isTabOpen()){
+				GameTab.open(TABS.PRAYERS);
+				waitForTab(TABS.PRAYERS);
+			}
+			
 			Prayer.disable(PRAYERS.EAGLE_EYE);
-			sleep(800,1000);
+			Timing.waitCondition(new Condition() {
+				public boolean active() {
+					return !Prayer.isQuickPrayerEnabled(PRAYERS.EAGLE_EYE);
+				}
+			}, General.random(400, 500));
 		}
 	}
 	
@@ -970,13 +921,9 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		return null;
 	}
 	
-	public boolean inAviesSpot(){
-		return inArea(aviesArea);
-	}
+	public boolean inAviesSpot(){	return inArea(Constants.AVIES_Area);	}
 	
-	public boolean inArea(RSArea a) {
-		return a.contains(pos());
-	}
+	public boolean inArea(RSArea a) {	return a.contains(pos());	}
 	
 	public void waitIsMovin(){ 
 		for(int i = 0; i < 57; i++, sleep(30, 40)){
@@ -990,8 +937,13 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 			Inventory.open();
 			RSItem[] potion = Inventory.find(pot);
 			if (potion.length > 0) {
-				if(potion[0].click("Drink"))
-					General.sleep(1100, 1300);
+				if(Clicking.click("Drink", potion[0])){
+					Timing.waitCondition(new Condition() {
+						public boolean active() {
+							return Skills.getCurrentLevel(SKILLS.RANGED) > Skills.getActualLevel(SKILLS.RANGED);
+						}
+					}, General.random(1000, 1200));
+				}
 			}
 		}
 	}
@@ -1000,21 +952,26 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		if (Prayer.isPrayerEnabled(PRAYERS.PROTECT_FROM_MISSILES)){
 			if(!Prayer.isTabOpen()){
 				GameTab.open(TABS.PRAYERS);
-				sleep(500,650);
+				waitForTab(TABS.PRAYERS);
 			}
 			Prayer.disable(PRAYERS.PROTECT_FROM_MISSILES);
-			sleep(800,1000);
+			Timing.waitCondition(new Condition() {
+				public boolean active() {
+					return !Prayer.isQuickPrayerEnabled(PRAYERS.PROTECT_FROM_MISSILES);
+				}
+			}, General.random(400, 500));
 		}
 	}
 	
 	private void waitForInv(int lootID, int lootNum) {
-		fightStatus = "waiting for loot";
-		int k = 0;
-		while (lootCount(lootID) == lootNum && k < 70
-				&& Player.isMoving()) {
-			sleep(80);
-			k++;
-		}
+		FIGHT_STATUS = "waiting for loot";
+		final int lootIDFinal = lootID;
+		final int lootNumFinal = lootNum;
+		Timing.waitCondition(new Condition() {
+			public boolean active() {
+				return itemCount(lootIDFinal) == lootNumFinal && Player.isMoving();
+			}
+		}, General.random(3500, 4000));
 	}
 	
 	public boolean aroundPath(RSTile[] path){
@@ -1023,22 +980,42 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 				return true;
 			}	
 		}
-		sleep(1000, 1500);
 		return false;
 	}
 	
-	public boolean inGW(){
-		return pos().distanceTo(gwCenter) <= 50 && pos().getPlane() == 2;
-	}
+	public boolean inGW(){	return pos().distanceTo(Constants.GWD_CENTER) <= 50 && pos().getPlane() == 2;	}
 	
 	public void alc(int[] loot){
 		RSItem[] l = Inventory.find(loot);
 		GameTab.open(TABS.MAGIC);
-		sleep(200,250);
+		waitForTab(TABS.MAGIC);
 		Magic.selectSpell("High Level Alchemy");
-		sleep(200,250);
-		if(l[0].click("Cast"))
-			sleep(1000,1200);
+		waitFor(!Magic.getSelectedSpellName().equals(""), 500, 1000);
+		final int exp = Skills.getXP(SKILLS.MAGIC);
+		if(Clicking.click("Cast", l[0])){
+			waitFor(Skills.getXP(SKILLS.MAGIC) > exp, 1100, 1400);
+		}
+	}
+	
+	public void waitForTab(TABS t){
+		final TABS tab = t;
+		Timing.waitCondition(new Condition() {
+			public boolean active() {
+				return GameTab.getOpen() == tab;
+			}
+		}, General.random(500, 1000));
+	}
+	
+	public void waitFor(final boolean b, int begin, int end){
+		Timing.waitCondition(new Condition() {
+			public boolean active() {
+				return b;
+			}
+		}, General.random(begin, end));
+	}
+	
+	public boolean inHouse(){
+		return !inArea(Constants.VARROCK_AREA) && Objects.findNearest(50, "Portal").length > 0;
 	}
 
 	@Override
@@ -1059,7 +1036,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	@Override
 	public void serverMessageReceived(String arg0) {
 		if(arg0.equals("You need a higher slayer level to know how to wound this monster.")){
-			moveRandom = true;
+			MOVE_RANDOM = true;
 		}
 	}
 
@@ -1086,7 +1063,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		return false;
 	}
 
-	public void clickObject(RSNPC a, String option) {
+	public boolean clickObject(RSNPC a, String option) {
 		RSNPC object = a;
 		if (object != null) {
 			int x = (int) object.getModel().getEnclosedArea().getBounds()
@@ -1100,12 +1077,10 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 					ChooseOption.close();
 				}
 				Mouse.move(p);
-//				if(ChooseOption.isOpen()){
-//					ChooseOption.close();
-//				}
 				if (Game.getUptext().contains(option)
 						&& (checkActions(object, option)) && Game.getUptext().contains("Aviansie")) {
 					Mouse.click(1);
+					return true;
 				}
 				else if (!Game.getUptext().contains(option)) {
 					Mouse.click(3);
@@ -1128,8 +1103,29 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 				}
 			}
 		}
+		return false;
     }
 	
+    
+        
+   
+    
+    public void drawModel(RSModel model, Graphics g, boolean fill) {
+		if (model.getAllVisiblePoints().length != 0) {
+			if (fill) {
+				// fill triangles
+				for (Polygon p : model.getTriangles()) {
+					g.fillPolygon(p);
+				}
+			} else {
+				// draw triangles
+				for (Polygon p : model.getTriangles()) {
+					g.drawPolygon(p);
+				}
+			}
+		}
+	}
+    
 	public class AvieGUI extends javax.swing.JFrame {
 
 	    /**
@@ -1268,34 +1264,30 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	        pack();
 	    }// </editor-fold>                        
 
-	    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {                                         
-	        // TODO add your handling code here:
+	    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {      
 	    	String food = foodusing.getSelectedItem().toString();
 	    	switch(food){
 	    	case "lobster":
-	    		foodIDs = new int[] {379}; break;
+	    		FOOD_IDS = new int[] {379}; break;
 	    	case "trout":
-	    		foodIDs = new int[] {333}; break;
+	    		FOOD_IDS = new int[] {333}; break;
 	    	case "salmon":
-	    		foodIDs = new int[] {329}; break;
+	    		FOOD_IDS = new int[] {329}; break;
 	    	case "shark":
-	    		foodIDs = new int[] {385}; break;
+	    		FOOD_IDS = new int[] {385}; break;
 	    	}
-	    	foodNum = Integer.parseInt(foodamount.getText());
-	    	useHouse = telemethod.getSelectedItem().toString().equals("house") ? true : false;
-	        waitGUI = false;
+	    	FOOD_NUMBER = Integer.parseInt(foodamount.getText());
+	    	USE_HOUSE = telemethod.getSelectedItem().toString().equals("house") ? true : false;
+	        WAIT_GUI = false;
 	    }                                       
 
-	    private void foodamountActionPerformed(java.awt.event.ActionEvent evt) {                                           
-	        // TODO add your handling code here:
+	    private void foodamountActionPerformed(java.awt.event.ActionEvent evt) { 
 	    }                                          
 
-	    private void foodusingActionPerformed(java.awt.event.ActionEvent evt) {                                          
-	        // TODO add your handling code here:
+	    private void foodusingActionPerformed(java.awt.event.ActionEvent evt) {   
 	    }                                         
 
-	    private void telemethodActionPerformed(java.awt.event.ActionEvent evt) {                                           
-	        // TODO add your handling code here:
+	    private void telemethodActionPerformed(java.awt.event.ActionEvent evt) { 
 	    }
 
 	    // Variables declaration - do not modify                     
@@ -1311,20 +1303,5 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 	    // End of variables declaration                   
 	}
 	
-	public void drawModel(RSModel model, Graphics g, boolean fill) {
-		if (model.getAllVisiblePoints().length != 0) {
-			if (fill) {
-				// fill triangles
-				for (Polygon p : model.getTriangles()) {
-					g.fillPolygon(p);
-				}
-			} else {
-				// draw triangles
-				for (Polygon p : model.getTriangles()) {
-					g.drawPolygon(p);
-				}
-			}
-		}
-	}
 
 }

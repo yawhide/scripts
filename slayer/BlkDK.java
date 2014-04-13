@@ -1,23 +1,13 @@
 package scripts.slayer;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Polygon;
-import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.text.NumberFormat;
 import java.util.HashMap;
-import java.util.Locale;
-import org.tribot.api.interfaces.Positionable;
-import org.tribot.api.DynamicClicking;
 import org.tribot.api.General;
 import org.tribot.api.Timing;
 import org.tribot.api.input.Keyboard;
@@ -27,45 +17,35 @@ import org.tribot.api2007.Banking;
 import org.tribot.api2007.Camera;
 import org.tribot.api2007.ChooseOption;
 import org.tribot.api2007.Combat;
+import org.tribot.api2007.Equipment;
+import org.tribot.api2007.Equipment.SLOTS;
 import org.tribot.api2007.Game;
 import org.tribot.api2007.GameTab;
 import org.tribot.api2007.GameTab.TABS;
 import org.tribot.api2007.GroundItems;
-import org.tribot.api2007.Interfaces;
 import org.tribot.api2007.Inventory;
-import org.tribot.api2007.Magic;
-import org.tribot.api2007.NPCChat;
 import org.tribot.api2007.NPCs;
 import org.tribot.api2007.Objects;
-import org.tribot.api2007.PathFinding;
 import org.tribot.api2007.Player;
-import org.tribot.api2007.Players;
+import org.tribot.api2007.Prayer;
 import org.tribot.api2007.Projection;
-import org.tribot.api2007.Screen;
 import org.tribot.api2007.Skills;
+import org.tribot.api2007.Prayer.PRAYERS;
 import org.tribot.api2007.Skills.SKILLS;
 import org.tribot.api2007.Walking;
-import org.tribot.api2007.WebWalking;
-import org.tribot.api2007.types.RSArea;
 import org.tribot.api2007.types.RSGroundItem;
-import org.tribot.api2007.types.RSInterface;
 import org.tribot.api2007.types.RSItem;
 import org.tribot.api2007.types.RSModel;
 import org.tribot.api2007.types.RSNPC;
 import org.tribot.api2007.types.RSObject;
-import org.tribot.api2007.types.RSPlayer;
 import org.tribot.api2007.types.RSTile;
 import org.tribot.script.Script;
 import org.tribot.script.ScriptManifest;
-import org.tribot.script.interfaces.Ending;
-import org.tribot.script.interfaces.MessageListening07;
 import org.tribot.script.interfaces.Painting;
-import org.tribot.script.interfaces.EventBlockingOverride;
 import org.tribot.script.interfaces.Pausing;
-import org.tribot.api2007.ext.Doors;
 
 
-@ScriptManifest(authors = { "Yaw hide" }, version = 1.81, category = "Ranged", name = "Yawhide's BlkDK", description = "Welcome to my first black dragon script!")
+@ScriptManifest(authors = { "Yaw hide" }, version = 2.0, category = "Ranged", name = "Yawhide's BlkDK", description = "Welcome to my first black dragon script!")
 public class BlkDK extends Script implements Painting, Pausing {
 	
 	private int[] foodIDs  = { 333, 329, 379, 385, 7946, 1897 };
@@ -73,21 +53,17 @@ public class BlkDK extends Script implements Painting, Pausing {
 	int[] ppot = { 2434, 139, 141, 143 }; 
 	
 	private int chicken = 2138;
-	private int[] dragz = { 642, 640, 4018, 4016, 2875, 2873, 1258, 1256 };
+	private int[] dragz = { 642, 640, 4018, 4016, 2875, 2873, 1258, 1256, 5017, 5019 };
 	private int boltsID = 9142;
 
-	private RSTile[] toShrinePath = { new RSTile(2385, 4458, 0), new RSTile(2394, 4459, 0), new RSTile(2403, 4453, 0), 
-			new RSTile(2414, 4455, 0), new RSTile(2425, 4458, 0), new RSTile(2436, 4456, 0), new RSTile(2445, 4453, 0),
-			new RSTile(2453, 4459, 0), new RSTile(2452, 4467, 0), new RSTile(2453, 4476, 0) };
+	RSTile[] toShrinePath = { new RSTile(2386, 4457, 0), new RSTile(2394, 4454, 0), new RSTile(2402, 4453, 0), new RSTile(2409, 4453, 0), new RSTile(2414, 4455, 0), new RSTile(2420, 4455, 0), new RSTile(2426, 4457, 0), new RSTile(2433, 4456, 0), new RSTile(2441, 4454, 0), new RSTile(2447, 4456, 0), new RSTile(2452, 4459, 0), new RSTile(2453, 4468, 0), new RSTile(2453, 4476, 0) };
 	
 	private RSTile[] toMiningArea = { new RSTile(2471, 4363, 0), new RSTile(2476, 4369, 0), new RSTile(2483, 4372, 0),
 			new RSTile(2485, 4374, 0) };
 
 	private RSTile[] toSafeSpotFromMiningArea = { new RSTile(2485, 4375, 0), new RSTile(2476, 4369, 0), new RSTile(2472, 4363, 0) };
 	
-	private RSTile[] toBank = { new RSTile(2453, 4476, 0), new RSTile(2453, 4463, 0), new RSTile(2448, 4454, 0), 
-			new RSTile(2436, 4456, 0), new RSTile(2423, 4458, 0), new RSTile(2413, 4455, 0), 
-			new RSTile(2401, 4452, 0), new RSTile(2393, 4456, 0), new RSTile(2387, 4457, 0) };
+	RSTile[] toBank = { new RSTile(2453, 4476, 0), new RSTile(2451, 4468, 0), new RSTile(2452, 4463, 0), new RSTile(2451, 4457, 0), new RSTile(2446, 4453, 0), new RSTile(2440, 4453, 0), new RSTile(2435, 4456, 0), new RSTile(2429, 4457, 0), new RSTile(2423, 4459, 0), new RSTile(2418, 4455, 0), new RSTile(2412, 4454, 0), new RSTile(2406, 4452, 0), new RSTile(2401, 4452, 0), new RSTile(2396, 4453, 0), new RSTile(2390, 4454, 0), new RSTile(2386, 4459, 0) };
 	
 	private RSTile[] toPortalPath = { new RSTile(2463, 4371, 0), new RSTile(2462, 4360, 0), new RSTile(2461, 4356, 0)};
 	   
@@ -141,7 +117,7 @@ public class BlkDK extends Script implements Painting, Pausing {
 			"Rune kiteshield", "Rune sq shield", "Rune chainbody",
 			"Rune platelegs", "Rune arrow", "Blood rune", "Death rune",
 			"Nature rune", "Law rune", "Adamantite bar", "Shield left half",
-			"Silver ore", "Nature talisman", "Tooth half of a key", "Loop half of a key",
+			"Silver ore", "Nature talisman", "Tooth half of key", "Loop half of key",
 			"Runite bar", "Uncut diamond", "Uncut ruby", "Air orb",
 			"Draconic visage", "Clue scroll" };
 
@@ -207,7 +183,8 @@ public class BlkDK extends Script implements Painting, Pausing {
 	private final long start_time = System.currentTimeMillis();
 	private double XpToLVrange = Skills.getXPToNextLevel(SKILLS.RANGED);
 	private double XpToLVhp = Skills.getXPToNextLevel(SKILLS.HITPOINTS);
-	
+	RSTile lootTile = new RSTile(2465, 4363, 0);
+	private RSTile portaltile = new RSTile(2459, 4354, 0);
 	
 	int startLv = Skills.getActualLevel(SKILLS.RANGED) + Skills.getActualLevel(SKILLS.HITPOINTS);
 	
@@ -325,6 +302,7 @@ public class BlkDK extends Script implements Painting, Pausing {
 	public String foodusing;
 	public boolean rangepotting = false;
 	boolean prayFlick = false;
+	boolean scriptStatus = true;
 
 	@Override
 	public void run() {
@@ -365,9 +343,15 @@ public class BlkDK extends Script implements Painting, Pausing {
 
 		putMap();
 		sleep(200, 250);
-			
-
-		while (true) {
+		General.useAntiBanCompliance(true);
+		boltsID = Equipment.getItem(SLOTS.ARROW).getID();
+		if (boltsID < 1){
+			scriptStatus = false;
+			println("YOu need to have the bolts you want to use equiped when you use this script");
+		}
+		sleep(200,300);
+		
+		while (scriptStatus) {
 
 			current_xp = Skills.getXP(SKILLS.RANGED) + Skills.getXP(SKILLS.HITPOINTS);
 			currentState = getState();
@@ -376,7 +360,7 @@ public class BlkDK extends Script implements Painting, Pausing {
 
 			if(pos().distanceTo(new RSTile(3201, 3169, 0)) <=5 && pos().getPlane() == 0){
 				println("somehow i got out of zanaris");
-				stopScript();
+				scriptStatus = false;
 			}
 			
 			if (getHp() < 30) {
@@ -493,9 +477,6 @@ public class BlkDK extends Script implements Painting, Pausing {
 				return State.HEAL;
 			
 		}
-
-		
-			
 		else if (isFull()) {
 			if (pos().distanceTo(zbanktile) <= 7)
 				return State.BANKZ;
@@ -517,12 +498,12 @@ public class BlkDK extends Script implements Painting, Pausing {
 
 		}
 
-		if (inDragArea()) {
+		else if (inDragArea()) {
 
 			return State.FIGHTZ;
 		}
 		
-		if (doneBanking() && !inDragArea()) {
+		else if (doneBanking() && !inDragArea()) {
 			
 			if (pos().distanceTo(shrinetile) <= 4)
 				return State.USE_SHRINE;
@@ -530,10 +511,10 @@ public class BlkDK extends Script implements Painting, Pausing {
 			return State.WALK_PATH_SHRINE;
 		}
 
-		if (pos().distanceTo(miningtile) <= 4)
+		else if (pos().distanceTo(miningtile) <= 4)
 			return State.GOTO_SAFEZ_FROM_MINING;
 
-		if (!doneBanking()) {
+		else if (!doneBanking()) {
 
 			if (pos().distanceTo(zbanktile) <= 7)
 				return State.BANKZ;
@@ -541,27 +522,20 @@ public class BlkDK extends Script implements Painting, Pausing {
 		}
 		
 		// antiban logic
-		if (System.currentTimeMillis() - antiban > (General.random(300000,
+		else if (System.currentTimeMillis() - antiban > (General.random(300000,
 				600000)))
 			return State.ANTIBAN;
 
 		return State.UNKNOWN_POSITION;
 
 	}
-
-
-	// .................................................................
-	//
-	// zanaris stuff
-
-	// ..................................................................
+	
 	//TODO 
 	// Walking path method
 	public void WALKING_PATH_SHRINE(){
 
 		Keyboard.pressKey((char) KeyEvent.VK_CONTROL);
-		//Mouse.setSpeed(General.random(140, 160));
-		Walking.walking_timeout = 500L;
+		Walking.setWalkingTimeout(500L);
 		Walking.walkPath(toShrinePath);
 		Keyboard.releaseKey((char) KeyEvent.VK_CONTROL);
 		sleep(50, 100);
@@ -569,16 +543,14 @@ public class BlkDK extends Script implements Painting, Pausing {
 	
 	public void WALKING_PATH_BANK(){
 
-		//Mouse.setSpeed(General.random(140, 160));
-		Walking.walking_timeout = 500L;
+		Walking.setWalkingTimeout(500L);
 		Walking.walkPath(toBank);
 		sleep(50, 100);
 	}
 	public void GOTO_SAFEZ_FROM_MINING(){
 
 		Keyboard.pressKey((char) KeyEvent.VK_CONTROL);
-		//Mouse.setSpeed(General.random(140, 160));
-		Walking.walking_timeout = 500L;
+		Walking.setWalkingTimeout(500L);
 		Walking.walkPath(toSafeSpotFromMiningArea);
 		Keyboard.releaseKey((char) KeyEvent.VK_CONTROL);
 		sleep(50, 100);
@@ -586,28 +558,22 @@ public class BlkDK extends Script implements Painting, Pausing {
 	
 	public void GOTO_SHRINE() {
 
-		// Keyboard.pressKey((char) KeyEvent.VK_CONTROL);
-		Walking.walking_timeout = 500L;
+		Walking.setWalkingTimeout(500L);
 		Walking.walkPath(Walking.generateStraightPath(shrinetile));
-		// Keyboard.releaseKey((char) KeyEvent.VK_CONTROL);
 		sleep(50, 100);
 	}
 
 	public void GOTO_SOUTHSHRINE() {
 
-		// Keyboard.pressKey((char) KeyEvent.VK_CONTROL);
-		Walking.walking_timeout = 500L;
+		Walking.setWalkingTimeout(500L);
 		Walking.walkPath(Walking.generateStraightPath(southshrine));
-		// Keyboard.releaseKey((char) KeyEvent.VK_CONTROL);
 		sleep(80, 100);
 	}
 
 	public void GOTO_MIDDLEAREA() {
 
-		// Keyboard.pressKey((char) KeyEvent.VK_CONTROL);
-		Walking.walking_timeout = 500L;
+		Walking.setWalkingTimeout(500L);
 		Walking.walkPath(Walking.generateStraightPath(middlearea));
-		// Keyboard.releaseKey((char) KeyEvent.VK_CONTROL);
 		sleep(80, 100);
 	}
 
@@ -646,7 +612,6 @@ public class BlkDK extends Script implements Painting, Pausing {
 
 	}
 	
-	private RSTile portaltile = new RSTile(2459, 4354, 0);
 	public void USE_PORTAL() {
 		
 		RSObject[] PORTAL = Objects.findNearest(10, "Portal");
@@ -674,14 +639,12 @@ public class BlkDK extends Script implements Painting, Pausing {
 	public void GOTO_BANKZ() {
 
 		Keyboard.pressKey((char) KeyEvent.VK_CONTROL);
-		Walking.walking_timeout = 500L;
-		//Walking.walkPath(Walking.generateStraightPath(zbanktile));
+		Walking.setWalkingTimeout(500L);
 		if(pos().distanceTo(portaltile) <=2){
 			USE_PORTAL();
 			sleep(200,300);
 		}
 		else if(inDragArea()){
-			//WebWalking.walkTo(portaltile);
 			Walking.walkPath(toPortalPath);
 			sleep(200,300);
 			USE_PORTAL();
@@ -696,7 +659,7 @@ public class BlkDK extends Script implements Painting, Pausing {
 
 		Keyboard.pressKey((char) KeyEvent.VK_CONTROL);
 		Mouse.setSpeed(General.random(100, 105));
-		Walking.walking_timeout = 1500L;
+		Walking.setWalkingTimeout(1500L);
 		fightstate = "Going to safe spot";
 		
 		if (pos().distanceTo(safez) > 3)
@@ -705,7 +668,6 @@ public class BlkDK extends Script implements Painting, Pausing {
 			if (Camera.getCameraAngle() < 60) {
 				Camera.setCameraAngle(General.random(60, 70));
 			}
-			//Walking.walkScreenPath(Walking.generateStraightScreenPath(safez));
 			Walking.blindWalkTo(safez);
 		} 
 		else if (!inSafeSpotZ()){
@@ -811,7 +773,7 @@ public class BlkDK extends Script implements Painting, Pausing {
 						sleep(600, 650);
 						
 						if(Banking.find(chicken).length == 0)
-							stopScript();
+							scriptStatus = false;
 						Banking.withdraw(1, chicken);
 						sleep(600, 650);
 						
@@ -826,7 +788,7 @@ public class BlkDK extends Script implements Painting, Pausing {
 
 							println("withdrawing some bolts cuz we have less than 500");
 							
-							Banking.withdraw(200, boltsID);
+							Banking.withdraw(500, boltsID);
 							sleep(600, 650);
 						}
 
@@ -961,7 +923,7 @@ public class BlkDK extends Script implements Painting, Pausing {
 				killDragon(blkdragsz);
 			} 
 			else if (prayFlick)
-				prayerflick(blkdragsz[0]);
+				prayerflick();
 			else {
 				fightstate = "Doing some antiban";
 
@@ -997,49 +959,6 @@ public class BlkDK extends Script implements Painting, Pausing {
 
 	}
 
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	// // ..................................................................
-	//
-	// MAIN CODE
-	//
-	// // ..................................................................
-	//
-
-	//
-	//
-	//
-	//
-	//
-	// fally code
-	//
-	//
-	//
-	//
-	//
-	// /
-	//
-
 	public void HEAL() {
 		fightstate = "Healing up";
 		GameTab.open(org.tribot.api2007.GameTab.TABS.INVENTORY);
@@ -1052,24 +971,6 @@ public class BlkDK extends Script implements Painting, Pausing {
 		}
 	}
 
-	//
-	//
-	//
-	//
-	//
-	//
-	// /
-	//
-	// just some handy methods
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	// /
-	//
 	public boolean DROPJUNK() {
 
 		// hate dropping junk where i loot, bad idea
@@ -1157,36 +1058,19 @@ public class BlkDK extends Script implements Painting, Pausing {
 		return junks.length == 0;
 	}
 
-	public boolean isFull() {
-		
-		sleep(5, 7);
-		return Inventory.getAll().length == 28;
-	}
+	public boolean isFull() { return (Inventory.find(junk).length == 0 && (Inventory.isFull() || Inventory.getAll().length == 27));	}
 
-	public void cameraDrag() {
-		Camera.setCameraRotation(General.random(88, 92));
-	}
+	public void cameraDrag() {	Camera.setCameraRotation(General.random(88, 92));}
 
-	public void cameraPortal() {
-		Camera.setCameraRotation(General.random(178, 182));
-	}
+	public void cameraPortal() {	Camera.setCameraRotation(General.random(178, 182));	}
 
-	public void cameraBank() {
-		Camera.setCameraRotation(General.random(0, 2));
-	}
+	public void cameraBank() {	Camera.setCameraRotation(General.random(0, 2));	}
 
-	public boolean inCombat() {
-		sleep(5, 7);
-		return Player.getRSPlayer().isInCombat();
-	}
+	public boolean inCombat() {	return Player.getRSPlayer().isInCombat();	}
 
-	public int getHp() {
-		return Combat.getHPRatio();
-	}
+	public int getHp() {return Combat.getHPRatio();	}
 
-	public RSTile pos() {
-		return Player.getPosition();
-	}
+	public RSTile pos() {	return Player.getPosition();}
 
 	public boolean inArea(RSTile nw, RSTile se) {
 		RSTile pos = pos();
@@ -1209,22 +1093,22 @@ public class BlkDK extends Script implements Painting, Pausing {
 
 	public void checkXP() {
 
-		GameTab.open(org.tribot.api2007.GameTab.TABS.STATS);
+		GameTab.open(TABS.STATS);
 		sleep(80, 100);
 		Mouse.moveBox(557, 307, 600, 321);
 		sleep(1700, 2200);
-		GameTab.open(org.tribot.api2007.GameTab.TABS.INVENTORY);
+		GameTab.open(TABS.INVENTORY);
 		sleep(80, 100);
 
 	}
 
 	public void checkFriends() {
 
-		GameTab.open(org.tribot.api2007.GameTab.TABS.FRIENDS);
+		GameTab.open(TABS.FRIENDS);
 		sleep(80, 100);
 		Mouse.moveBox(616, 240, 664, 261);
 		sleep(1700, 2200);
-		GameTab.open(org.tribot.api2007.GameTab.TABS.INVENTORY);
+		GameTab.open(TABS.INVENTORY);
 		sleep(80, 100);
 	}
 
@@ -1259,37 +1143,25 @@ public class BlkDK extends Script implements Painting, Pausing {
 	}
 //TODO doneBanking
 	private boolean doneBanking() {
-		if (getHp() >= 85
+		return (getHp() >= 85
 				&& (Inventory.getCount(foodID) == location)
 				&& (Inventory.getCount(rangepots) == 1 || rangepotting == false)
-				&& Inventory.getCount(chicken) == 1) {
-			
-			sleep(5, 7);
-			return true;
-		} 
-		return false;
-		
+				&& Inventory.getCount(chicken) == 1);
 	}
 
 	// TODO
 	public boolean lootIsOnGround() {
-		
+				
 		RSGroundItem[] nest = GroundItems.findNearest(loot2);
-		int acc = 0;
 		int junky = 0;
+		
 		for (int i = 0; i < nest.length; i++) {
 			if (nest[i].getPosition().distanceTo(loottile) > 2)
 				junky += 1;
-			else if (nest[i].getID() == 9142 || nest[i].getID() == 995)
-				acc += 1;
 		}
-		sleep(5, 7);
 		if (junky == nest.length)
 			return false;
-		else if (acc == nest.length)
-			return false;
-		else
-			return true;
+		return true;
 	}
 
 	public void drinkPotion(int[] pot) {
@@ -1311,8 +1183,7 @@ public class BlkDK extends Script implements Painting, Pausing {
 			// after i attack
 			// so just click back to to the tile right after i attack
 			if (dragon[0].getPosition().distanceTo(pos()) > 6) {
-				clickNPC(dragon[0], "Attack"); // clickModel(blkdragsz[0].getModel(),
-												// "Attack", true);
+				clickNPC(dragon[0], "Attack"); 
 				println("attacked a dragon that is further than 8 tiles away, run to safespot!");
 				
 
@@ -1374,21 +1245,7 @@ public class BlkDK extends Script implements Painting, Pausing {
 		}
 		sleep(1500, 1700);
 	}
-
-	//
-	//
-	//
-	//
-	//
-	//
-	// /
-	//
-	//
-	//
-	//
-	//
-	//
-	//
+	
 	private boolean clickOBJ(RSObject npc, String option) {
 		Camera.turnToTile(npc.getPosition());
 		
@@ -1412,158 +1269,33 @@ public class BlkDK extends Script implements Painting, Pausing {
 		return false;
 	}
 
-	public void drawModel(RSModel model, Graphics g, boolean fill) {
-		if (model.getAllVisiblePoints().length != 0) {
-			if (fill) {
-				// fill triangles
-				for (Polygon p : model.getTriangles()) {
-					g.fillPolygon(p);
-				}
-			} else {
-				// draw triangles
-				for (Polygon p : model.getTriangles()) {
-					g.drawPolygon(p);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Draws our path
-	 * 
-	 * @param path
-	 *            The tile array we are drawing
-	 * @param g
-	 *            Our graphics render
-	 * @param minimap
-	 *            Whether or not we are drawing to the minimap
-	 */
-	public void drawPath(RSTile[] path, Graphics g, boolean minimap) {
-		
-		if (minimap) {
-			// Drawing on the other whatever
-			for (int i = 0; i < path.length - 1; i++) {
-				Point tilePoint = Projection.tileToMinimap(path[i]);
-				if (Projection.isInMinimap(tilePoint)) {
-					if (i < path.length - 1) {
-						Point nextPoint = Projection.tileToMinimap(path[i + 1]);
-						if (Projection.isInMinimap(nextPoint)) {
-							g.drawLine(tilePoint.x, tilePoint.y, nextPoint.x,
-									nextPoint.y);
-						}
-					}
-					g.fillOval(tilePoint.x, tilePoint.y, 3, 3);
-				}
-			}
-		} else {
-			for (int i = 0; i < path.length - 1; i++) {
-				if (path[i].getPosition().isOnScreen()) {
-					if (i > 0) { // could just start index
-						Point currentTile = Projection.tileToScreen(path[i], 0);
-						Point lastTile = Projection
-								.tileToScreen(path[i - 1], 0);
-						g.drawLine(currentTile.x, currentTile.y, lastTile.x,
-								lastTile.y);
-					}
-					//g.setColor("#FF0000");
-					drawTile(path[i], g, false);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Draws a tile onto the screen
-	 * 
-	 * @param tile
-	 *            The tile you want to draw
-	 * @param g
-	 *            The graphics render we are using
-	 * @param color
-	 *            The color we want to use as filler
-	 * @param fill
-	 *            Whether or not we are filling the tile
-	 */
-	public void drawTile(RSTile tile, Graphics g, boolean fill) {
-		if (tile.getPosition().isOnScreen()) {
-			if (fill) {
-				g.fillPolygon(Projection.getTileBoundsPoly(tile, 0));
-			} else {
-				g.drawPolygon(Projection.getTileBoundsPoly(tile, 0));
-			}
-		}
-	}
-
-	public boolean inSafeSpotZ() {
-		sleep(5, 7);
-		if (inArea(nwSafeSpotZ, seSafeSpotZ))
-			return true;
-		else
-			return false;
-	}
-
-	public boolean isMovin() {
-
-		return Player.isMoving();
-	}
-
-	public boolean gotFood() {
-
-		return Inventory.getCount(foodID) > 0;
-	}
-
-	// TODO
-	// prayer flicking
 	
+
+	public boolean inSafeSpotZ() {	return inArea(nwSafeSpotZ, seSafeSpotZ);}
+
+	public boolean isMovin() {return Player.isMoving();}
+
+	public boolean gotFood() {return Inventory.getCount(foodID) > 0;}
 
 	public int distanceTo(RSTile myPos, RSTile t){
 		return Math.max(myPos.getX()-t.getX(), myPos.getY() - t.getY());
 		
 	}
 	
-	
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	// anti random support here:
-
-	// TODO
-	// add timer here
 	public void runFromCombat() {
 		
 		Keyboard.pressKey((char) KeyEvent.VK_CONTROL);
 	
-		Walking.walking_timeout = 500L;
+		Walking.setWalkingTimeout(500L);
 		Walking.walkPath(toMiningArea);
 		println("waiting about 5 seconds just to make sure the chicken leaves!");
 		sleep(4900, 5500);
 		Keyboard.releaseKey((char) KeyEvent.VK_CONTROL);
-		sleep(50, 100);
 	}
 
-	public int getStackBolts() {
-		RSItem[] items = Interfaces.get(387, 28).getItems(); // get all equiped
-																// stuff
-		for (int i = 0; i < items.length; i++) { // looping threw items equiped
-			if (items[i].getID() == boltsID) { // arrows there
-				return items[i].getStack();// return number of arrows
-			}
-		}
-		sleep(80, 100);
-		return 0;
+	public int getStackBolts() {return Equipment.getItem(SLOTS.ARROW).getStack();}
 
-	}
-
-	public int lootCount(int ID) {
-
-		return Inventory.getCount(ID);
-	}
+	public int lootCount(int ID) {	return Inventory.getCount(ID); }
 
 	// improved waiting for loot
 	private void waitForInv(int lootID) {
@@ -1647,31 +1379,23 @@ public class BlkDK extends Script implements Painting, Pausing {
 		}
 		 else{
 			 println("Something went wrong with the GUI");
-			 stopScript();
+			 scriptStatus = false;
 			 
 		 }
 	}
 	
 	public void waitForDrag(RSNPC drag){
-		
-		while(drag.isInCombat() && inSafeSpotZ())
+		while(drag.isInCombat() && isRanging() && inSafeSpotZ())
 			sleep(1000,1300);
 	}
 
-	public boolean isRanging() {
-		/*for (int i = 0; i < 57; i++, sleep(30, 40)) {
-			if (Player.getRSPlayer().getAnimation() == 4230) {
-				return true;
-			}
-		}*/
-		return Player.getRSPlayer().getInteractingCharacter() != null;
-	}
-
+	public boolean isRanging() {return Player.getRSPlayer().getInteractingCharacter() != null; }
+	
 	public boolean inDragArea() {
 		
 		if(inArea(nwdragz, sedragz))
 			return true;
-		else return false;
+		return false;
 	}
 	
 	@Override
@@ -1697,45 +1421,98 @@ public class BlkDK extends Script implements Painting, Pausing {
 	}
 	
 	//GOTO prayerFlick
-	public void prayerflick(RSNPC drag) {
+	public void prayerflick() {// RSNPC drag) {
 
-		if (GameTab.getOpen() != GameTab.TABS.PRAYERS) {
-			GameTab.open(TABS.PRAYERS);
-			sleep(80, 100);
-		}
-		while (drag != null && drag.isInteractingWithMe() && getHp() > 30 &&
-				Skills.getCurrentLevel(SKILLS.PRAYER) > 10 && 
-				Player.getRSPlayer().getInteractingCharacter() != null) {
+		while (getHp() > 30 && Skills.getCurrentLevel(SKILLS.PRAYER) > 5 && isRanging() && inSafeSpotZ() && !lootIsOnGround()) {
 			
+			if(!Prayer.isTabOpen()){
+				GameTab.open(TABS.PRAYERS);
+			}
 			Timer t = new Timer(1100L);
 			do {
-				if (!PrayerBook.isOpen()) {
-					PrayerBook.open();
-					sleep(50, 100);
+				if (Player.getAnimation() != 4230) {
+					sleep(250, 300);
+					Prayer.enable(PRAYERS.EAGLE_EYE);
+				} else if (Prayer.isPrayerEnabled(PRAYERS.EAGLE_EYE)){
+					Prayer.disable(PRAYERS.EAGLE_EYE);
+					sleep(350, 400);
+				} else {
+					sleep(400, 450);
 				}
-				if (Player.getAnimation() != 4230){
-					sleep(700,750);
-					PrayerBook.activate(Prayer.EAGLE_EYE);
-				}
-				else{
-					if (Prayer.EAGLE_EYE.isActive()){
-						sleep(50,150);
-						Prayer.EAGLE_EYE.click();
-						sleep(450,510);
-					}
-				}
-				
-			} while(t.getRemaining() > 0);
+			} while (t.getRemaining() > 0);
 		}
-		
-		if (!PrayerBook.isOpen()) {
-			PrayerBook.open();
-			sleep(80, 100);
-		}
-		if (PrayerBook.activate(Prayer.EAGLE_EYE, PrayerState.DEACTIVATED));
-			sleep(80, 100);
+
+		turnOffPrayerEagle();
 	}
 	
+	public void turnOffPrayerEagle(){
+		if (Prayer.isPrayerEnabled(PRAYERS.EAGLE_EYE)){
+			if(!Prayer.isTabOpen()) GameTab.open(TABS.PRAYERS);
+			sleep(200,250);
+			Prayer.disable(PRAYERS.EAGLE_EYE);
+			sleep(800,1000);
+		}
+	}
+	public void drawModel(RSModel model, Graphics g, boolean fill) {
+		if (model.getAllVisiblePoints().length != 0) {
+			if (fill) {
+				// fill triangles
+				for (Polygon p : model.getTriangles()) {
+					g.fillPolygon(p);
+				}
+			} else {
+				// draw triangles
+				for (Polygon p : model.getTriangles()) {
+					g.drawPolygon(p);
+				}
+			}
+		}
+	}
+
+	
+	public void drawPath(RSTile[] path, Graphics g, boolean minimap) {
+		
+		if (minimap) {
+			// Drawing on the other whatever
+			for (int i = 0; i < path.length - 1; i++) {
+				Point tilePoint = Projection.tileToMinimap(path[i]);
+				if (Projection.isInMinimap(tilePoint)) {
+					if (i < path.length - 1) {
+						Point nextPoint = Projection.tileToMinimap(path[i + 1]);
+						if (Projection.isInMinimap(nextPoint)) {
+							g.drawLine(tilePoint.x, tilePoint.y, nextPoint.x,
+									nextPoint.y);
+						}
+					}
+					g.fillOval(tilePoint.x, tilePoint.y, 3, 3);
+				}
+			}
+		} else {
+			for (int i = 0; i < path.length - 1; i++) {
+				if (path[i].getPosition().isOnScreen()) {
+					if (i > 0) { // could just start index
+						Point currentTile = Projection.tileToScreen(path[i], 0);
+						Point lastTile = Projection
+								.tileToScreen(path[i - 1], 0);
+						g.drawLine(currentTile.x, currentTile.y, lastTile.x,
+								lastTile.y);
+					}
+					//g.setColor("#FF0000");
+					drawTile(path[i], g, false);
+				}
+			}
+		}
+	}
+
+	public void drawTile(RSTile tile, Graphics g, boolean fill) {
+		if (tile.getPosition().isOnScreen()) {
+			if (fill) {
+				g.fillPolygon(Projection.getTileBoundsPoly(tile, 0));
+			} else {
+				g.drawPolygon(Projection.getTileBoundsPoly(tile, 0));
+			}
+		}
+	}
 	
 	@SuppressWarnings("serial")
 	class myForm extends javax.swing.JFrame {

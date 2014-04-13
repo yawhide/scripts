@@ -9,9 +9,11 @@ import org.tribot.api.input.Mouse;
 import org.tribot.api.util.ABCUtil;
 import org.tribot.api2007.Camera;
 import org.tribot.api2007.ChooseOption;
+import org.tribot.api2007.Combat;
 import org.tribot.api2007.GameTab;
 import org.tribot.api2007.NPCChat;
 import org.tribot.api2007.Objects;
+import org.tribot.api2007.Player;
 import org.tribot.api2007.Skills;
 import org.tribot.api2007.GameTab.TABS;
 import org.tribot.api2007.Skills.SKILLS;
@@ -64,12 +66,14 @@ public class PVPtrainerAttacker extends Script implements Painting{
 	public void run() {
 		startTime = System.currentTimeMillis();
 		abc_util = new ABCUtil();
+		General.useAntiBanCompliance(true);
 		startLvStr = Skills.getActualLevel(SKILLS.STRENGTH);
 		startLvHP = Skills.getActualLevel(SKILLS.HITPOINTS);
 		updateLA();
 		
 		while(scriptStatus){
-			
+			if(Combat.getTargetEntity() != null && Combat.getTargetEntity().getHealth() < 10)
+				Clicking.click("Walk here", Player.getRSPlayer().getPosition());
 			if(System.currentTimeMillis() - la > General.random(100000, 240000)){
 				println("Time for some antiban to stay logged in");
 				doSomething();
@@ -82,21 +86,21 @@ public class PVPtrainerAttacker extends Script implements Painting{
 	}
 	
 	public void checkAntiBan(){
-		if(abc_util.TIME_TRACKER.CHECK_XP.next() <= System.currentTimeMillis()){
+		if(abc_util.TIME_TRACKER.CHECK_XP.next() <= System.currentTimeMillis() && abc_util.TIME_TRACKER.CHECK_XP.next() != 0){
 			println("checking xp");
 			checkXp();
 			abc_util.TIME_TRACKER.CHECK_XP.reset();
 			updateLA();
 		}
-		if (abc_util.TIME_TRACKER.ROTATE_CAMERA.next() != 0){
+		if (abc_util.TIME_TRACKER.ROTATE_CAMERA.next() != 0 && abc_util.TIME_TRACKER.ROTATE_CAMERA.next() <= System.currentTimeMillis()){
 			println("rotating camera");
 			Camera.setCameraRotation(General.random(0, 355));
 			abc_util.TIME_TRACKER.ROTATE_CAMERA.reset();
 			updateLA();
 		}
-		if (abc_util.TIME_TRACKER.EXAMINE_OBJECT.next() != 0){
+		if (abc_util.TIME_TRACKER.EXAMINE_OBJECT.next() != 0 && abc_util.TIME_TRACKER.EXAMINE_OBJECT.next() <= System.currentTimeMillis()){
 			println("Examining a random object");
-			RSObject[] random = Objects.getAll(10);
+			RSObject[] random = Objects.getAll(4);
 			if(random.length > 0){
 				Clicking.click("Examine", random);
 			}
