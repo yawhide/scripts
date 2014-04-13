@@ -86,22 +86,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		//ABCUtil abc = new ABCUtil();
 				
 		BOLTS_ID = Equipment.getItem(SLOTS.ARROW).getID();
-		if(Skills.getActualLevel(SKILLS.RANGED) < 70){
-			println("You must be at least 70 range to use this script");
-			SCRIPT_STATUS = false;
-		}
-		else if (Skills.getActualLevel(SKILLS.PRAYER) < 44){
-			println("You must be at least 44 prayer to use this script");
-			SCRIPT_STATUS = false;
-		}
-		else if (Skills.getActualLevel(SKILLS.AGILITY) < 60 && Skills.getActualLevel(SKILLS.STRENGTH) < 60){
-			println("You must be at least 60 agility or strength to use this script");
-			SCRIPT_STATUS = false;
-		}
-		if(Skills.getActualLevel(SKILLS.CONSTRUCTION) < 50){
-			USE_HOUSE = false;
-			println("You do not have 50 con for varrock portal focus, you must use varrock teletabs");
-		}
+		YawsGeneral.checkStats();
 		
 		boolean devmode = true;
 		

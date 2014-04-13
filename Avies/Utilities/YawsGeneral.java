@@ -343,4 +343,23 @@ public class YawsGeneral {
 			}
 		}
 	}
+	
+	public static void checkStats(){
+		if(Skills.getActualLevel(SKILLS.RANGED) < 70){
+			General.println("You must be at least 70 range to use this script");
+			Avies.SCRIPT_STATUS = false;
+		}
+		else if (Skills.getActualLevel(SKILLS.PRAYER) < 44){
+			General.println("You must be at least 44 prayer to use this script");
+			Avies.SCRIPT_STATUS = false;
+		}
+		else if (Skills.getActualLevel(SKILLS.AGILITY) < 60 && Skills.getActualLevel(SKILLS.STRENGTH) < 60){
+			General.println("You must be at least 60 agility or strength to use this script");
+			Avies.SCRIPT_STATUS = false;
+		}
+		if(Skills.getActualLevel(SKILLS.CONSTRUCTION) < 50){
+			Avies.USE_HOUSE = false;
+			General.println("You do not have 50 con for varrock portal focus, you must use varrock teletabs");
+		}
+	}
 }
