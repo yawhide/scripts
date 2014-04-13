@@ -261,11 +261,7 @@ public class YawsGeneral {
 				final int boltsCount = Equipment.getItem(SLOTS.ARROW)
 						.getStack();
 				if (Clicking.click("Wield", bolts[0])) {
-					Timing.waitCondition(new Condition() {
-						public boolean active() {
-							return Equipment.getItem(SLOTS.ARROW).getStack() > boltsCount;
-						}
-					}, General.random(400, 500));
+					Conditionals.waitFor(Equipment.getItem(SLOTS.ARROW).getStack() > boltsCount, 400, 500);
 				}
 			}
 			Inventory.drop(Constants.JUNK);
@@ -333,12 +329,7 @@ public class YawsGeneral {
 			RSItem[] potion = Inventory.find(pot);
 			if (potion.length > 0) {
 				if (Clicking.click("Drink", potion[0])) {
-					Timing.waitCondition(new Condition() {
-						public boolean active() {
-							return Skills.getCurrentLevel(SKILLS.RANGED) > Skills
-									.getActualLevel(SKILLS.RANGED);
-						}
-					}, General.random(1000, 1200));
+					Conditionals.waitFor(Skills.getCurrentLevel(SKILLS.RANGED) > Skills.getActualLevel(SKILLS.RANGED), 1000, 1200);
 				}
 			}
 		}

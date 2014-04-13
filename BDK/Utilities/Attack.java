@@ -4,12 +4,15 @@ import java.awt.Point;
 
 import org.tribot.api.Clicking;
 import org.tribot.api.General;
+import org.tribot.api.Timing;
 import org.tribot.api.input.Mouse;
+import org.tribot.api.types.generic.Condition;
 import org.tribot.api2007.Camera;
 import org.tribot.api2007.ChooseOption;
 import org.tribot.api2007.Combat;
 import org.tribot.api2007.Game;
 import org.tribot.api2007.Inventory;
+import org.tribot.api2007.NPCChat;
 import org.tribot.api2007.NPCs;
 import org.tribot.api2007.Player;
 import org.tribot.api2007.Prayer;
@@ -26,112 +29,178 @@ import scripts.Avies.Main.Avies;
 
 public class Attack {
 
-	public static boolean clickObject(RSNPC a, String option) {
-		RSNPC object = a;
-		if (object != null) {
-			int x = (int) object.getModel().getEnclosedArea().getBounds()
-					.getCenterX();
-			int y = (int) object.getModel().getEnclosedArea().getBounds()
-					.getCenterY();
-			Point p = new Point(x + General.random(-4, 4), y
-					+ General.random(-4, 0));
-			if (object.getPosition().isOnScreen()) {
-				if (ChooseOption.isOpen()) {
-					ChooseOption.close();
-				}
-				Mouse.move(p);
-				if (Game.getUptext().contains(option)
-						&& (YawsGeneral.checkActions(object, option))
-						&& Game.getUptext().contains("Aviansie")) {
-					Mouse.click(1);
-					return true;
-				} else if (!Game.getUptext().contains(option)) {
-					Mouse.click(3);
-					if (ChooseOption.isOpen()
-							&& ChooseOption.isOptionValid(option))
-						ChooseOption.select(option);
-					if (ChooseOption.isOpen()
-							&& !ChooseOption.isOptionValid(option)) {
-						ChooseOption.close();
-						Camera.turnToTile(object.getPosition());
+	public void fight(){
+		RSNPC[] drag = NPCs.findNearest(dragIDs);
+		RSNPC[] dragWithBaby = NPCs.findNearest(dragWithBabyArr);
+		Walking.setWalkingTimeout(1500L);
+		
+		if(Inventory.isFull() || (Inventory.getAll().length == 27 && !isLoot())){
+			println("Inv is full");
+			isFull();
+		}
+		else if(isLoot()){
+			println("looting...");
+			LOOT();
+		}
+		else if (inCombat() && getHp() > 50){
+			println("under attack somewhere");
+			FIGHT_STATUS = "underattack";
+			if (dragWithBaby.length > 0){
+				for(RSNPC d : dragWithBaby){
+					if(d.isInteractingWithMe()){
+						if(!inSafeSpot()){
+							println("under attack, not in safe spot");
+							gotoSafeSpot();
+						}
+						else if(isRanging()){
+							println("under attack, is ranging");
+							sleep(1000,1200);
+						}
+						else{
+							println("attack baby dragon");
+							if(d.getPosition().isOnScreen()){
+								if (clickNPC(d, "Attack")) {
+									final RSNPC tmp_blkdrag = d;
+									Timing.waitCondition(new Condition() {
+										public boolean active() {
+											return Player.getAnimation() == 4230
+													|| inCombat()
+													|| tmp_blkdrag.isInCombat()
+													|| !inSafeSpot();
+										}
+									}, General.random(2200, 2400));
+									for (int i = 0; i < 57; i++, sleep(30, 40)) {
+										if (!inSafeSpot()) {
+											println("attacked the dragon, running to safety!");
+											gotoSafeSpot();
+											break;
+										}
+									}
+								}
+							}
+							else{
+								Camera.turnToTile(d.getPosition());
+								Camera.setCameraAngle(General.random(50, 70));
+							}
+						}
+						break;
+					}
+					else if(!inSafeSpot()){
+						println("under attack, not in safe spot");
+						gotoSafeSpot();
 					}
 				}
-			} else {
-				if (Player.getPosition().distanceTo(object.getPosition()) > 4)
-					WebWalking.walkTo(object.getPosition());
-				if (!object.getPosition().isOnScreen())
-					Camera.turnToTile(object.getPosition());
-				while (Player.isMoving()) {
-					General.sleep(50, 80);
+			}
+			else{
+				gotoSafeSpot();
+				waitIsMovin();
+			}
+		}
+		else if (inSafeSpot()){
+			if (NPCChat.clickContinue(true)){
+				println("clicking to continue");
+			}
+			else if (Inventory.getCount(rangepots) > 0
+					&& Skills.getCurrentLevel(SKILLS.RANGED) < Skills
+							.getActualLevel(SKILLS.RANGED) + 2) {
+
+				println(Skills.getCurrentLevel(SKILLS.RANGED) + "  "
+						+ Skills.getActualLevel(SKILLS.RANGED));
+				FIGHT_STATUS = "Potting up";
+				drinkPotion(rangepots);
+				sleep(1000,1200);
+				println("Potted up");
+			}
+			else if(isRanging()){
+				waitForLoot();
+				
+				//sleep(2000,4000);
+			}
+			else{
+				if(drag.length > 0){
+					if(Camera.getCameraRotation() < 100 || Camera.getCameraRotation() > 270){
+						Camera.setCameraRotation(General.random(140, 180));
+					}
+					RSNPC d = drag[0];
+					if (!d.isInCombat() || (d.isInCombat() && d.isInteractingWithMe()) || d.isInteractingWithMe()) {
+						println("d not in combat, or is interacting with me or is in combat and interacting with me");
+						FIGHT_STATUS = "attacking dragon " + d.getID();
+						if(d.getPosition().isOnScreen()){
+							if (clickNPC(d, "Attack")) {
+								final RSNPC tmp_blkdrag = d;
+								Timing.waitCondition(new Condition() {
+									public boolean active() {
+										return Player.getAnimation() == 4230
+												|| inCombat()
+												|| tmp_blkdrag.isInCombat()
+												|| !inSafeSpot();
+									}
+								}, General.random(2200, 2400));
+								for (int i = 0; i < 57; i++, sleep(30, 40)) {
+									if (!inSafeSpot()) {
+										println("attacked the dragon, running to safety!");
+										gotoSafeSpot();
+										break;
+									}
+								}
+							}
+							else{
+								sleep(500,700);
+							}
+						}
+						else {
+							println("turning to face dragon");
+							Camera.turnToTile(d.getPosition());
+							Camera.setCameraAngle(General.random(50, 70));
+						}
+					}
+					else if (drag.length > 1){
+						d = drag[1];
+						if (!d.isInCombat() || (d.isInCombat() && d.isInteractingWithMe()) || d.isInteractingWithMe()) {
+							println("d not in combat, or is interacting with me or is in combat and interacting with me");
+							FIGHT_STATUS = "attacking dragon " + d.getID();
+							if(d.getPosition().isOnScreen()){
+								if (clickNPC(d, "Attack")) {
+									final RSNPC tmp_blkdrag = d;
+									Timing.waitCondition(new Condition() {
+										public boolean active() {
+											return Player.getAnimation() == 4230
+													|| inCombat()
+													|| tmp_blkdrag.isInCombat()
+													|| !inSafeSpot();
+										}
+									}, General.random(2200, 2400));
+									for (int i = 0; i < 57; i++, sleep(30, 40)) {
+										if (!inSafeSpot()) {
+											println("attacked the dragon, running to safety!");
+											gotoSafeSpot();
+											break;
+										}
+									}
+								}
+								else{
+									sleep(500,700);
+								}
+							}
+							else {
+								println("turning to face dragon");
+								Camera.turnToTile(d.getPosition());
+								Camera.setCameraAngle(General.random(50, 70));
+							}
+						}
+					}
 				}
 			}
 		}
-		return false;
-	}
-
-	public static void fight() {
-
-		Walking.setControlClick(true);
-		Walking.setWalkingTimeout(1500L);
-
-		if (YawsGeneral.getHp() <= 30) {
-			YawsGeneral.heal();
-		} else if (Inventory.isFull()
-				|| (Inventory.getAll().length > 26 && !YawsGeneral.lootExists())) {
-			General.println("Inv is full");
-			YawsGeneral.isInvFull();
-		} else if (YawsGeneral.lootExists()) {
-			General.println("looting...");
-			YawsGeneral.loot();
-		} else if (Inventory.getCount(Constants.RANGE_POT) > 0
-				&& Skills.getCurrentLevel(SKILLS.RANGED) < Skills
-						.getActualLevel(SKILLS.RANGED) + 2) {
-
-			General.println(Skills.getCurrentLevel(SKILLS.RANGED) + "  "
-					+ Skills.getActualLevel(SKILLS.RANGED));
-			Avies.FIGHT_STATUS = "Potting up";
-			General.println("Potted up");
-			YawsGeneral.drinkPotion(Constants.RANGE_POT);
-		} else if (Prayer.getCurrentPrayers().length > 0) {
-			PRAYERS[] p = Prayer.getCurrentPrayers();
-			if (!Prayer.isTabOpen()) {
-				YawsGeneral.openTab(TABS.PRAYERS);
-			}
-			for (int i = 0; i < p.length; i++) {
-				final PRAYERS currentPrayer = p[i];
-				Prayer.disable(currentPrayer);
-				Conditionals.waitFor(!Prayer.isPrayerEnabled(currentPrayer), 400, 500);
-			}
-		} else if (YawsGeneral.isRanging()) {
-			if (Combat.getTargetEntity() != null
-					&& !Combat.getTargetEntity().getName().equals("Aviansie")) {
-				Avies.MOVE_RANDOM = true;
-			}
-		} else if (Inventory.find(Constants.ALC_LOOT).length > 0) {
-			YawsGeneral.alc(Constants.ALC_LOOT);
-		} else {
-			RSNPC[] avies = NPCs.findNearest("Aviansie");
-			for (RSNPC a : avies) {
-				if (Constants.AVIES_Area.contains(a.getPosition())
-						&& (a.getCombatLevel() == 69
-								|| a.getCombatLevel() == 71 
-								|| a.getCombatLevel() == 83)) {
-					if (a.isOnScreen()) {
-						if (Clicking.click("Attack", a)){//clickObject(a, "Attack")) {// 
-							Avies.FIGHT_STATUS = "killing an avie";
-							Conditionals.waitFor(Player.getAnimation() == 4230, 3000, 3200);
-							//General.sleep(1000,1200);
-						}
-					} else {
-						General.println("running to closest avie");
-						Walking.clickTileMM(a.getAnimablePosition(), 1);
-						Camera.turnToTile(a.getPosition());
-						General.sleep(300, 400); // can't really put a conditional wait
-											// here cuz i can't get the rotation
-					}
-					break;
-				}
-			}
+		else if (!inSafeSpot()){
+			println("end case, not in safespot");
+			gotoSafeSpot();
+		}
+		else{
+			println("doing nothing...");
+			sleep(1000);
+			//println("else case...");
+			//gotoSafeSpot();
 		}
 	}
 

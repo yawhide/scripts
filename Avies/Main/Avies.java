@@ -37,7 +37,7 @@ import scripts.Avies.Utilities.Attack;
 import scripts.Avies.Utilities.YawsGeneral;
 import scripts.slayer.Zybez;
 
-@ScriptManifest(authors = { "Yaw hide" }, category = "ranged", version=0.3, name = "Yaw hide's Ava Killer", description="Local version")
+@ScriptManifest(authors = { "Yaw hide" }, category = "ranged", version=1.0, name = "Yaw hide's Ava Killer", description="Local version")
 public class Avies extends Script implements Painting, Pausing, MessageListening07{
 
 	public static int ADDY_BARS, COINS, RANARRS = 0;
