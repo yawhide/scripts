@@ -1,4 +1,4 @@
-package scripts.slayer;
+package scripts.BDK.Main;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -46,6 +46,7 @@ import org.tribot.script.Script;
 import org.tribot.script.ScriptManifest;
 import org.tribot.script.interfaces.Painting;
 import org.tribot.script.interfaces.Pausing;
+
 
 
 @ScriptManifest(authors = { "Yaw hide" }, category = "ranged", name = "Yaw hide's BDK", version = 0.63, description="Local version")
