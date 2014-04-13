@@ -47,6 +47,7 @@ import org.tribot.script.ScriptManifest;
 import org.tribot.script.interfaces.Painting;
 import org.tribot.script.interfaces.Pausing;
 
+import scripts.BDK.Data.Constants;
 import scripts.BDK.Utilities.YawsGeneral;
 import scripts.BDK.Utilities.Zybez;
 
@@ -56,36 +57,36 @@ import scripts.BDK.Utilities.Zybez;
 public class BDK extends Script implements Painting, Pausing {
 	  
 	// Variables
-	static int[] FOOD_IDS  = { };
-	int BOLTS_ID = 9142;
-	long ANTIBAN = System.currentTimeMillis();
-	int START_XP = Skills.getXP(SKILLS.HITPOINTS) + Skills.getXP(SKILLS.RANGED);
-	double VERSION;
-	int CURRENT_XP;
-	final long START_TIME = System.currentTimeMillis();
-	double XP_TO_LVL_RANGE = Skills.getXPToNextLevel(SKILLS.RANGED);
-	double XP_TO_LVL_HP = Skills.getXPToNextLevel(SKILLS.HITPOINTS);
-	int START_LV = Skills.getActualLevel(SKILLS.RANGED) + Skills.getActualLevel(SKILLS.HITPOINTS);
-	final String[] SKILLS_TYPES = {"Defence", "Ranged", "Hitpoints" };
-	final SKILLS[] SKILL = {SKILLS.DEFENCE, SKILLS.RANGED, SKILLS.HITPOINTS, };
-	final int[] XP = { Skills.getXP(SKILLS.DEFENCE), Skills.getXP(SKILLS.RANGED), 
+	public static int[] FOOD_IDS  = { };
+	public static int BOLTS_ID = 9142;
+	public static long ANTIBAN = System.currentTimeMillis();
+	public static int START_XP = Skills.getXP(SKILLS.HITPOINTS) + Skills.getXP(SKILLS.RANGED);
+	public static double VERSION;
+	public static int CURRENT_XP;
+	public static final long START_TIME = System.currentTimeMillis();
+	public static double XP_TO_LVL_RANGE = Skills.getXPToNextLevel(SKILLS.RANGED);
+	public static double XP_TO_LVL_HP = Skills.getXPToNextLevel(SKILLS.HITPOINTS);
+	public static int START_LV = Skills.getActualLevel(SKILLS.RANGED) + Skills.getActualLevel(SKILLS.HITPOINTS);
+	public static final String[] SKILLS_TYPES = {"Defence", "Ranged", "Hitpoints" };
+	public static final SKILLS[] SKILL = {SKILLS.DEFENCE, SKILLS.RANGED, SKILLS.HITPOINTS, };
+	public static final int[] XP = { Skills.getXP(SKILLS.DEFENCE), Skills.getXP(SKILLS.RANGED), 
 			Skills.getXP(SKILLS.HITPOINTS) };
-	int[] START_SKILL_LVS = { 	Skills.getActualLevel(SKILLS.DEFENCE), Skills.getActualLevel(SKILLS.RANGED), 
+	public static int[] START_SKILL_LVS = { 	Skills.getActualLevel(SKILLS.DEFENCE), Skills.getActualLevel(SKILLS.RANGED), 
 			Skills.getActualLevel(SKILLS.HITPOINTS) };
-	boolean SCRIPT_STATUS = true;
-	static int FOOD_NUM = 2;
+	public static boolean SCRIPT_STATUS = true;
+	public static int FOOD_NUM = 2;
 	
-	int DHIDES,DBONES = 0;
-	int DHIDE_COUNT, DBONE_COUNT = 0;
-	int DHIDES_INI, DBONES_INI = 0;
-	int DHIDE_PRICE = 1775;
-	int DBONES_PRICE = 1800;
-	int MITH_BOLTS_PRICE;
-	int RUNE_DAGGER_PRICE;
-	int NAT_PRICE;
+	public static int DHIDES,DBONES = 0;
+	public static int DHIDE_COUNT, DBONE_COUNT = 0;
+	public static int DHIDES_INI, DBONES_INI = 0;
+	public static int DHIDE_PRICE = 1775;
+	public static int DBONES_PRICE = 1800;
+	public static int MITH_BOLTS_PRICE;
+	public static int RUNE_DAGGER_PRICE;
+	public static int NAT_PRICE;
 	static boolean WAIT_GUI = true;
 	
-	String FIGHT_STATUS;
+	public static String FIGHT_STATUS;
 	
 	@Override
 	public void run() {
@@ -496,33 +497,8 @@ public class BDK extends Script implements Painting, Pausing {
 		else
 			emergTele();
 	}
-	
-	private void waitForInv(int lootID, int lootNum) {
-		FIGHT_STATUS = "waiting for loot";
-		int k = 0;
-		while (lootCount(lootID) == lootNum && k < 200
-				&& Player.isMoving()) {
-			sleep(80);
-			k++;
-		}
-		if (lootCount(lootID) > lootNum) {
-			if (lootID == 1751)
-				DHIDES++;
-			else if (lootID == 536)
-				DBONES++;
-		}
-	}
-	
-	public void drawTile(RSTile tile, Graphics g, boolean fill) {
-		if (tile.getPosition().isOnScreen()) {
-			if (fill) {
-				g.fillPolygon(Projection.getTileBoundsPoly(tile, 0));
-			} else {
-				g.drawPolygon(Projection.getTileBoundsPoly(tile, 0));
-			}
-		}
-	}
-	
+
+		
 	public BDK() {
 		VERSION = ((ScriptManifest) getClass().getAnnotation(
 				ScriptManifest.class)).version();
@@ -530,7 +506,7 @@ public class BDK extends Script implements Painting, Pausing {
 
 	@Override
 	public void onPause() {
-		if(inArea(blueDragArea)){
+		if(inArea(Constants.BLUE_DRAG_AREA)){
 			if(!inSafeSpot())
 				gotoSafeSpot();
 		}
@@ -543,86 +519,12 @@ public class BDK extends Script implements Painting, Pausing {
 			gotoSafeSpot();
 	}
 	
-	private boolean clickNPC(RSNPC npc, String option) {
 
-		RSTile loc = null;
-		if (npc != null && npc.isOnScreen()) {
-			if(npc.getID() == drag247){
-				loc = new RSTile(npc.getPosition().getX()-1, npc.getPosition().getY()-1);
-			}
-			else{
-				loc = new RSTile(npc.getPosition().getX(), npc.getPosition().getY()-1);
-			}
-			Mouse.move(Projection.tileToScreen(loc, 10));
-			if(Game.isUptext("Walk here / 2 more options")){
-				Mouse.click(3);
-				if (ChooseOption.isOpen()) {
-					ChooseOption.select(option);
-				}
-			}
-			else if (Game.isUptext(option)) {
-				Mouse.click(1);
-				waitForDrag(npc);
-				return true;
-			} else {
-				Mouse.click(3);
-				if (ChooseOption.isOpen()) {
-					ChooseOption.select(option);
-				}
-			}
-		}
-		return false;
-	}
 	
 	public void waitForDrag(RSNPC drag) {
 
 		while (drag.isInCombat() && inSafeSpot() && !inCombat())
 			sleep(1000, 1300);
-	}
-	
-	public void drinkPotion(int[] pot) {
-		if (Skills.getCurrentLevel(SKILLS.RANGED) < Skills.getActualLevel(SKILLS.RANGED) + 2) {
-			Inventory.open();
-			RSItem[] potion = Inventory.find(pot);
-			if (potion.length > 0) {
-				if(Clicking.click("Drink", potion[0])){
-					Timing.waitCondition(new Condition() {
-						public boolean active() {
-							return Skills.getCurrentLevel(SKILLS.RANGED) > Skills.getActualLevel(SKILLS.RANGED);
-						}
-					}, General.random(1000, 1200));
-				}
-			}
-		}
-	}
-
-	public void waitForItem(int[] i) {
-		final int[] item = i;
-		Timing.waitCondition(new Condition() {
-			public boolean active() {
-				return Inventory.getCount(item) > 0;
-			}
-		}, General.random(500, 1000));
-	}
-
-	public void waitForItem(int i) {
-		final int item = i;
-		Timing.waitCondition(new Condition() {
-			public boolean active() {
-				return Inventory.getCount(item) > 0;
-			}
-		}, General.random(500, 1000));
-	}
-
-	public void waitForTab(TABS t) {
-		final TABS tab = t;
-		Timing.waitCondition(new Condition() {
-			public boolean active() {
-				return GameTab.getOpen() == tab;
-			}
-		}, General.random(500, 1000));
-	}
-	
-	
+	}	
 	
 }

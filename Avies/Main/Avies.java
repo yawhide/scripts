@@ -88,7 +88,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 		BOLTS_ID = Equipment.getItem(SLOTS.ARROW).getID();
 		YawsGeneral.checkStats();
 		
-		boolean devmode = true;
+		boolean devmode = false;
 		
 		if(devmode){
 			FOOD_NUMBER = 9;

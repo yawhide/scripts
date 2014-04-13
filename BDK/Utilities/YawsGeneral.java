@@ -32,6 +32,7 @@ import org.tribot.api2007.types.RSNPC;
 import org.tribot.api2007.types.RSTile;
 
 import scripts.BDK.Data.Constants;
+import scripts.BDK.Main.BDK;
 
 public class YawsGeneral {
 
@@ -167,7 +168,7 @@ public class YawsGeneral {
 	}
 
 	public static void emergTele() {
-		Avies.FIGHT_STATUS = "tele tabbing";
+		BDK.FIGHT_STATUS = "tele tabbing";
 		RSItem[] tab = Inventory.find("Falador teleport");
 		openTab(TABS.INVENTORY);
 		if (tab.length > 0) {
@@ -176,60 +177,33 @@ public class YawsGeneral {
 			}
 		} else {
 			General.println("Out of tabs");
-			Avies.SCRIPT_STATUS = false;
+			BDK.SCRIPT_STATUS = false;
 		}
 	}
 
 	public static void heal() {
-		RSItem[] food = Inventory.find(Avies.FOOD_IDS);
-		Avies.FIGHT_STATUS = "eating food";
+		RSItem[] food = Inventory.find(BDK.FOOD_IDS);
+		BDK.FIGHT_STATUS = "eating food";
 		if (GameTab.getOpen() != TABS.INVENTORY) {
 			openTab(TABS.INVENTORY);
 		}
 
 		if (food.length > 0) {
-			final int count = Inventory.getCount(Avies.FOOD_IDS);
+			final int count = Inventory.getCount(BDK.FOOD_IDS);
 			if (Clicking.click("Eat", food[0]))
 				Conditionals.waitForEating(count);
 		} else
 			emergTele();
 	}
 
-	public static void CWTele() {
-		RSItem[] ROD = Equipment.find(SLOTS.RING);
-
-		openTab(TABS.EQUIPMENT);
-		if (ROD.length > 0) {
-			if (!inCombat()) {
-				if (Clicking.click("Operate", ROD[0])) {
-					if (NPCChat.selectOption("Castle Wars Arena.", true)) {
-						Conditionals.waitFor(inArea(Constants.CW_AREA), 4500,
-								5500);
-					}
-				}
-			} else {
-				emergTele();
-			}
-		}
-	}
-
-	public static boolean gotEquipment() {
-		return (((!Avies.USE_HOUSE && lootCountStack(Constants.VTAB) > 0) || (Avies.USE_HOUSE && lootCountStack(Constants.HTAB) > 0))
-				&& lootCountStack(Constants.NAT) >= 10
-				&& lootCountStack(Constants.FIRE) >= 52
-				&& lootCountStack(Constants.LAW) == 2
-				&& Inventory.find(Constants.RANGE_POT).length == 1 && Inventory
-					.find(Avies.FOOD_IDS).length == Avies.FOOD_NUMBER);
-	}
-
 	public static void isInvFull() {
-		RSItem[] food = Inventory.find(Avies.FOOD_IDS);
-		RSItem[] bolts = Inventory.find(Avies.BOLTS_ID);
+		RSItem[] food = Inventory.find(BDK.FOOD_IDS);
+		RSItem[] bolts = Inventory.find(BDK.BOLTS_ID);
 		if (Inventory.find(Constants.JUNK).length > 0 || food.length > 0
 				|| bolts.length > 0) {
-			Avies.FIGHT_STATUS = "dropping junk";
+			BDK.FIGHT_STATUS = "dropping junk";
 			if (food.length > 0) {
-				final int count = Inventory.getCount(Avies.FOOD_IDS);
+				final int count = Inventory.getCount(BDK.FOOD_IDS);
 				if (Clicking.click("Eat", food[0])) {
 					Conditionals.waitForEating(count);
 				}
@@ -250,17 +224,17 @@ public class YawsGeneral {
 	public static boolean lootExists() {
 		RSGroundItem[] Nests = GroundItems.findNearest(Constants.LOOT2);
 		return Nests.length > 0
-				&& Constants.AVIES_Area.contains(Nests[0].getPosition());
+				&& Constants.BLUE_DRAG_AREA.contains(Nests[0].getPosition());
 	}
 
 	public static void loot() {
-		Avies.FIGHT_STATUS = "looting";
+		BDK.FIGHT_STATUS = "looting";
 		Pray.turnOffPrayerEagle();
 		RSGroundItem[] Nests = GroundItems.findNearest(Constants.LOOT);
 
 		for (int i = 0; i < Nests.length; i++) {
 			Walking.setWalkingTimeout(1000L);
-			if (Nests[i].getID() == Avies.BOLTS_ID) {
+			if (Nests[i].getID() == BDK.BOLTS_ID) {
 				if (Nests[i].getStack() > 9) {
 					if (!Nests[i].isOnScreen()) {
 						Walking.walkPath(Walking.generateStraightPath(Nests[i]
@@ -269,7 +243,7 @@ public class YawsGeneral {
 						Camera.setCameraAngle(General.random(90, 100));
 						waitIsMovin();
 					}
-					String str = Constants.LOOT_MAPPING.get(Nests[i].getID());
+					String str = Constants.LOOT_MAP.get(Nests[i].getID());
 					final int tmpCount = Inventory.getCount(Nests[i].getID());
 					if (Nests[i].click("Take " + str))
 						Conditionals.waitForItem(Nests[i].getID(), tmpCount);
@@ -282,7 +256,7 @@ public class YawsGeneral {
 					Camera.setCameraAngle(General.random(90, 100));
 					waitIsMovin();
 				}
-				String str = Constants.LOOT_MAPPING.get(Nests[i].getID());
+				String str = Constants.LOOT_MAP.get(Nests[i].getID());
 				final int tmpCount = Inventory.getCount(Nests[i].getID());
 				if (Nests[i].click("Take " + str))
 					Conditionals.waitForItem(Nests[i].getID(), tmpCount);
@@ -292,8 +266,8 @@ public class YawsGeneral {
 
 	// TODO fix waitForLoot
 	public static void waitForLoot(RSCharacter avv) {
-		Avies.FIGHT_STATUS = "prayerflicking";
-		if (!lootExists() && isRanging() && inAviesSpot() && getHp() > 30) {
+		BDK.FIGHT_STATUS = "prayerflicking";
+		if (!lootExists() && isRanging() && inBDKSpot() && getHp() > 30) {
 			Pray.prayerFlick();
 		}
 		Pray.turnOffPrayerEagle();
