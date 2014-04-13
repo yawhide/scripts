@@ -4346,9 +4346,7 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 				
 				g.setColor(new Color(0, 0, 0));
 				g.drawString(Percentage + "% to " + NXT_LVL, x1+25, y1 + 9);
-				
 
-				
 				x += 15;
 				}
 			}			
