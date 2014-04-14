@@ -6,6 +6,7 @@ import java.awt.Polygon;
 import org.tribot.api.Clicking;
 import org.tribot.api.General;
 import org.tribot.api.Timing;
+import org.tribot.api.interfaces.Positionable;
 import org.tribot.api.types.generic.Condition;
 import org.tribot.api2007.Camera;
 import org.tribot.api2007.Combat;
@@ -29,6 +30,7 @@ import org.tribot.api2007.types.RSGroundItem;
 import org.tribot.api2007.types.RSItem;
 import org.tribot.api2007.types.RSModel;
 import org.tribot.api2007.types.RSNPC;
+import org.tribot.api2007.types.RSObject;
 import org.tribot.api2007.types.RSTile;
 
 import scripts.Avies.Data.Constants;
@@ -351,6 +353,56 @@ public class YawsGeneral {
 		if(Skills.getActualLevel(SKILLS.CONSTRUCTION) < 50){
 			Avies.USE_HOUSE = false;
 			General.println("You do not have 50 con for varrock portal focus, you must use varrock teletabs");
+		}
+	}
+	
+	public static void doHouseStuff(){
+		Avies.FIGHT_STATUS = "in house...";
+		RSObject[] alter = Objects.findNearest(20, "Altar");
+		RSObject[] portal = Objects.findNearest(20, "Varrock Portal");
+		RSObject[] portal2 = Objects.findNearest(30, "Portal");
+		
+		if(alter.length == 0 || portal.length == 0){
+			Avies.FIGHT_STATUS = "not inside house...";
+			if(portal2.length > 0){
+				if(portal2[0].isOnScreen()){
+					if(Clicking.click("Enter", portal2[0])){
+						NPCChat.selectOption("Go to your house", true);
+					}
+				}
+				else{
+					Walking.walkPath(Walking.generateStraightPath(portal2[0].getPosition()));
+					YawsGeneral.waitIsMovin();
+				}
+			}
+			
+			General.println("Could not determine where you are, are you outside of the house???");
+			//scriptStatus = false;
+		}
+		
+		else if (Skills.getCurrentLevel(SKILLS.PRAYER) == Skills.getActualLevel(SKILLS.PRAYER)) {
+			if(portal.length > 0){
+				if (portal[0].isOnScreen()) {
+					if (Clicking.click("Enter", portal[0])) {
+						Conditionals.waitFor(YawsGeneral.inArea(Constants.VARROCK_AREA), 1200, 2000);
+					}
+				} else {
+					Positionable temp = new RSTile(portal[0].getPosition().getX(), portal[0].getPosition().getY()-2, 0);
+					Walking.walkPath(Walking.generateStraightPath(temp));
+					YawsGeneral.waitIsMovin();
+				}
+			}
+		} else {
+			if (alter.length > 0) {
+				if (alter[0].isOnScreen()) {
+					if (Clicking.click("Pray", alter[0])) {
+						Conditionals.waitFor(Skills.getCurrentLevel(SKILLS.PRAYER) == Skills.getActualLevel(SKILLS.PRAYER), 1500, 2300);
+					}
+				} else {
+					Walking.walkPath(Walking.generateStraightPath(alter[0].getPosition()));
+					YawsGeneral.waitIsMovin();
+				}
+			}
 		}
 	}
 }

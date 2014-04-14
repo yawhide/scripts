@@ -25,53 +25,7 @@ public class Pathing {
 		if (YawsGeneral.inArea(Constants.AVIES_AREA) && YawsGeneral.pos().getPlane() == 2)
 			return true;
 		else if(!YawsGeneral.inArea(Constants.VARROCK_AREA) && Objects.findNearest(50, "Portal").length > 0){
-			Avies.FIGHT_STATUS = "in house...";
-			RSObject[] alter = Objects.findNearest(20, "Altar");
-			RSObject[] portal = Objects.findNearest(20, "Varrock Portal");
-			RSObject[] portal2 = Objects.findNearest(30, "Portal");
-			
-			if(alter.length == 0 || portal.length == 0){
-				Avies.FIGHT_STATUS = "not inside house...";
-				if(portal2.length > 0){
-					if(portal2[0].isOnScreen()){
-						if(Clicking.click("Enter", portal2[0])){
-							NPCChat.selectOption("Go to your house", true);
-						}
-					}
-					else{
-						Walking.walkPath(Walking.generateStraightPath(portal2[0].getPosition()));
-						YawsGeneral.waitIsMovin();
-					}
-				}
-				
-				General.println("Could not determine where you are, are you outside of the house???");
-				//scriptStatus = false;
-			}
-			
-			else if (Skills.getCurrentLevel(SKILLS.PRAYER) == Skills.getActualLevel(SKILLS.PRAYER)) {
-				if(portal.length > 0){
-					if (portal[0].isOnScreen()) {
-						if (Clicking.click("Enter", portal[0])) {
-							Conditionals.waitFor(YawsGeneral.inArea(Constants.VARROCK_AREA), 1200, 2000);
-						}
-					} else {
-						Positionable temp = new RSTile(portal[0].getPosition().getX(), portal[0].getPosition().getY()-2, 0);
-						Walking.walkPath(Walking.generateStraightPath(temp));
-						YawsGeneral.waitIsMovin();
-					}
-				}
-			} else {
-				if (alter.length > 0) {
-					if (alter[0].isOnScreen()) {
-						if (Clicking.click("Pray", alter[0])) {
-							Conditionals.waitFor(Skills.getCurrentLevel(SKILLS.PRAYER) == Skills.getActualLevel(SKILLS.PRAYER), 1500, 2300);
-						}
-					} else {
-						Walking.walkPath(Walking.generateStraightPath(alter[0].getPosition()));
-						YawsGeneral.waitIsMovin();
-					}
-				}
-			}
+			YawsGeneral.doHouseStuff();
 		}
 		else if(YawsGeneral.inGW()){
 			Avies.FIGHT_STATUS = "walking to avies spot";
@@ -123,7 +77,7 @@ public class Pathing {
 			if(!YawsGeneral.gotEquipment()){
 				if (YawsGeneral.pos().distanceTo(Constants.BANK_TILE) <= 5){
 					General.println("banking...");
-					Bank.bank();
+					Bank.openBank();
 				}
 				else{
 					General.println("gonna web walk to bank");

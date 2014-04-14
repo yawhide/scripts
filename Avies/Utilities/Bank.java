@@ -41,60 +41,63 @@ public class Bank {
 	    	return false;
 	    }
 	    
-	    public static void bank(){
+	    public static void openBank(){
 			if(Banking.openBankBooth()){
 				if(Banking.isPinScreenOpen())
 					Banking.inPin();
 				else if (Banking.isBankScreenOpen()){
-					
-					Avies.ADDY_COUNT += Avies.ADDY_BARS;
-					Avies.COINS_AMOUNT += Avies.COINS;
-					Avies.RANARR_COUNT += Avies.RANARRS;
-					Avies.ADDY_INI = 0;
-					Avies.COINS_INI = 0;
-					Avies.RANARR_INI = 0;
-					
-					Banking.depositAll();
-					Conditionals.waitFor(Inventory.getAll().length == 0, 400, 500);
-					
-					if(!Avies.USE_HOUSE){
-						withdrawPPots();
-					}
-					
-					withdraw(1, Constants.RANGE_POT);
-					withdraw(10, Constants.NAT);
-					withdraw(52, Constants.FIRE);
-					withdraw(2, Constants.LAW);
-					withdraw(Avies.FOOD_NUMBER+((Combat.getMaxHP() - Combat.getHP()) / 12), Avies.FOOD_IDS);
-					
-					if(Avies.USE_HOUSE){
-						if(Inventory.getCount(Constants.HTAB) < 5){
-							withdraw(10, Constants.HTAB);
-						}
-					}
-					else{
-						if(Inventory.getCount(Constants.HTAB) < 5){
-							withdraw(10, Constants.VTAB);
-						}
-					}
-					if(YawsGeneral.getStackBolts(Avies.BOLTS_ID) < 500){
-						withdraw(1000, Avies.BOLTS_ID);
-					}
-					
-					closeBank();
-					
-					if(Inventory.find(Avies.BOLTS_ID).length > 0){
-						Clicking.click("Equip", Inventory.find(Avies.BOLTS_ID)[0]);
-					}
-					
-					while(Inventory.find(Avies.FOOD_IDS).length > Avies.FOOD_NUMBER){
-					    final int i = Inventory.find(Avies.FOOD_IDS).length;
-						if(Clicking.click("Eat", Inventory.find(Avies.FOOD_IDS)[0]))
-							Conditionals.waitForEating(i);
-					}
+					bank();					
 				}
 			}
 		}
+	    
+	    public static void bank(){
+	    	Avies.ADDY_COUNT += Avies.ADDY_BARS;
+			Avies.COINS_AMOUNT += Avies.COINS;
+			Avies.RANARR_COUNT += Avies.RANARRS;
+			Avies.ADDY_INI = 0;
+			Avies.COINS_INI = 0;
+			Avies.RANARR_INI = 0;
+			
+			Banking.depositAll();
+			Conditionals.waitFor(Inventory.getAll().length == 0, 400, 500);
+			
+			if(!Avies.USE_HOUSE){
+				withdrawPPots();
+			}
+			
+			withdraw(1, Constants.RANGE_POT);
+			withdraw(10, Constants.NAT);
+			withdraw(52, Constants.FIRE);
+			withdraw(2, Constants.LAW);
+			withdraw(Avies.FOOD_NUMBER+((Combat.getMaxHP() - Combat.getHP()) / 12), Avies.FOOD_IDS);
+			
+			if(Avies.USE_HOUSE){
+				if(Inventory.getCount(Constants.HTAB) < 5){
+					withdraw(10, Constants.HTAB);
+				}
+			}
+			else{
+				if(Inventory.getCount(Constants.HTAB) < 5){
+					withdraw(10, Constants.VTAB);
+				}
+			}
+			if(YawsGeneral.getStackBolts(Avies.BOLTS_ID) < 500){
+				withdraw(1000, Avies.BOLTS_ID);
+			}
+			
+			closeBank();
+			
+			if(Inventory.find(Avies.BOLTS_ID).length > 0){
+				Clicking.click("Equip", Inventory.find(Avies.BOLTS_ID)[0]);
+			}
+			
+			while(Inventory.find(Avies.FOOD_IDS).length > Avies.FOOD_NUMBER){
+			    final int i = Inventory.find(Avies.FOOD_IDS).length;
+				if(Clicking.click("Eat", Inventory.find(Avies.FOOD_IDS)[0]))
+					Conditionals.waitForEating(i);
+			}
+	    }
 	    
 	    public static void closeBank(){
 	    	Banking.close();

@@ -1,21 +1,15 @@
 package scripts.Avies.Utilities;
 
-import java.awt.Point;
-
 import org.tribot.api.Clicking;
 import org.tribot.api.General;
-import org.tribot.api.input.Mouse;
 import org.tribot.api2007.Camera;
-import org.tribot.api2007.ChooseOption;
 import org.tribot.api2007.Combat;
-import org.tribot.api2007.Game;
 import org.tribot.api2007.Inventory;
 import org.tribot.api2007.NPCs;
 import org.tribot.api2007.Player;
 import org.tribot.api2007.Prayer;
 import org.tribot.api2007.Skills;
 import org.tribot.api2007.Walking;
-import org.tribot.api2007.WebWalking;
 import org.tribot.api2007.GameTab.TABS;
 import org.tribot.api2007.Prayer.PRAYERS;
 import org.tribot.api2007.Skills.SKILLS;
@@ -25,49 +19,6 @@ import scripts.Avies.Data.Constants;
 import scripts.Avies.Main.Avies;
 
 public class Attack {
-
-	public static boolean clickObject(RSNPC a, String option) {
-		RSNPC object = a;
-		if (object != null) {
-			int x = (int) object.getModel().getEnclosedArea().getBounds()
-					.getCenterX();
-			int y = (int) object.getModel().getEnclosedArea().getBounds()
-					.getCenterY();
-			Point p = new Point(x + General.random(-4, 4), y
-					+ General.random(-4, 0));
-			if (object.getPosition().isOnScreen()) {
-				if (ChooseOption.isOpen()) {
-					ChooseOption.close();
-				}
-				Mouse.move(p);
-				if (Game.getUptext().contains(option)
-						&& (YawsGeneral.checkActions(object, option))
-						&& Game.getUptext().contains("Aviansie")) {
-					Mouse.click(1);
-					return true;
-				} else if (!Game.getUptext().contains(option)) {
-					Mouse.click(3);
-					if (ChooseOption.isOpen()
-							&& ChooseOption.isOptionValid(option))
-						ChooseOption.select(option);
-					if (ChooseOption.isOpen()
-							&& !ChooseOption.isOptionValid(option)) {
-						ChooseOption.close();
-						Camera.turnToTile(object.getPosition());
-					}
-				}
-			} else {
-				if (Player.getPosition().distanceTo(object.getPosition()) > 4)
-					WebWalking.walkTo(object.getPosition());
-				if (!object.getPosition().isOnScreen())
-					Camera.turnToTile(object.getPosition());
-				while (Player.isMoving()) {
-					General.sleep(50, 80);
-				}
-			}
-		}
-		return false;
-	}
 
 	public static void fight() {
 
@@ -120,7 +71,6 @@ public class Attack {
 						if (Clicking.click("Attack", a)){//clickObject(a, "Attack")) {// 
 							Avies.FIGHT_STATUS = "killing an avie";
 							Conditionals.waitFor(Player.getAnimation() == 4230, 3000, 3200);
-							//General.sleep(1000,1200);
 						}
 					} else {
 						General.println("running to closest avie");
