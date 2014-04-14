@@ -27,7 +27,7 @@ import org.tribot.api2007.types.RSNPC;
 
 public class Attack {
 
-	public void fight(){
+	public static void fight(){
 		RSNPC[] drag = NPCs.findNearest(dragIDs);
 		RSNPC[] dragWithBaby = NPCs.findNearest(dragWithBabyArr);
 		Walking.setWalkingTimeout(1500L);

@@ -53,10 +53,6 @@ public class YawsGeneral {
 		return Combat.getHPRatio();
 	}
 
-	public static boolean isFull() {
-		return Inventory.isFull();
-	}
-
 	public static int itemCount(int ID) {
 		return Inventory.find(ID).length;
 	}
@@ -90,6 +86,10 @@ public class YawsGeneral {
 	public static void openTab(TABS t) {
 		GameTab.open(t);
 		Conditionals.waitForTab(t);
+	}
+	
+	public static boolean inSafeSpot(){
+		return inArea(Constants.NORTHEAST_SAFESPOT_AREA);
 	}
 
 	public static boolean checkActions(RSNPC object, String action) {
@@ -227,41 +227,45 @@ public class YawsGeneral {
 				&& Constants.BLUE_DRAG_AREA.contains(Nests[0].getPosition());
 	}
 
-	public static void loot() {
+	public void LOOT() {
 		BDK.FIGHT_STATUS = "looting";
-		Pray.turnOffPrayerEagle();
-		RSGroundItem[] Nests = GroundItems.findNearest(Constants.LOOT);
-
-		if(getHp() < 50)
-			heal();
 		
-		for (int i = 0; i < Nests.length; i++) {
-			Walking.setWalkingTimeout(1000L);
-			if (Nests[i].getID() == BDK.BOLTS_ID) {
+		Pray.turnOffPrayerEagle();
+		
+		RSGroundItem[] Nests = GroundItems.findNearest(Constants.LOOT);
+		if (YawsGeneral.getHp() <= 50) {
+			if (Inventory.getCount(BDK.FOOD_IDS) == 0) {
+				YawsGeneral.emergTele();
+			} 
+			else
+				YawsGeneral.heal();
+		}
+		
+		for(int i = 0; i < Nests.length; i++){
+			if(Nests[i].getID() == 9142){
 				if (Nests[i].getStack() > 9) {
 					if (!Nests[i].isOnScreen()) {
-						Walking.walkPath(Walking.generateStraightPath(Nests[i]
-								.getPosition()));
+						Walking.clickTileMM(Nests[i].getPosition(), 1);
 						Camera.turnToTile(Nests[i].getPosition());
 						Camera.setCameraAngle(General.random(90, 100));
-						waitIsMovin();
+						YawsGeneral.waitIsMovin();
 					}
 					String str = Constants.LOOT_MAP.get(Nests[i].getID());
-					final int tmpCount = Inventory.getCount(Nests[i].getID());
+					int tmpCount = Inventory.getCount(Nests[i].getID());
 					if (Nests[i].click("Take " + str))
 						Conditionals.waitForItem(Nests[i].getID(), tmpCount);
 				}
-			} else {
+			}
+			else{
 				if (!Nests[i].isOnScreen()) {
-					Walking.walkPath(Walking.generateStraightPath(Nests[i]
-							.getPosition()));
+					Walking.clickTileMM(Nests[i].getPosition(), 1);
 					Camera.turnToTile(Nests[i].getPosition());
 					Camera.setCameraAngle(General.random(90, 100));
-					waitIsMovin();
+					YawsGeneral.waitIsMovin();
 				}
 				String str = Constants.LOOT_MAP.get(Nests[i].getID());
-				final int tmpCount = Inventory.getCount(Nests[i].getID());
-				if (Nests[i].click("Take " + str))
+				int tmpCount = Inventory.getCount(Nests[i].getID());
+				if(Nests[i].click("Take " + str))
 					Conditionals.waitForItem(Nests[i].getID(), tmpCount);
 			}
 		}
@@ -270,7 +274,7 @@ public class YawsGeneral {
 	// TODO fix waitForLoot
 	public static void waitForLoot(RSCharacter avv) {
 		BDK.FIGHT_STATUS = "prayerflicking";
-		if (!lootExists() && isRanging() && inBDKSpot() && getHp() > 30) {
+		if (!lootExists() && isRanging() && inSafeSpot() && getHp() > 30) {
 			Pray.prayerFlick();
 		}
 		Pray.turnOffPrayerEagle();
@@ -289,5 +293,48 @@ public class YawsGeneral {
 		}
 	}
 	
+	public void isFull(){
+		RSItem[] coin = Inventory.find("Coins");
+		RSItem[] food = Inventory.find(BDK.FOOD_IDS);
+		RSItem[] bolts = Inventory.find("Mithril bolts");
+		if(Inventory.find(Constants.JUNK).length > 0 || food.length > 0 || coin.length > 0 || bolts.length > 0){
+			BDK.FIGHT_STATUS = "dropping junk";
+			
+			if(coin.length > 0 && coin[0].getStack() < 1500){
+				Inventory.drop(coin[0].getID());
+				General.sleep(150,200);
+			}
+			else if (food.length > 0){
+				food[0].click("Eat");
+				sleep(300,350);
+			}
+			else if (bolts.length > 0){
+				bolts[0].click("Wield");
+				sleep(300, 350);
+			}
+			Inventory.drop(junk);
+		}
+		else{
+			emergTele();
+		}
+	}
+
+	
+	
+	public void waitForLoot(){
+		FIGHT_STATUS = "prayerflicking";
+		while(!lootExists() && isRanging() && inSafeSpot() && !isMovin()){
+			
+			prayerflick();
+		}
+		turnOffPrayer();
+	}
+
+	
+	public void waitForDrag(RSNPC drag) {
+
+		while (drag.isInCombat() && inSafeSpot() && !inCombat())
+			sleep(1000, 1300);
+	}
 	
 }

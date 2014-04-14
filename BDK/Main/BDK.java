@@ -48,6 +48,9 @@ import org.tribot.script.interfaces.Painting;
 import org.tribot.script.interfaces.Pausing;
 
 import scripts.BDK.Data.Constants;
+import scripts.BDK.Utilities.Attack;
+import scripts.BDK.Utilities.Conditionals;
+import scripts.BDK.Utilities.Pray;
 import scripts.BDK.Utilities.YawsGeneral;
 import scripts.BDK.Utilities.Zybez;
 
@@ -140,13 +143,13 @@ public class BDK extends Script implements Painting, Pausing {
 			
 			if(Inventory.find("Falador teleport").length > 0 && Inventory.find("Falador teleport")[0].getStack() == 1){
 				println("Ran out of ftabs...");
-				emergTele();
+				YawsGeneral.emergTele();
 				SCRIPT_STATUS = false;
 			}
 			
 			if(Equipment.getItem(SLOTS.ARROW).getStack() < 100){
 				println("Ran out of bolts");
-				emergTele();
+				YawsGeneral.emergTele();
 				SCRIPT_STATUS = false;
 			}
 			
@@ -154,57 +157,12 @@ public class BDK extends Script implements Painting, Pausing {
 			    Options.setRunOn(true);
 			}
 			
-			if(gotoDrag()){
-				fight();
+			if(Pathing.gotoDrag()){
+				Attack.fight();
 			}
 		}
 	}
 			
-	public void LOOT() {
-		FIGHT_STATUS = "looting";
-		
-		turnOffPrayer();
-		
-		
-		RSGroundItem[] Nests = GroundItems.findNearest(loot);
-		if (getHp() <= 50) {
-			if (Inventory.getCount(FOOD_IDS) == 0) {
-				emergTele();
-			} 
-			else
-				HEAL();
-		}
-		
-		for(int i = 0; i < Nests.length; i++){
-			if(Nests[i].getID() == 9142){
-				if (Nests[i].getStack() > 9) {
-					if (!Nests[i].isOnScreen()) {
-						Walking.clickTileMM(Nests[i].getPosition(), 1);
-						Camera.turnToTile(Nests[i].getPosition());
-						Camera.setCameraAngle(General.random(90, 100));
-						waitIsMovin();
-					}
-					String str = map.get(Nests[i].getID());
-					int tmpCount = lootCount(Nests[i].getID());
-					if (Nests[i].click("Take " + str))
-						waitForInv(Nests[i].getID(), tmpCount);
-				}
-			}
-			else{
-				if (!Nests[i].isOnScreen()) {
-					Walking.clickTileMM(Nests[i].getPosition(), 1);
-					Camera.turnToTile(Nests[i].getPosition());
-					Camera.setCameraAngle(General.random(90, 100));
-					waitIsMovin();
-				}
-				String str = map.get(Nests[i].getID());
-				int tmpCount = lootCount(Nests[i].getID());
-				if(Nests[i].click("Take " + str))
-					waitForInv(Nests[i].getID(), tmpCount);
-			}
-		}
-	}
-	
 	@Override
 	public void onPaint(Graphics g) {
 		
@@ -302,43 +260,6 @@ public class BDK extends Script implements Painting, Pausing {
 			
 	}
 	
-	public void isFull(){
-		RSItem[] coin = Inventory.find("Coins");
-		RSItem[] food = Inventory.find(FOOD_IDS);
-		RSItem[] bolts = Inventory.find("Mithril bolts");
-		if(Inventory.find(junk).length > 0 || food.length > 0 || coin.length > 0 || bolts.length > 0){
-			FIGHT_STATUS = "dropping junk";
-			
-			if(coin.length > 0 && coin[0].getStack() < 1500){
-				Inventory.drop(coin[0].getID());
-				sleep(150,200);
-			}
-			else if (food.length > 0){
-				food[0].click("Eat");
-				sleep(300,350);
-			}
-			else if (bolts.length > 0){
-				bolts[0].click("Wield");
-				sleep(300, 350);
-			}
-			Inventory.drop(junk);
-		}
-		else{
-			emergTele();
-		}
-	}
-
-	
-	
-	public void waitForLoot(){
-		FIGHT_STATUS = "prayerflicking";
-		while(!lootExists() && isRanging() && inSafeSpot() && !isMovin()){
-			
-			prayerflick();
-		}
-		turnOffPrayer();
-	}
-
 	public BDK() {
 		VERSION = ((ScriptManifest) getClass().getAnnotation(
 				ScriptManifest.class)).version();
@@ -346,25 +267,17 @@ public class BDK extends Script implements Painting, Pausing {
 
 	@Override
 	public void onPause() {
-		if(inArea(Constants.BLUE_DRAG_AREA)){
-			if(!inSafeSpot())
-				gotoSafeSpot();
+		if(YawsGeneral.inArea(Constants.BLUE_DRAG_AREA)){
+			if(!YawsGeneral.inSafeSpot())
+				Pathing.gotoSafeSpot();
 		}
-		turnOffPrayer();
+		Pray.turnOffPrayerEagle();
 	}
 
 	@Override
 	public void onResume() {
-		if(!inSafeSpot())
-			gotoSafeSpot();
+		if(!YawsGeneral.inSafeSpot())
+			Pathing.gotoSafeSpot();
 	}
-	
-
-	
-	public void waitForDrag(RSNPC drag) {
-
-		while (drag.isInCombat() && inSafeSpot() && !inCombat())
-			sleep(1000, 1300);
-	}	
-	
+		
 }
