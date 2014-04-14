@@ -151,8 +151,8 @@ public class AvieGUI extends javax.swing.JFrame {
 	    		Avies.FOOD_IDS = new int[] {385}; break;
 	    	}
 	    	Avies.FOOD_NUMBER = Integer.parseInt(foodamount.getText());
-	    	Avies.USE_HOUSE = telemethod.getSelectedItem().toString().equals("house") ? true : false;
-	        Avies.WAIT_GUI = false;
+	    	Avies.useHouseTab = telemethod.getSelectedItem().toString().equals("house") ? true : false;
+	        Avies.waitForGuiToFinish = false;
 	    }                                       
 
 	    private void foodamountActionPerformed(java.awt.event.ActionEvent evt) { 

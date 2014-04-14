@@ -53,12 +53,12 @@ public class Avies extends Script implements Painting, Pausing,
 
 	public static long ANTIBAN = System.currentTimeMillis();
 
-	public static boolean SCRIPT_STATUS = true;
-	public static String FIGHT_STATUS;
+	public static boolean mainLoopStatus = true;
+	public static String fightStatus;
 
 	// GUI
-	public static boolean MOVE_RANDOM = false, USE_HOUSE = true,
-			WAIT_GUI = true;
+	public static boolean runAwayFromMonster = false, useHouseTab = true,
+			waitForGuiToFinish = true;
 
 	// paint
 	public static int START_XP = Skills.getXP(SKILLS.HITPOINTS)
@@ -67,8 +67,8 @@ public class Avies extends Script implements Painting, Pausing,
 	START_LV = Skills.getActualLevel(SKILLS.RANGED)
 			+ Skills.getActualLevel(SKILLS.HITPOINTS);
 
-	public static double VERSION;
-	public static int CURRENT_XP;
+	public static double version;
+	public static int current_xp;
 	public static final long START_TIME = System.currentTimeMillis();
 	public static double XP_TO_LVL_RANGE = Skills
 			.getXPToNextLevel(SKILLS.RANGED), XP_TO_LVL_HP = Skills
@@ -97,11 +97,11 @@ public class Avies extends Script implements Painting, Pausing,
 		if (devmode) {
 			FOOD_NUMBER = 9;
 			FOOD_IDS = new int[] { 379 };
-			USE_HOUSE = true;
+			useHouseTab = true;
 		} else {
 			AvieGUI g = new AvieGUI();
 			g.setVisible(true);
-			while (WAIT_GUI)
+			while (waitForGuiToFinish)
 				sleep(500);
 			g.setVisible(false);
 		}
@@ -124,8 +124,8 @@ public class Avies extends Script implements Painting, Pausing,
 		Walking.setWalkingTimeout(5000L);
 		Walking.setControlClick(true);
 
-		while (SCRIPT_STATUS) {
-			CURRENT_XP = Skills.getXP(SKILLS.RANGED)
+		while (mainLoopStatus) {
+			current_xp = Skills.getXP(SKILLS.RANGED)
 					+ Skills.getXP(SKILLS.HITPOINTS);
 			XP_TO_LVL_RANGE = Skills.getXPToNextLevel(SKILLS.RANGED);
 			XP_TO_LVL_HP = Skills.getXPToNextLevel(SKILLS.HITPOINTS);
@@ -139,7 +139,7 @@ public class Avies extends Script implements Painting, Pausing,
 				Options.setRunOn(true);
 			}
 
-			if (MOVE_RANDOM) {
+			if (runAwayFromMonster) {
 				if (YawsGeneral.pos().distanceTo(Tiles.RANDOM_EAST_TILE) > YawsGeneral
 						.pos().distanceTo(Tiles.RANDOM_WEST_TILE)) {
 					Walking.walkPath(Walking
@@ -150,7 +150,7 @@ public class Avies extends Script implements Painting, Pausing,
 							.generateStraightPath(Tiles.RANDOM_WEST_TILE));
 					YawsGeneral.waitIsMovin();
 				}
-				MOVE_RANDOM = false;
+				runAwayFromMonster = false;
 			} else if (Pathing.goToAvies()) {
 				Attack.fight();
 			}
@@ -162,7 +162,7 @@ public class Avies extends Script implements Painting, Pausing,
 		Rectangle hideZone = new Rectangle(342, 369, 542, 500);
 		Point p = Mouse.getPos();
 
-		int xpGained = CURRENT_XP - START_XP;
+		int xpGained = current_xp - START_XP;
 		long timeRan = System.currentTimeMillis() - START_TIME;
 
 		double multiplier = timeRan / 3600000D;
@@ -266,12 +266,12 @@ public class Avies extends Script implements Painting, Pausing,
 			g.setColor(Color.WHITE);
 			g.drawString("Yawhide's BDK", 345, 385);
 			g.drawString(
-					"Version :" + VERSION + "   Curr world: "
+					"Version :" + version + "   Curr world: "
 							+ Game.getCurrentWorld(), 345, 405);
 			g.drawString("Running for: " + Timing.msToString(timeRan), 345, 420);
 			g.drawString("Total XP ganed: " + xpGained + " (" + xpPerHour
 					+ "/h)", 345, 435);
-			g.drawString("State: " + FIGHT_STATUS, 345, 450);
+			g.drawString("State: " + fightStatus, 345, 450);
 			g.drawString("Addy bars: " + dh + "       GP: " + db / 1000 + " K",
 					345, 465);
 			g.drawString("Gp/hr: "
@@ -284,7 +284,7 @@ public class Avies extends Script implements Painting, Pausing,
 	}
 
 	public Avies() {
-		VERSION = ((ScriptManifest) getClass().getAnnotation(
+		version = ((ScriptManifest) getClass().getAnnotation(
 				ScriptManifest.class)).version();
 	}
 
@@ -306,7 +306,7 @@ public class Avies extends Script implements Painting, Pausing,
 	@Override
 	public void serverMessageReceived(String arg0) {
 		if (arg0.equals("You need a higher slayer level to know how to wound this monster.")) {
-			MOVE_RANDOM = true;
+			runAwayFromMonster = true;
 		}
 	}
 

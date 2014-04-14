@@ -185,25 +185,25 @@ public class YawsGeneral {
 	}
 
 	public static void emergTele() {
-		Avies.FIGHT_STATUS = "tele tabbing";
+		Avies.fightStatus = "tele tabbing";
 		RSItem[] tab = Inventory.find(Constants.VTAB);
-		if (Avies.USE_HOUSE)
+		if (Avies.useHouseTab)
 			tab = Inventory.find(Constants.HTAB);
 		openTab(TABS.INVENTORY);
 		if (tab.length > 0) {
 			if (Clicking.click("Break", tab[0])) {
-				Conditionals.waitFor(Avies.USE_HOUSE ? inHouse()
+				Conditionals.waitFor(Avies.useHouseTab ? inHouse()
 						: inArea(Tiles.VARROCK_AREA), 2500, 3000);
 			}
 		} else {
 			General.println("Out of tabs");
-			Avies.SCRIPT_STATUS = false;
+			Avies.mainLoopStatus = false;
 		}
 	}
 
 	public static void heal() {
 		RSItem[] food = Inventory.find(Avies.FOOD_IDS);
-		Avies.FIGHT_STATUS = "eating food";
+		Avies.fightStatus = "eating food";
 		if (GameTab.getOpen() != TABS.INVENTORY) {
 			openTab(TABS.INVENTORY);
 		}
@@ -235,7 +235,7 @@ public class YawsGeneral {
 	}
 
 	public static boolean gotEquipment() {
-		return (((!Avies.USE_HOUSE && lootCountStack(Constants.VTAB) > 0) || (Avies.USE_HOUSE && lootCountStack(Constants.HTAB) > 0))
+		return (((!Avies.useHouseTab && lootCountStack(Constants.VTAB) > 0) || (Avies.useHouseTab && lootCountStack(Constants.HTAB) > 0))
 				&& lootCountStack(Constants.NAT) >= 10
 				&& lootCountStack(Constants.FIRE) >= 52
 				&& lootCountStack(Constants.LAW) == 2
@@ -248,7 +248,7 @@ public class YawsGeneral {
 		RSItem[] bolts = Inventory.find(Avies.BOLTS_ID);
 		if (Inventory.find(Constants.JUNK).length > 0 || food.length > 0
 				|| bolts.length > 0) {
-			Avies.FIGHT_STATUS = "dropping junk";
+			Avies.fightStatus = "dropping junk";
 			if (food.length > 0) {
 				final int count = Inventory.getCount(Avies.FOOD_IDS);
 				if (Clicking.click("Eat", food[0])) {
@@ -275,7 +275,7 @@ public class YawsGeneral {
 	}
 
 	public static void loot() {
-		Avies.FIGHT_STATUS = "looting";
+		Avies.fightStatus = "looting";
 		Pray.turnOffPrayerEagle();
 		RSGroundItem[] Nests = GroundItems.findNearest(Constants.LOOT);
 
@@ -313,7 +313,7 @@ public class YawsGeneral {
 
 	// TODO fix waitForLoot
 	public static void waitForLoot(RSCharacter avv) {
-		Avies.FIGHT_STATUS = "prayerflicking";
+		Avies.fightStatus = "prayerflicking";
 		if (!lootExists() && isRanging() && inAviesSpot() && getHp() > 30) {
 			Pray.prayerFlick();
 		}
@@ -336,30 +336,30 @@ public class YawsGeneral {
 	public static void checkStats(){
 		if(Skills.getActualLevel(SKILLS.RANGED) < 70){
 			General.println("You must be at least 70 range to use this script");
-			Avies.SCRIPT_STATUS = false;
+			Avies.mainLoopStatus = false;
 		}
 		else if (Skills.getActualLevel(SKILLS.PRAYER) < 44){
 			General.println("You must be at least 44 prayer to use this script");
-			Avies.SCRIPT_STATUS = false;
+			Avies.mainLoopStatus = false;
 		}
 		else if (Skills.getActualLevel(SKILLS.AGILITY) < 60 && Skills.getActualLevel(SKILLS.STRENGTH) < 60){
 			General.println("You must be at least 60 agility or strength to use this script");
-			Avies.SCRIPT_STATUS = false;
+			Avies.mainLoopStatus = false;
 		}
 		if(Skills.getActualLevel(SKILLS.CONSTRUCTION) < 50){
-			Avies.USE_HOUSE = false;
+			Avies.useHouseTab = false;
 			General.println("You do not have 50 con for varrock portal focus, you must use varrock teletabs");
 		}
 	}
 	
 	public static void prayAtHouseAltar(){
-		Avies.FIGHT_STATUS = "in house...";
+		Avies.fightStatus = "in house...";
 		RSObject[] alter = Objects.findNearest(20, "Altar");
 		RSObject[] portal = Objects.findNearest(20, "Varrock Portal");
 		RSObject[] portal2 = Objects.findNearest(30, "Portal");
 		
 		if(alter.length == 0 || portal.length == 0){
-			Avies.FIGHT_STATUS = "not inside house...";
+			Avies.fightStatus = "not inside house...";
 			if(portal2.length > 0){
 				if(portal2[0].isOnScreen()){
 					if(Clicking.click("Enter", portal2[0])){

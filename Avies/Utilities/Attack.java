@@ -41,7 +41,7 @@ public class Attack {
 
 			General.println(Skills.getCurrentLevel(SKILLS.RANGED) + "  "
 					+ Skills.getActualLevel(SKILLS.RANGED));
-			Avies.FIGHT_STATUS = "Potting up";
+			Avies.fightStatus = "Potting up";
 			General.println("Potted up");
 			YawsGeneral.drinkPotion(Constants.RANGE_POT);
 		} else if (Prayer.getCurrentPrayers().length > 0) {
@@ -57,7 +57,7 @@ public class Attack {
 		} else if (YawsGeneral.isRanging()) {
 			if (Combat.getTargetEntity() != null
 					&& !Combat.getTargetEntity().getName().equals("Aviansie")) {
-				Avies.MOVE_RANDOM = true;
+				Avies.runAwayFromMonster = true;
 			}
 		} else if (Inventory.find(Constants.ALC_LOOT).length > 0) {
 			YawsGeneral.alc(Constants.ALC_LOOT);
@@ -70,7 +70,7 @@ public class Attack {
 								|| a.getCombatLevel() == 83)) {
 					if (a.isOnScreen()) {
 						if (Clicking.click("Attack", a)){//clickObject(a, "Attack")) {// 
-							Avies.FIGHT_STATUS = "killing an avie";
+							Avies.fightStatus = "killing an avie";
 							Conditionals.waitFor(Player.getAnimation() == 4230, 3000, 3200);
 						}
 					} else {

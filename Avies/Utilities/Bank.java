@@ -23,7 +23,7 @@ public class Bank {
 	    	}
 	    	else if(Banking.find(ids).length == 0){
 	    		General.println("Your bank does not have the item with ids: " + ids);
-	    		Avies.SCRIPT_STATUS = false;
+	    		Avies.mainLoopStatus = false;
 	    	}
 	    	return false;
 	    }
@@ -36,7 +36,7 @@ public class Bank {
 	    	}
 	    	else if(Banking.find(id).length == 0){
 	    		General.println("Your bank does not have the item with id: " + id);
-	    		Avies.SCRIPT_STATUS = false;
+	    		Avies.mainLoopStatus = false;
 	    	}
 	    	return false;
 	    }
@@ -62,7 +62,7 @@ public class Bank {
 			Banking.depositAll();
 			Conditionals.waitFor(Inventory.getAll().length == 0, 400, 500);
 			
-			if(!Avies.USE_HOUSE){
+			if(!Avies.useHouseTab){
 				withdrawPPots();
 			}
 			
@@ -72,7 +72,7 @@ public class Bank {
 			withdraw(2, Constants.LAW);
 			withdraw(Avies.FOOD_NUMBER+((Combat.getMaxHP() - Combat.getHP()) / 12), Avies.FOOD_IDS);
 			
-			if(Avies.USE_HOUSE){
+			if(Avies.useHouseTab){
 				if(Inventory.getCount(Constants.HTAB) < 5){
 					withdraw(10, Constants.HTAB);
 				}
