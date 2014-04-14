@@ -31,6 +31,7 @@ import org.tribot.api2007.types.RSModel;
 import org.tribot.api2007.types.RSNPC;
 import org.tribot.api2007.types.RSTile;
 
+import scripts.Avies.Main.Avies;
 import scripts.BDK.Data.Constants;
 import scripts.BDK.Main.BDK;
 
@@ -298,6 +299,21 @@ public class YawsGeneral {
 
 		while (drag.isInCombat() && inSafeSpot() && !inCombat())
 			General.sleep(1000, 1300);
+	}
+	
+	public static void checkStats(){
+		if(Skills.getActualLevel(SKILLS.RANGED) < 70){
+			General.println("You must be at least 70 range to use this script");
+			BDK.SCRIPT_STATUS = false;
+		}
+		else if (Skills.getActualLevel(SKILLS.PRAYER) < 44){
+			General.println("You must be at least 44 prayer to use this script");
+			BDK.SCRIPT_STATUS = false;
+		}
+		else if (Skills.getActualLevel(SKILLS.AGILITY) < 70){
+			General.println("You must be at least 70 agility ");
+			BDK.SCRIPT_STATUS = false;
+		}
 	}
 	
 }

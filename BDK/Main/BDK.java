@@ -134,6 +134,9 @@ public class BDK extends Script implements Painting, Pausing {
 		General.useAntiBanCompliance(true);
 		ThreadSettings.get().setAlwaysRightClick(true);
 		
+		BOLTS_ID = Equipment.getItem(SLOTS.ARROW).getID();
+		YawsGeneral.checkStats();
+		
 		while(SCRIPT_STATUS){
 			CURRENT_XP = Skills.getXP(SKILLS.RANGED) + Skills.getXP(SKILLS.HITPOINTS);
 			XP_TO_LVL_RANGE = Skills.getXPToNextLevel(SKILLS.RANGED);
