@@ -297,7 +297,7 @@ public class YawsGeneral {
 	public void waitForDrag(RSNPC drag) {
 
 		while (drag.isInCombat() && inSafeSpot() && !inCombat())
-			sleep(1000, 1300);
+			General.sleep(1000, 1300);
 	}
 	
 }

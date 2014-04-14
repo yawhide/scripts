@@ -58,12 +58,12 @@ public class Attack {
 						}
 						else if(YawsGeneral.isRanging()){
 							General.println("under attack by baby drag, is ranging");
-							sleep(1000,1200);
+							General.sleep(1000,1200);
 						}
 						else{
 							General.println("attack baby dragon");
 							if(d.getPosition().isOnScreen()){
-								if (clickNPC(d, "Attack")) {
+								if (Clicking.click("Attack", d)){//clickNPC(d, "Attack")) {
 									final RSNPC tmp_blkdrag = d;
 									Conditionals.waitFor(Player.getAnimation() == 4230
 													|| YawsGeneral.inCombat()
@@ -98,7 +98,7 @@ public class Attack {
 			if (NPCChat.clickContinue(true)){
 				General.println("clicking to continue");
 			}
-			else if (Inventory.getCount(Constants.RANGE_POTS)) > 0
+			else if (Inventory.getCount(Constants.RANGE_POTS) > 0
 					&& Skills.getCurrentLevel(SKILLS.RANGED) < Skills
 							.getActualLevel(SKILLS.RANGED) + 2) {
 
@@ -106,7 +106,7 @@ public class Attack {
 						+ Skills.getActualLevel(SKILLS.RANGED));
 				BDK.FIGHT_STATUS = "Potting up";
 				YawsGeneral.drinkPotion(Constants.RANGE_POTS);
-				sleep(1000,1200);
+				Conditionals.waitFor(Skills.getCurrentLevel(SKILLS.RANGED) > Skills.getActualLevel(SKILLS.RANGED), 1000, 1200);
 				General.println("Potted up");
 			}
 			else if(YawsGeneral.isRanging()){
@@ -126,7 +126,7 @@ public class Attack {
 							General.println("d not in combat, or is interacting with me or is in combat and interacting with me");
 							BDK.FIGHT_STATUS = "attacking dragon " + d.getID();
 							if (d.getPosition().isOnScreen()) {
-								if (clickNPC(d, "Attack")) {
+								if (Clicking.click("Attack", d)){//clickNPC(d, "Attack")) {
 									final RSNPC tmp_blkdrag = d;
 									Conditionals.waitFor(
 											Player.getAnimation() == 4230
