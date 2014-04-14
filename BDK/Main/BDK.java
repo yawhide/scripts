@@ -42,6 +42,7 @@ import org.tribot.api2007.types.RSItem;
 import org.tribot.api2007.types.RSNPC;
 import org.tribot.api2007.types.RSObject;
 import org.tribot.api2007.types.RSTile;
+import org.tribot.api2007.util.ThreadSettings;
 import org.tribot.script.Script;
 import org.tribot.script.ScriptManifest;
 import org.tribot.script.interfaces.Painting;
@@ -131,6 +132,7 @@ public class BDK extends Script implements Painting, Pausing {
 		Mouse.setSpeed(General.random(175,190));
 		Walking.setWalkingTimeout(5000L);
 		General.useAntiBanCompliance(true);
+		ThreadSettings.get().setAlwaysRightClick(true);
 		
 		while(SCRIPT_STATUS){
 			CURRENT_XP = Skills.getXP(SKILLS.RANGED) + Skills.getXP(SKILLS.HITPOINTS);
@@ -223,7 +225,7 @@ public class BDK extends Script implements Painting, Pausing {
 		int k = 0;
 	    while (it.hasNext()) {
 	        Map.Entry pairs = (Map.Entry)it.next();
-	        g.drawString((map.get(pairs.getKey()) != null ? map.get(pairs.getKey()) : pairs.getKey()) 
+	        g.drawString((Constants.LOOT_MAP.get(pairs.getKey()) != null ? Constants.LOOT_MAP.get(pairs.getKey()) : pairs.getKey()) 
 	        		+ " = " + pairs.getValue(), 5, 100+k);
 	        it.remove(); // avoids a ConcurrentModificationException
 	        k+=15;

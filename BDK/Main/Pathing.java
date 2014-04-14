@@ -2,20 +2,14 @@ package scripts.BDK.Main;
 
 import org.tribot.api.Clicking;
 import org.tribot.api.General;
-import org.tribot.api.Timing;
-import org.tribot.api.interfaces.Positionable;
-import org.tribot.api.types.generic.Condition;
 import org.tribot.api2007.Inventory;
-import org.tribot.api2007.NPCChat;
 import org.tribot.api2007.Objects;
-import org.tribot.api2007.Skills;
 import org.tribot.api2007.Walking;
 import org.tribot.api2007.WebWalking;
-import org.tribot.api2007.Skills.SKILLS;
 import org.tribot.api2007.types.RSObject;
-import org.tribot.api2007.types.RSTile;
 
 import scripts.BDK.Data.Constants;
+import scripts.BDK.Utilities.Bank;
 import scripts.BDK.Utilities.Conditionals;
 import scripts.BDK.Utilities.YawsGeneral;
 
@@ -23,63 +17,63 @@ import scripts.BDK.Utilities.YawsGeneral;
 public class Pathing {
 	
 	public static boolean gotoDrag(){
-		if (inArea(blueDragArea))
+		if (YawsGeneral.inArea(Constants.BLUE_DRAG_AREA))
 			return true;
-		else if (inArea(lowWallArea)){
+		else if (YawsGeneral.inArea(Constants.LOWWALL_AREA)){
 			BDK.FIGHT_STATUS = "doing low wall";
-			RSObject[] LOWWALL = Objects.getAt(lowWallT);
+			RSObject[] LOWWALL = Objects.getAt(Constants.LOWWALL_TILE);
 			if (LOWWALL.length > 0){
-				if(LOWWALL[0].click("Climb-over")){
-					sleep(5000,6000);
+				if(Clicking.click("Climb-over", LOWWALL[0])){
+					Conditionals.waitFor(YawsGeneral.inArea(Constants.TO_TAV_LADDER_AREA), 3000, 4000);
 				}
 			}
 		}
-		else if (inArea(fallyArea)){
+		else if (YawsGeneral.inArea(Constants.FALLY_AREA)){
 			Walking.setWalkingTimeout(1000L);
-			if(Inventory.find(FOOD_IDS).length == FOOD_NUM && Inventory.find("Falador teleport").length > 0
-					&& Inventory.find(loot).length == 0 && Inventory.find(rangepots).length > 0) {
+			if(Inventory.find(BDK.FOOD_IDS).length == BDK.FOOD_NUM && Inventory.find("Falador teleport").length > 0
+					&& Inventory.find(Constants.LOOT).length == 0 && Inventory.find(Constants.RANGE_POTS).length > 0) {
 				BDK.FIGHT_STATUS = "walking to low wall";
-				WebWalking.walkTo(lowWall);
-				waitIsMovin();
+				WebWalking.walkTo(Constants.LOWWALL_TILE);
+				YawsGeneral.waitIsMovin();
 			}
-			else if(inArea(bankArea)){
+			else if(YawsGeneral.inArea(Constants.FALLY_BANK_AREA)){
 				BDK.FIGHT_STATUS = "banking";
-				bank();
+				Bank.bank();
 			}
 			else{
 				BDK.FIGHT_STATUS = "walking to bank";
-				WebWalking.walkTo(bankT);
-				waitIsMovin();
+				WebWalking.walkTo(Constants.FALLY_BANK_TILE);
+				YawsGeneral.waitIsMovin();
 			}
 		}
-		else if (inArea(tavladderArea)){
+		else if (YawsGeneral.inArea(Constants.TAV_LADDER_AREA)){
 			BDK.FIGHT_STATUS = "clicking down ladder";
-			RSObject[] TAVLAD = Objects.getAt(tavernlyLadderT);
+			RSObject[] TAVLAD = Objects.getAt(Constants.TAV_LADDER_TILE);
 			if (TAVLAD.length > 0){
 				if(TAVLAD[0].isOnScreen()){
-					if(TAVLAD[0].click("Climb-down")){
-						sleep(4000,5000);
+					if(Clicking.click("Climb-down", TAVLAD[0])){
+						Conditionals.waitFor(YawsGeneral.inArea(Constants.TAV_DUNG_LADDER_AREA), 4000,5000);
 					}
 				}
 				else{
 					BDK.FIGHT_STATUS = "walking to down ladder";
 					Walking.clickTileMM(TAVLAD[0].getPosition(), 1);
-					waitIsMovin();
+					YawsGeneral.waitIsMovin();
 				}
 			}
 		}
-		else if (inArea(toTavLadderDownArea)){
+		else if (YawsGeneral.inArea(Constants.TO_TAV_LADDER_AREA)){
 			BDK.FIGHT_STATUS = "walking to tavernly";
-			Walking.walkPath(toTavernlyDungPath);
-			waitIsMovin();
+			Walking.walkPath(Constants.TO_TAVERNLY_DUNGEON_PATH);
+			YawsGeneral.waitIsMovin();
 		}
-		else if (inArea(afterTavernlyLadderArea)){
+		else if (YawsGeneral.inArea(Constants.TAV_DUNG_LADDER_AREA)){
 			BDK.FIGHT_STATUS = "doing pipe";
 			RSObject[] pipe = Objects.findNearest(7, "Obstacle pipe");
 			if(pipe.length > 0){
 				if(pipe[0].isOnScreen()){
 					if(Clicking.click("Squeeze-through", pipe[0])){
-						Conditionals.waitFor(inArea(blueDragArea), 5000, 6000);
+						Conditionals.waitFor(YawsGeneral.inArea(Constants.BLUE_DRAG_AREA), 5000, 6000);
 					}
 				}
 				else{
@@ -90,7 +84,7 @@ public class Pathing {
 		}
 		else{
 			General.println("we are somewhere unsupported, gonna web walk to bank");
-			WebWalking.walkTo(bankT);
+			WebWalking.walkTo(Constants.FALLY_BANK_TILE);
 			YawsGeneral.waitIsMovin();
 		}
 		return false;

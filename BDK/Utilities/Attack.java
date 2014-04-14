@@ -24,57 +24,55 @@ import org.tribot.api2007.Prayer.PRAYERS;
 import org.tribot.api2007.Skills.SKILLS;
 import org.tribot.api2007.types.RSNPC;
 
+import scripts.BDK.Data.Constants;
+import scripts.BDK.Main.BDK;
+import scripts.BDK.Main.Pathing;
+
 
 public class Attack {
 
 	public static void fight(){
-		RSNPC[] drag = NPCs.findNearest(dragIDs);
-		RSNPC[] dragWithBaby = NPCs.findNearest(dragWithBabyArr);
+		RSNPC[] drag = NPCs.findNearest(Constants.BLUE_DRAGON_IDS);
+		RSNPC[] dragWithBaby = NPCs.findNearest(Constants.DRAGON_IDS);
 		Walking.setWalkingTimeout(1500L);
 		
-		if(getHp() < 50)
-			heal();
-		else if(Inventory.isFull() || (Inventory.getAll().length == 27 && !lootExists())){
-			println("Inv is full");
-			isFull();
+		if(YawsGeneral.getHp() < 50)
+			YawsGeneral.heal();
+		else if(Inventory.isFull() || (Inventory.getAll().length == 27 && !YawsGeneral.lootExists())){
+			General.println("Inv is full");
+			YawsGeneral.isInvFull();
 		}
-		else if(lootExists()){
-			println("looting...");
-			LOOT();
+		else if(YawsGeneral.lootExists()){
+			General.println("looting...");
+			YawsGeneral.loot();
 		}
-		else if (inCombat() && getHp() > 50){
-			println("under attack somewhere");
-			FIGHT_STATUS = "underattack";
+		else if (YawsGeneral.inCombat() && YawsGeneral.getHp() > 50){
+			General.println("under attack somewhere");
+			BDK.FIGHT_STATUS = "underattack";
 			if (dragWithBaby.length > 0){
 				for(RSNPC d : dragWithBaby){
 					if(d.isInteractingWithMe()){
-						if(!inSafeSpot()){
-							println("under attack, not in safe spot");
-							gotoSafeSpot();
+						if(!YawsGeneral.inSafeSpot()){
+							General.println("under attack, not in safe spot");
+							Pathing.gotoSafeSpot();
 						}
-						else if(isRanging()){
-							println("under attack, is ranging");
+						else if(YawsGeneral.isRanging()){
+							General.println("under attack by baby drag, is ranging");
 							sleep(1000,1200);
 						}
 						else{
-							println("attack baby dragon");
+							General.println("attack baby dragon");
 							if(d.getPosition().isOnScreen()){
 								if (clickNPC(d, "Attack")) {
 									final RSNPC tmp_blkdrag = d;
-									Timing.waitCondition(new Condition() {
-										public boolean active() {
-											return Player.getAnimation() == 4230
-													|| inCombat()
+									Conditionals.waitFor(Player.getAnimation() == 4230
+													|| YawsGeneral.inCombat()
 													|| tmp_blkdrag.isInCombat()
-													|| !inSafeSpot();
-										}
-									}, General.random(2200, 2400));
-									for (int i = 0; i < 57; i++, sleep(30, 40)) {
-										if (!inSafeSpot()) {
-											println("attacked the dragon, running to safety!");
-											gotoSafeSpot();
-											break;
-										}
+													|| !YawsGeneral.inSafeSpot(), 2200, 2400);
+									if (!YawsGeneral.inSafeSpot()) {
+										General.println("attacked the dragon, running to safety!");
+										Pathing.gotoSafeSpot();
+										Conditionals.waitFor(YawsGeneral.inSafeSpot(), 3000,4000);
 									}
 								}
 							}
@@ -85,34 +83,34 @@ public class Attack {
 						}
 						break;
 					}
-					else if(!inSafeSpot()){
-						println("under attack, not in safe spot");
-						gotoSafeSpot();
+					else if(!YawsGeneral.inSafeSpot()){
+						General.println("under attack, not in safe spot");
+						Pathing.gotoSafeSpot();
 					}
 				}
 			}
 			else{
-				gotoSafeSpot();
-				waitIsMovin();
+				Pathing.gotoSafeSpot();
+				YawsGeneral.waitIsMovin();
 			}
 		}
-		else if (inSafeSpot()){
+		else if (YawsGeneral.inSafeSpot()){
 			if (NPCChat.clickContinue(true)){
-				println("clicking to continue");
+				General.println("clicking to continue");
 			}
-			else if (Inventory.getCount(rangepots) > 0
+			else if (Inventory.getCount(Constants.RANGE_POTS)) > 0
 					&& Skills.getCurrentLevel(SKILLS.RANGED) < Skills
 							.getActualLevel(SKILLS.RANGED) + 2) {
 
-				println(Skills.getCurrentLevel(SKILLS.RANGED) + "  "
+				General.println(Skills.getCurrentLevel(SKILLS.RANGED) + "  "
 						+ Skills.getActualLevel(SKILLS.RANGED));
-				FIGHT_STATUS = "Potting up";
-				drinkPotion(rangepots);
+				BDK.FIGHT_STATUS = "Potting up";
+				YawsGeneral.drinkPotion(Constants.RANGE_POTS);
 				sleep(1000,1200);
-				println("Potted up");
+				General.println("Potted up");
 			}
-			else if(isRanging()){
-				waitForLoot();
+			else if(YawsGeneral.isRanging()){
+				YawsGeneral.waitForLoot();
 				
 				//sleep(2000,4000);
 			}
@@ -121,69 +119,30 @@ public class Attack {
 					if(Camera.getCameraRotation() < 100 || Camera.getCameraRotation() > 270){
 						Camera.setCameraRotation(General.random(140, 180));
 					}
-					RSNPC d = drag[0];
-					if (!d.isInCombat() || (d.isInCombat() && d.isInteractingWithMe()) || d.isInteractingWithMe()) {
-						println("d not in combat, or is interacting with me or is in combat and interacting with me");
-						FIGHT_STATUS = "attacking dragon " + d.getID();
-						if(d.getPosition().isOnScreen()){
-							if (clickNPC(d, "Attack")) {
-								final RSNPC tmp_blkdrag = d;
-								Timing.waitCondition(new Condition() {
-									public boolean active() {
-										return Player.getAnimation() == 4230
-												|| inCombat()
-												|| tmp_blkdrag.isInCombat()
-												|| !inSafeSpot();
-									}
-								}, General.random(2200, 2400));
-								for (int i = 0; i < 57; i++, sleep(30, 40)) {
-									if (!inSafeSpot()) {
-										println("attacked the dragon, running to safety!");
-										gotoSafeSpot();
-										break;
-									}
-								}
-							}
-							else{
-								sleep(500,700);
-							}
-						}
-						else {
-							println("turning to face dragon");
-							Camera.turnToTile(d.getPosition());
-							Camera.setCameraAngle(General.random(50, 70));
-						}
-					}
-					else if (drag.length > 1){
-						d = drag[1];
-						if (!d.isInCombat() || (d.isInCombat() && d.isInteractingWithMe()) || d.isInteractingWithMe()) {
-							println("d not in combat, or is interacting with me or is in combat and interacting with me");
-							FIGHT_STATUS = "attacking dragon " + d.getID();
-							if(d.getPosition().isOnScreen()){
+					for(RSNPC d : drag){
+						if (!d.isInCombat()
+								|| (d.isInCombat() && d.isInteractingWithMe())
+								|| d.isInteractingWithMe()) {
+							General.println("d not in combat, or is interacting with me or is in combat and interacting with me");
+							BDK.FIGHT_STATUS = "attacking dragon " + d.getID();
+							if (d.getPosition().isOnScreen()) {
 								if (clickNPC(d, "Attack")) {
 									final RSNPC tmp_blkdrag = d;
-									Timing.waitCondition(new Condition() {
-										public boolean active() {
-											return Player.getAnimation() == 4230
-													|| inCombat()
+									Conditionals.waitFor(
+											Player.getAnimation() == 4230
+													|| YawsGeneral.inCombat()
 													|| tmp_blkdrag.isInCombat()
-													|| !inSafeSpot();
-										}
-									}, General.random(2200, 2400));
-									for (int i = 0; i < 57; i++, sleep(30, 40)) {
-										if (!inSafeSpot()) {
-											println("attacked the dragon, running to safety!");
-											gotoSafeSpot();
-											break;
-										}
+													|| !YawsGeneral.inSafeSpot(), 2200,	2400);
+									if (!YawsGeneral.inSafeSpot()) {
+										General.println("attacked the dragon, running to safety!");
+										Pathing.gotoSafeSpot();
+										Conditionals.waitFor(
+												YawsGeneral.inSafeSpot(), 3000,
+												4000);
 									}
 								}
-								else{
-									sleep(500,700);
-								}
-							}
-							else {
-								println("turning to face dragon");
+							} else {
+								General.println("turning to face dragon");
 								Camera.turnToTile(d.getPosition());
 								Camera.setCameraAngle(General.random(50, 70));
 							}
@@ -192,13 +151,13 @@ public class Attack {
 				}
 			}
 		}
-		else if (!inSafeSpot()){
-			println("end case, not in safespot");
-			gotoSafeSpot();
+		else if (!YawsGeneral.inSafeSpot()){
+			General.println("end case, not in safespot");
+			Pathing.gotoSafeSpot();
 		}
 		else{
-			println("doing nothing...");
-			sleep(1000);
+			General.println("doing nothing...");
+			General.sleep(1000);
 			//println("else case...");
 			//gotoSafeSpot();
 		}

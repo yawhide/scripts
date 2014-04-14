@@ -227,7 +227,7 @@ public class YawsGeneral {
 				&& Constants.BLUE_DRAG_AREA.contains(Nests[0].getPosition());
 	}
 
-	public void LOOT() {
+	public static void loot() {
 		BDK.FIGHT_STATUS = "looting";
 		
 		Pray.turnOffPrayerEagle();
@@ -271,15 +271,6 @@ public class YawsGeneral {
 		}
 	}
 
-	// TODO fix waitForLoot
-	public static void waitForLoot(RSCharacter avv) {
-		BDK.FIGHT_STATUS = "prayerflicking";
-		if (!lootExists() && isRanging() && inSafeSpot() && getHp() > 30) {
-			Pray.prayerFlick();
-		}
-		Pray.turnOffPrayerEagle();
-	}
-
 	public static void drinkPotion(int[] pot) {
 		if (Skills.getCurrentLevel(SKILLS.RANGED) < Skills
 				.getActualLevel(SKILLS.RANGED) + 2) {
@@ -292,42 +283,14 @@ public class YawsGeneral {
 			}
 		}
 	}
-	
-	public void isFull(){
-		RSItem[] coin = Inventory.find("Coins");
-		RSItem[] food = Inventory.find(BDK.FOOD_IDS);
-		RSItem[] bolts = Inventory.find("Mithril bolts");
-		if(Inventory.find(Constants.JUNK).length > 0 || food.length > 0 || coin.length > 0 || bolts.length > 0){
-			BDK.FIGHT_STATUS = "dropping junk";
-			
-			if(coin.length > 0 && coin[0].getStack() < 1500){
-				Inventory.drop(coin[0].getID());
-				General.sleep(150,200);
-			}
-			else if (food.length > 0){
-				food[0].click("Eat");
-				sleep(300,350);
-			}
-			else if (bolts.length > 0){
-				bolts[0].click("Wield");
-				sleep(300, 350);
-			}
-			Inventory.drop(junk);
-		}
-		else{
-			emergTele();
-		}
-	}
-
-	
-	
-	public void waitForLoot(){
-		FIGHT_STATUS = "prayerflicking";
+		
+	public static void waitForLoot(){
+		BDK.FIGHT_STATUS = "prayerflicking";
 		while(!lootExists() && isRanging() && inSafeSpot() && !isMovin()){
 			
-			prayerflick();
+			Pray.prayerFlick();
 		}
-		turnOffPrayer();
+		Pray.turnOffPrayerEagle();
 	}
 
 	
