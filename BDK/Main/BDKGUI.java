@@ -151,7 +151,7 @@ public class BDKGUI extends javax.swing.JFrame {
 	    	case "shark":
 	    		BDK.FOOD_IDS = new int[] {385}; break;
 	    	}
-	    	BDK.FOOD_NUM = Integer.parseInt(foodamount.getText());
+	    	BDK.NUM_FOOD_TO_WITHDRAW = Integer.parseInt(foodamount.getText());
 	    	//useHouse = telemethod.getSelectedItem().toString().equals("house") ? true : false;
 	    	BDK.WAIT_GUI = false;
 	    }                                      

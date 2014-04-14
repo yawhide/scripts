@@ -27,6 +27,7 @@ import org.tribot.api2007.types.RSNPC;
 import org.tribot.api2007.types.RSTile;
 
 import scripts.BDK.Data.Constants;
+import scripts.BDK.Data.Tiles;
 import scripts.BDK.Main.BDK;
 
 public class YawsGeneral {
@@ -84,7 +85,7 @@ public class YawsGeneral {
 	}
 	
 	public static boolean inSafeSpot(){
-		return inArea(Constants.NORTHEAST_SAFESPOT_AREA);
+		return inArea(Tiles.NORTHEAST_SAFESPOT_AREA);
 	}
 
 	public static boolean checkActions(RSNPC object, String action) {
@@ -164,7 +165,7 @@ public class YawsGeneral {
 		openTab(TABS.INVENTORY);
 		if (tab.length > 0) {
 			if (Clicking.click("Break", tab[0])) {
-				Conditionals.waitFor(inArea(Constants.FALLY_AREA), 2500, 3000);
+				Conditionals.waitFor(inArea(Tiles.FALLY_AREA), 2500, 3000);
 			}
 		} else {
 			General.println("Out of tabs");
@@ -214,7 +215,7 @@ public class YawsGeneral {
 	public static boolean lootExists() {
 		RSGroundItem[] Nests = GroundItems.findNearest(Constants.LOOT2);
 		return Nests.length > 0
-				&& Constants.BLUE_DRAG_AREA.contains(Nests[0].getPosition());
+				&& Tiles.BLUE_DRAG_AREA.contains(Nests[0].getPosition());
 	}
 
 	public static void loot() {
@@ -232,7 +233,7 @@ public class YawsGeneral {
 		}
 		
 		for(int i = 0; i < Nests.length; i++){
-			if(Nests[i].getID() == 9142){
+			if(Nests[i].getID() == BDK.BOLTS_ID){
 				if (Nests[i].getStack() > 9) {
 					if (!Nests[i].isOnScreen()) {
 						Walking.clickTileMM(Nests[i].getPosition(), 1);

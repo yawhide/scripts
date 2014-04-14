@@ -59,7 +59,7 @@ public class Bank {
 					withdrawPPots();
 										
 					withdraw(1, Constants.RANGE_POTS);
-					withdraw(BDK.FOOD_NUM+((Combat.getMaxHP() - Combat.getHP()) / 12), BDK.FOOD_IDS);
+					withdraw(BDK.NUM_FOOD_TO_WITHDRAW+((Combat.getMaxHP() - Combat.getHP()) / 12), BDK.FOOD_IDS);
 					
 					if(YawsGeneral.getStackBolts(BDK.BOLTS_ID) < 500){
 						withdraw(500, BDK.BOLTS_ID);
@@ -71,7 +71,7 @@ public class Bank {
 						Clicking.click("Equip", Inventory.find(BDK.BOLTS_ID)[0]);
 					}
 					
-					while(Inventory.find(BDK.FOOD_IDS).length > BDK.FOOD_NUM){
+					while(Inventory.find(BDK.FOOD_IDS).length > BDK.NUM_FOOD_TO_WITHDRAW){
 					    final int i = Inventory.find(BDK.FOOD_IDS).length;
 						if(Clicking.click("Eat", Inventory.find(BDK.FOOD_IDS)[0]))
 							Conditionals.waitForEating(i);

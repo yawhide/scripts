@@ -27,6 +27,7 @@ import org.tribot.script.interfaces.Painting;
 import org.tribot.script.interfaces.Pausing;
 
 import scripts.BDK.Data.Constants;
+import scripts.BDK.Data.Tiles;
 import scripts.BDK.Utilities.Attack;
 import scripts.BDK.Utilities.Pray;
 import scripts.BDK.Utilities.YawsGeneral;
@@ -40,37 +41,32 @@ public class BDK extends Script implements Painting, Pausing {
 	public static int BOLTS_ID = 9142;
 	public static long ANTIBAN = System.currentTimeMillis();
 	public static int START_XP = Skills.getXP(SKILLS.HITPOINTS)
-			+ Skills.getXP(SKILLS.RANGED);
+			+ Skills.getXP(SKILLS.RANGED), START_LV = Skills
+			.getActualLevel(SKILLS.RANGED)
+			+ Skills.getActualLevel(SKILLS.HITPOINTS);
 	public static double VERSION;
 	public static int CURRENT_XP;
 	public static final long START_TIME = System.currentTimeMillis();
 	public static double XP_TO_LVL_RANGE = Skills
-			.getXPToNextLevel(SKILLS.RANGED);
-	public static double XP_TO_LVL_HP = Skills
+			.getXPToNextLevel(SKILLS.RANGED), XP_TO_LVL_HP = Skills
 			.getXPToNextLevel(SKILLS.HITPOINTS);
-	public static int START_LV = Skills.getActualLevel(SKILLS.RANGED)
-			+ Skills.getActualLevel(SKILLS.HITPOINTS);
+
 	public static final String[] SKILLS_TYPES = { "Defence", "Ranged",
 			"Hitpoints" };
 	public static final SKILLS[] SKILL = { SKILLS.DEFENCE, SKILLS.RANGED,
 			SKILLS.HITPOINTS, };
 	public static final int[] XP = { Skills.getXP(SKILLS.DEFENCE),
-			Skills.getXP(SKILLS.RANGED), Skills.getXP(SKILLS.HITPOINTS) };
-	public static int[] START_SKILL_LVS = {
-			Skills.getActualLevel(SKILLS.DEFENCE),
+			Skills.getXP(SKILLS.RANGED), Skills.getXP(SKILLS.HITPOINTS) },
+
+	START_SKILL_LVS = { Skills.getActualLevel(SKILLS.DEFENCE),
 			Skills.getActualLevel(SKILLS.RANGED),
 			Skills.getActualLevel(SKILLS.HITPOINTS) };
 	public static boolean SCRIPT_STATUS = true;
-	public static int FOOD_NUM = 2;
 
-	public static int DHIDES, DBONES = 0;
-	public static int DHIDE_COUNT, DBONE_COUNT = 0;
-	public static int DHIDES_INI, DBONES_INI = 0;
-	public static int DHIDE_PRICE = 1775;
-	public static int DBONES_PRICE = 1800;
-	public static int MITH_BOLTS_PRICE;
-	public static int RUNE_DAGGER_PRICE;
-	public static int NAT_PRICE;
+	public static int DHIDES, DBONES, DHIDE_COUNT, DBONE_COUNT, DHIDES_INI,
+			DBONES_INI = 0;
+	public static int DHIDE_PRICE = 1775, DBONES_PRICE = 1800, NUM_FOOD_TO_WITHDRAW = 2;
+	public static int MITH_BOLTS_PRICE, RUNE_DAGGER_PRICE, NAT_PRICE;
 	static boolean WAIT_GUI = true;
 
 	public static String FIGHT_STATUS;
@@ -92,7 +88,7 @@ public class BDK extends Script implements Painting, Pausing {
 		boolean devmode = true;
 
 		if (devmode) {
-			FOOD_NUM = 2;
+			NUM_FOOD_TO_WITHDRAW = 2;
 			FOOD_IDS = new int[] { 379 };
 		} else {
 			BDKGUI g = new BDKGUI();
@@ -252,8 +248,8 @@ public class BDK extends Script implements Painting, Pausing {
 					.getPosition().getY() - 1), g, false);
 		}
 		g.setColor(Color.RED);
-		for (int i = 0; i < Constants.NORTHEAST_SAFESPOT_AREA_TILES.length; i++) {
-			YawsGeneral.drawTile(Constants.NORTHEAST_SAFESPOT_AREA_TILES[i], g,
+		for (int i = 0; i < Tiles.NORTHEAST_SAFESPOT_AREA_TILES.length; i++) {
+			YawsGeneral.drawTile(Tiles.NORTHEAST_SAFESPOT_AREA_TILES[i], g,
 					false);
 		}
 	}
@@ -265,7 +261,7 @@ public class BDK extends Script implements Painting, Pausing {
 
 	@Override
 	public void onPause() {
-		if (YawsGeneral.inArea(Constants.BLUE_DRAG_AREA)) {
+		if (YawsGeneral.inArea(Tiles.BLUE_DRAG_AREA)) {
 			if (!YawsGeneral.inSafeSpot())
 				Pathing.goToSafeSpot();
 		}

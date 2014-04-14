@@ -16,6 +16,7 @@ import org.tribot.api2007.Skills.SKILLS;
 import org.tribot.api2007.types.RSNPC;
 
 import scripts.Avies.Data.Constants;
+import scripts.Avies.Data.Tiles;
 import scripts.Avies.Main.Avies;
 
 public class Attack {
@@ -63,7 +64,7 @@ public class Attack {
 		} else {
 			RSNPC[] avies = NPCs.findNearest("Aviansie");
 			for (RSNPC a : avies) {
-				if (Constants.AVIES_AREA.contains(a.getPosition())
+				if (Tiles.AVIES_AREA.contains(a.getPosition())
 						&& (a.getCombatLevel() == 69
 								|| a.getCombatLevel() == 71 
 								|| a.getCombatLevel() == 83)) {

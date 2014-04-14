@@ -34,12 +34,13 @@ import org.tribot.api2007.types.RSObject;
 import org.tribot.api2007.types.RSTile;
 
 import scripts.Avies.Data.Constants;
+import scripts.Avies.Data.Tiles;
 import scripts.Avies.Main.Avies;
 
 public class YawsGeneral {
 
 	public static boolean inHouse() {
-		return !inArea(Constants.VARROCK_AREA)
+		return !inArea(Tiles.VARROCK_AREA)
 				&& Objects.findNearest(50, "Portal").length > 0;
 	}
 
@@ -85,12 +86,12 @@ public class YawsGeneral {
 	}
 
 	public static boolean inGW() {
-		return pos().distanceTo(Constants.GWD_CENTER) <= 50
+		return pos().distanceTo(Tiles.GWD_CENTER) <= 50
 				&& pos().getPlane() == 2;
 	}
 
 	public static boolean inAviesSpot() {
-		return inArea(Constants.AVIES_AREA);
+		return inArea(Tiles.AVIES_AREA);
 	}
 
 	public static boolean inArea(RSArea a) {
@@ -126,7 +127,7 @@ public class YawsGeneral {
 	public static void teleToTroll() {
 		openTab(TABS.MAGIC);
 		Magic.selectSpell("Trollheim Teleport");
-		Conditionals.waitFor(inArea(Constants.TROLL_TELEPORT_AREA), 3500, 4500);
+		Conditionals.waitFor(inArea(Tiles.TROLL_TELEPORT_AREA), 3500, 4500);
 	}
 
 	public static String underAttack() {
@@ -192,7 +193,7 @@ public class YawsGeneral {
 		if (tab.length > 0) {
 			if (Clicking.click("Break", tab[0])) {
 				Conditionals.waitFor(Avies.USE_HOUSE ? inHouse()
-						: inArea(Constants.VARROCK_AREA), 2500, 3000);
+						: inArea(Tiles.VARROCK_AREA), 2500, 3000);
 			}
 		} else {
 			General.println("Out of tabs");
@@ -223,7 +224,7 @@ public class YawsGeneral {
 			if (!inCombat()) {
 				if (Clicking.click("Operate", ROD[0])) {
 					if (NPCChat.selectOption("Castle Wars Arena.", true)) {
-						Conditionals.waitFor(inArea(Constants.CW_AREA), 4500,
+						Conditionals.waitFor(inArea(Tiles.CW_AREA), 4500,
 								5500);
 					}
 				}
@@ -268,9 +269,9 @@ public class YawsGeneral {
 	}
 
 	public static boolean lootExists() {
-		RSGroundItem[] Nests = GroundItems.findNearest(Constants.LOOT2);
+		RSGroundItem[] Nests = GroundItems.findNearest(Constants.LOOT_WITHOUT_ARROWS);
 		return Nests.length > 0
-				&& Constants.AVIES_AREA.contains(Nests[0].getPosition());
+				&& Tiles.AVIES_AREA.contains(Nests[0].getPosition());
 	}
 
 	public static void loot() {
@@ -351,7 +352,7 @@ public class YawsGeneral {
 		}
 	}
 	
-	public static void doHouseStuff(){
+	public static void prayAtHouseAltar(){
 		Avies.FIGHT_STATUS = "in house...";
 		RSObject[] alter = Objects.findNearest(20, "Altar");
 		RSObject[] portal = Objects.findNearest(20, "Varrock Portal");
@@ -379,7 +380,7 @@ public class YawsGeneral {
 			if(portal.length > 0){
 				if (portal[0].isOnScreen()) {
 					if (Clicking.click("Enter", portal[0])) {
-						Conditionals.waitFor(YawsGeneral.inArea(Constants.VARROCK_AREA), 1200, 2000);
+						Conditionals.waitFor(YawsGeneral.inArea(Tiles.VARROCK_AREA), 1200, 2000);
 					}
 				} else {
 					Positionable temp = new RSTile(portal[0].getPosition().getX(), portal[0].getPosition().getY()-2, 0);
