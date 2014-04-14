@@ -20,7 +20,7 @@ import scripts.Avies.Utilities.YawsGeneral;
 
 public class Pathing {
 	
-	public static boolean gotoAvies(){
+	public static boolean goToAvies(){
 	
 		if (YawsGeneral.inArea(Constants.AVIES_AREA) && YawsGeneral.pos().getPlane() == 2)
 			return true;
@@ -92,7 +92,7 @@ public class Pathing {
 		return false;
 	}
 	
-	public static void gotoAviesSpot(){
+	public static void goToAviesSpot(){
 		Avies.FIGHT_STATUS = "going to avvieArea";
 		Walking.setWalkingTimeout(1500L);
 		Walking.walkPath(Constants.TO_AVIES);

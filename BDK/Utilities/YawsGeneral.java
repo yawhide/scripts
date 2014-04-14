@@ -114,11 +114,7 @@ public class YawsGeneral {
 	}
 	
 	public static String underAttack() {
-		RSCharacter[] mon = Combat.getAttackingEntities();
-		if (mon.length > 0) {
-			return mon[0].getName();
-		}
-		return null;
+		return Combat.getAttackingEntities().length > 0 ? Combat.getAttackingEntities()[0].getName() : null;
 	}
 
 	public static void putMap() {
@@ -319,35 +315,6 @@ public class YawsGeneral {
 		}
 	}
 	
-	public static boolean clickNPC(RSNPC npc, String option) {
 
-		RSTile loc = null;
-		if (npc != null && npc.isOnScreen()) {
-			if(npc.getID() == Constants.EAST_DRAGON_ID){
-				loc = new RSTile(npc.getPosition().getX()-1, npc.getPosition().getY()-1);
-			}
-			else{
-				loc = new RSTile(npc.getPosition().getX(), npc.getPosition().getY()-1);
-			}
-			Mouse.move(Projection.tileToScreen(loc, 10));
-			if(Game.isUptext("Walk here / 2 more options")){
-				Mouse.click(3);
-				if (ChooseOption.isOpen()) {
-					ChooseOption.select(option);
-				}
-			}
-			else if (Game.isUptext(option)) {
-				Mouse.click(1);
-				waitForDrag(npc);
-				return true;
-			} else {
-				Mouse.click(3);
-				if (ChooseOption.isOpen()) {
-					ChooseOption.select(option);
-				}
-			}
-		}
-		return false;
-	}
 	
 }

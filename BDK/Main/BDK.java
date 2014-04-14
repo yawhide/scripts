@@ -142,7 +142,7 @@ public class BDK extends Script implements Painting, Pausing {
 				Options.setRunOn(true);
 			}
 
-			if (Pathing.gotoDrag()) {
+			if (Pathing.goToDrag()) {
 				Attack.fight();
 			}
 		}
@@ -267,7 +267,7 @@ public class BDK extends Script implements Painting, Pausing {
 	public void onPause() {
 		if (YawsGeneral.inArea(Constants.BLUE_DRAG_AREA)) {
 			if (!YawsGeneral.inSafeSpot())
-				Pathing.gotoSafeSpot();
+				Pathing.goToSafeSpot();
 		}
 		Pray.turnOffPrayerEagle();
 	}
@@ -275,7 +275,7 @@ public class BDK extends Script implements Painting, Pausing {
 	@Override
 	public void onResume() {
 		if (!YawsGeneral.inSafeSpot())
-			Pathing.gotoSafeSpot();
+			Pathing.goToSafeSpot();
 	}
 
 }

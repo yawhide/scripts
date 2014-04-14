@@ -147,7 +147,7 @@ public class Avies extends Script implements Painting, Pausing, MessageListening
 				}
 				MOVE_RANDOM = false;
 			}
-			else if(Pathing.gotoAvies()){
+			else if(Pathing.goToAvies()){
 				Attack.fight();
 			}
 		}

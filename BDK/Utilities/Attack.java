@@ -16,6 +16,7 @@ import org.tribot.api2007.NPCChat;
 import org.tribot.api2007.NPCs;
 import org.tribot.api2007.Player;
 import org.tribot.api2007.Prayer;
+import org.tribot.api2007.Projection;
 import org.tribot.api2007.Skills;
 import org.tribot.api2007.Walking;
 import org.tribot.api2007.WebWalking;
@@ -23,6 +24,7 @@ import org.tribot.api2007.GameTab.TABS;
 import org.tribot.api2007.Prayer.PRAYERS;
 import org.tribot.api2007.Skills.SKILLS;
 import org.tribot.api2007.types.RSNPC;
+import org.tribot.api2007.types.RSTile;
 
 import scripts.BDK.Data.Constants;
 import scripts.BDK.Main.BDK;
@@ -54,7 +56,7 @@ public class Attack {
 					if(d.isInteractingWithMe()){
 						if(!YawsGeneral.inSafeSpot()){
 							General.println("under attack, not in safe spot");
-							Pathing.gotoSafeSpot();
+							Pathing.goToSafeSpot();
 						}
 						else if(YawsGeneral.isRanging()){
 							General.println("under attack by baby drag, is ranging");
@@ -63,7 +65,7 @@ public class Attack {
 						else{
 							General.println("attack baby dragon");
 							if(d.getPosition().isOnScreen()){
-								if (YawsGeneral.clickNPC(d, "Attack")){//Clicking.click("Attack", d)){//clickNPC(d, "Attack")) {
+								if (clickNPC(d, "Attack")){//Clicking.click("Attack", d)){//clickNPC(d, "Attack")) {
 									final RSNPC tmp_blkdrag = d;
 									Conditionals.waitFor(Player.getAnimation() == 4230
 													|| YawsGeneral.inCombat()
@@ -71,7 +73,7 @@ public class Attack {
 													|| !YawsGeneral.inSafeSpot(), 2200, 2400);
 									if (!YawsGeneral.inSafeSpot()) {
 										General.println("attacked the dragon, running to safety!");
-										Pathing.gotoSafeSpot();
+										Pathing.goToSafeSpot();
 										Conditionals.waitFor(YawsGeneral.inSafeSpot(), 3000,4000);
 									}
 								}
@@ -85,12 +87,12 @@ public class Attack {
 					}
 					else if(!YawsGeneral.inSafeSpot()){
 						General.println("under attack, not in safe spot");
-						Pathing.gotoSafeSpot();
+						Pathing.goToSafeSpot();
 					}
 				}
 			}
 			else{
-				Pathing.gotoSafeSpot();
+				Pathing.goToSafeSpot();
 				YawsGeneral.waitIsMovin();
 			}
 		}
@@ -126,7 +128,7 @@ public class Attack {
 							General.println("d not in combat, or is interacting with me or is in combat and interacting with me");
 							BDK.FIGHT_STATUS = "attacking dragon " + d.getID();
 							if (d.getPosition().isOnScreen()) {
-								if (YawsGeneral.clickNPC(d, "Attack")){//Clicking.click("Attack", d)){//clickNPC(d, "Attack")) {
+								if (clickNPC(d, "Attack")){//Clicking.click("Attack", d)){//clickNPC(d, "Attack")) {
 									final RSNPC tmp_blkdrag = d;
 									Conditionals.waitFor(
 											Player.getAnimation() == 4230
@@ -135,7 +137,7 @@ public class Attack {
 													|| !YawsGeneral.inSafeSpot(), 2200,	2400);
 									if (!YawsGeneral.inSafeSpot()) {
 										General.println("attacked the dragon, running to safety!");
-										Pathing.gotoSafeSpot();
+										Pathing.goToSafeSpot();
 										Conditionals.waitFor(
 												YawsGeneral.inSafeSpot(), 3000,
 												4000);
@@ -153,7 +155,7 @@ public class Attack {
 		}
 		else if (!YawsGeneral.inSafeSpot()){
 			General.println("end case, not in safespot");
-			Pathing.gotoSafeSpot();
+			Pathing.goToSafeSpot();
 		}
 		else{
 			General.println("doing nothing...");
@@ -161,6 +163,33 @@ public class Attack {
 			//println("else case...");
 			//gotoSafeSpot();
 		}
+	}
+	
+	public static boolean clickNPC(RSNPC npc, String option) {
+
+		RSTile loc = null;
+		if (npc != null && npc.isOnScreen()) {
+			loc = new RSTile(npc.getID() == Constants.EAST_DRAGON_ID ? npc.getPosition().getX()-1 : npc.getPosition().getX(), npc.getPosition().getY()-1);
+			
+			Mouse.move(Projection.tileToScreen(loc, 10));
+			if(Game.isUptext("Walk here / 2 more options")){
+				Mouse.click(3);
+				if (ChooseOption.isOpen()) {
+					ChooseOption.select(option);
+				}
+			}
+			else if (Game.isUptext(option)) {
+				Mouse.click(1);
+				YawsGeneral.waitForDrag(npc);
+				return true;
+			} else {
+				Mouse.click(3);
+				if (ChooseOption.isOpen()) {
+					ChooseOption.select(option);
+				}
+			}
+		}
+		return false;
 	}
 
 }

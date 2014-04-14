@@ -16,7 +16,7 @@ import scripts.BDK.Utilities.YawsGeneral;
 
 public class Pathing {
 	
-	public static boolean gotoDrag(){
+	public static boolean goToDrag(){
 		if (YawsGeneral.inArea(Constants.BLUE_DRAG_AREA))
 			return true;
 		else if (YawsGeneral.inArea(Constants.LOWWALL_AREA)){
@@ -90,7 +90,7 @@ public class Pathing {
 		return false;
 	}
 	
-	public static void gotoSafeSpot(){
+	public static void goToSafeSpot(){
 		BDK.FIGHT_STATUS = "going to safe spot";
 		Walking.setWalkingTimeout(1500L);
 		if(Constants.SAFESPOT_TILE.getPosition().isOnScreen()){

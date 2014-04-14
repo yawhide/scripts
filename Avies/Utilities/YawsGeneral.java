@@ -125,17 +125,12 @@ public class YawsGeneral {
 
 	public static void teleToTroll() {
 		openTab(TABS.MAGIC);
-
 		Magic.selectSpell("Trollheim Teleport");
 		Conditionals.waitFor(inArea(Constants.TROLL_TELEPORT_AREA), 3500, 4500);
 	}
 
 	public static String underAttack() {
-		RSCharacter[] mon = Combat.getAttackingEntities();
-		if (mon.length > 0) {
-			return mon[0].getName();
-		}
-		return null;
+		return Combat.getAttackingEntities().length > 0 ? Combat.getAttackingEntities()[0].getName() : null;
 	}
 
 	public static void putMap() {
