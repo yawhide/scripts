@@ -62,7 +62,8 @@ public class Bank {
 					}
 					
 					withdraw(1, Constants.RANGE_POT);
-					withdraw(10, Constants.NAT);withdraw(52, Constants.FIRE);
+					withdraw(10, Constants.NAT);
+					withdraw(52, Constants.FIRE);
 					withdraw(2, Constants.LAW);
 					withdraw(Avies.FOOD_NUMBER+((Combat.getMaxHP() - Combat.getHP()) / 12), Avies.FOOD_IDS);
 					

@@ -9,6 +9,9 @@ import org.tribot.api2007.GameTab.TABS;
 import org.tribot.api2007.Prayer.PRAYERS;
 import org.tribot.api2007.Skills.SKILLS;
 
+import scripts.BDK.Main.BDK;
+import scripts.BDK.Main.Timer;
+
 
 public class Pray {
 	
@@ -35,9 +38,8 @@ public class Pray {
 	
 	public static void prayerFlick() {
 
-		while (!Avies.MOVE_RANDOM && YawsGeneral.getHp() > 30 && Skills.getCurrentLevel(SKILLS.PRAYER) > 5 && YawsGeneral.isRanging() 
-				&& YawsGeneral.inAviesSpot() && !YawsGeneral.lootExists()) {
-			Avies.FIGHT_STATUS = "flicking now!";
+		while (getHp() > 30 &&	Prayer.getPrayerPoints() > 5 && isRanging() && inSafeSpot() && !lootExists()) {
+			BDK.FIGHT_STATUS = "flicking now!";
 			if(!Prayer.isTabOpen()){
 				GameTab.open(TABS.PRAYERS);
 			}
@@ -46,7 +48,9 @@ public class Pray {
 				if (Player.getAnimation() != 4230) {
 					General.sleep(250, 300);
 					Prayer.enable(PRAYERS.EAGLE_EYE);
-				} else if (Prayer.isPrayerEnabled(PRAYERS.EAGLE_EYE)){
+					//Options.setQuickPrayersOn(true);
+				} else if (Prayer.isPrayerEnabled(PRAYERS.EAGLE_EYE)){//.isQuickPrayerEnabled(PRAYERS.EAGLE_EYE)) {
+					//Options.setQuickPrayersOn(false);
 					Prayer.disable(PRAYERS.EAGLE_EYE);
 					General.sleep(350, 400);
 				} else {
@@ -54,7 +58,6 @@ public class Pray {
 				}
 			} while (t.getRemaining() > 0);
 		}
-
-		Pray.turnOffPrayerEagle();
+		turnOffPrayerEagle();
 	}
 }

@@ -45,15 +45,13 @@ public class Bank {
 					Banking.inPin();
 				else if (Banking.isBankScreenOpen()){
 					
-					Avies.ADDY_COUNT += Avies.ADDY_BARS;
-					Avies.COINS_AMOUNT += Avies.COINS;
-					Avies.RANARR_COUNT += Avies.RANARRS;
-					Avies.ADDY_INI = 0;
-					Avies.COINS_INI = 0;
-					Avies.RANARR_INI = 0;
+					DHIDE_COUNT += DHIDES;
+					DBONE_COUNT += DBONES;
+					DHIDES_INI = 0;
+					DBONES_INI = 0;
 					
-					Banking.depositAll();
-					Conditionals.waitFor(Inventory.getAll().length == 0, 400, 500);
+					Banking.depositAllExcept("Falador teleport");
+					Conditionals.waitFor(Inventory.getAll().length == 1, 400, 500);
 					
 					if(!Avies.USE_HOUSE){
 						withdrawPPots();
@@ -88,6 +86,76 @@ public class Bank {
 					    final int i = Inventory.find(Avies.FOOD_IDS).length;
 						if(Clicking.click("Eat", Inventory.find(Avies.FOOD_IDS)[0]))
 							Conditionals.waitForEating(i);
+					}
+				}
+			}
+		}
+	    public void bank(){
+			println("banking...");
+			
+			if(Banking.openBankBooth()){
+				if(Banking.isPinScreenOpen())
+					Banking.inPin();
+				else if (Banking.isBankScreenOpen()){
+					
+					
+					
+					Banking.depositAllExcept("Falador teleport");
+					sleep(100,150);
+					
+					
+					int pt = Skills.getActualLevel(SKILLS.PRAYER) / 3;
+					int currP = Skills.getCurrentLevel(SKILLS.PRAYER);
+					
+					RSItem[] pPot;
+					if( currP < pt * 2){
+						println("potting prayer, pt is: "+pt);
+						
+						Banking.withdraw(1, ppot);
+						sleep(600,640);
+						Banking.close();
+						sleep(200,230);
+						
+						pPot = Inventory.find(ppot);
+						if(pPot.length > 0){
+							do{
+								pPot[0].click("Drink");
+								sleep(1000,1200);
+							}while(Skills.getCurrentLevel(SKILLS.PRAYER) <= (pt*2)-2);
+						}
+						sleep(200,250);
+						if (!Banking.isBankScreenOpen()) {
+							if (Banking.openBankBanker()) {
+								sleep(200, 250);
+								Banking.deposit(1, ppot);
+								sleep(200,250);
+							}
+						}
+					}
+					sleep(200,300);
+					
+					if(Banking.find(FOOD_IDS).length == 0 || 
+							(Inventory.find("Falador teleport").length == 0 && 
+							Banking.find("Falador teleport").length == 0)){
+						println("Ran out of food");
+						SCRIPT_STATUS = false;
+					}
+					
+					Banking.withdraw(1, rangepots);
+					sleep(600, 650);
+					
+					Banking.withdraw(FOOD_NUM+((Combat.getMaxHP() - Combat.getHP()) / 7), FOOD_IDS);
+					sleep(100,150);
+					if(Inventory.find("Falador teleport").length == 0){
+						Banking.withdraw(10, "Falador teleport");
+						sleep(100,150);
+					}
+					Banking.close();
+					DBONES_INI = 0; 
+					DHIDES_INI = 0;
+					while(Inventory.find(FOOD_IDS).length > FOOD_NUM){
+						Inventory.find(FOOD_IDS)[0].click("Eat");
+						sleep(300);
 					}
 				}
 			}

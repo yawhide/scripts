@@ -159,16 +159,7 @@ public class BDK extends Script implements Painting, Pausing {
 			}
 		}
 	}
-	
-	
-	
-	
-	
-	public boolean isLoot(){
-		RSGroundItem[] Nests = GroundItems.findNearest(loot2);
-		return Nests.length > 0 && blueDragArea.contains(Nests[0].getPosition());
-	}
-		
+			
 	public void LOOT() {
 		FIGHT_STATUS = "looting";
 		
@@ -210,81 +201,6 @@ public class BDK extends Script implements Painting, Pausing {
 				int tmpCount = lootCount(Nests[i].getID());
 				if(Nests[i].click("Take " + str))
 					waitForInv(Nests[i].getID(), tmpCount);
-			}
-		}
-	}
-
-	
-	public void bank(){
-		println("banking...");
-		
-		if(Banking.openBankBooth()){
-			if(Banking.isPinScreenOpen())
-				Banking.inPin();
-			else if (Banking.isBankScreenOpen()){
-				
-				DHIDE_COUNT += DHIDES;
-				DBONE_COUNT += DBONES;
-				DHIDES_INI = 0;
-				DBONES_INI = 0;
-				
-				Banking.depositAllExcept("Falador teleport");
-				sleep(100,150);
-				
-				
-				int pt = Skills.getActualLevel(SKILLS.PRAYER) / 3;
-				int currP = Skills.getCurrentLevel(SKILLS.PRAYER);
-				
-				RSItem[] pPot;
-				if( currP < pt * 2){
-					println("potting prayer, pt is: "+pt);
-					
-					Banking.withdraw(1, ppot);
-					sleep(600,640);
-					Banking.close();
-					sleep(200,230);
-					
-					pPot = Inventory.find(ppot);
-					if(pPot.length > 0){
-						do{
-							pPot[0].click("Drink");
-							sleep(1000,1200);
-						}while(Skills.getCurrentLevel(SKILLS.PRAYER) <= (pt*2)-2);
-					}
-					sleep(200,250);
-					if (!Banking.isBankScreenOpen()) {
-						if (Banking.openBankBanker()) {
-							sleep(200, 250);
-							Banking.deposit(1, ppot);
-							sleep(200,250);
-						}
-					}
-				}
-				sleep(200,300);
-				
-				if(Banking.find(FOOD_IDS).length == 0 || 
-						(Inventory.find("Falador teleport").length == 0 && 
-						Banking.find("Falador teleport").length == 0)){
-					println("Ran out of food");
-					SCRIPT_STATUS = false;
-				}
-				
-				Banking.withdraw(1, rangepots);
-				sleep(600, 650);
-				
-				Banking.withdraw(FOOD_NUM+((Combat.getMaxHP() - Combat.getHP()) / 7), FOOD_IDS);
-				sleep(100,150);
-				if(Inventory.find("Falador teleport").length == 0){
-					Banking.withdraw(10, "Falador teleport");
-					sleep(100,150);
-				}
-				Banking.close();
-				DBONES_INI = 0; 
-				DHIDES_INI = 0;
-				while(Inventory.find(FOOD_IDS).length > FOOD_NUM){
-					Inventory.find(FOOD_IDS)[0].click("Eat");
-					sleep(300);
-				}
 			}
 		}
 	}
@@ -371,23 +287,20 @@ public class BDK extends Script implements Painting, Pausing {
 		g.drawString("Dbones:" + dh + "       Dhide: " + db, 345, 465);
 		g.drawString("Gp/hr: " + (int) ((dh*DHIDE_PRICE + db*DBONES_PRICE)/hoursRan/1000) + " K   Total: " + (int)(dh*DHIDE_PRICE + db*DBONES_PRICE)/1000, 345, 480);
 		//g.drawString("Ini: " + dhidesIni + " " + dbonesIni + "  Reg: " + dhides + " " + dbones, 345, 495);
-		g.drawString("In safespot? " + inSafeSpot(), 345, 495);
+		g.drawString("In safespot? " + YawsGeneral.inSafeSpot(), 345, 495);
 		g.setColor(Color.CYAN);
 		for(int i = 0; i < Combat.getAttackingEntities().length;i++){
 			RSCharacter tmp = Combat.getAttackingEntities()[i];
-			drawTile(new RSTile(tmp.getPosition().getX()-1, tmp.getPosition().getY()-1), g, false);
+			YawsGeneral.drawTile(new RSTile(tmp.getPosition().getX()-1, tmp.getPosition().getY()-1), g, false);
 			g.setColor(Color.GREEN);
-			drawTile(new RSTile(tmp.getPosition().getX(), tmp.getPosition().getY()-1), g, false);
+			YawsGeneral.drawTile(new RSTile(tmp.getPosition().getX(), tmp.getPosition().getY()-1), g, false);
 		}
 		g.setColor(Color.RED);
-		for(int i = 0; i < neSSA.length; i++){
-			drawTile(neSSA[i], g, false);
+		for(int i = 0; i < Constants.NORTHEAST_SAFESPOT_AREA_TILES.length; i++){
+			YawsGeneral.drawTile(Constants.NORTHEAST_SAFESPOT_AREA_TILES[i], g, false);
 		}
 			
 	}
-	
-
-	
 	
 	public void isFull(){
 		RSItem[] coin = Inventory.find("Coins");
@@ -415,90 +328,17 @@ public class BDK extends Script implements Painting, Pausing {
 		}
 	}
 
-	public void gotoSafeSpot(){
-		FIGHT_STATUS = "going to safe spot";
-		Walking.setWalkingTimeout(1500L);
-		if(neSS.isOnScreen()){
-			println("clicking on screen");
-			Walking.clickTileMS(clickNESS, 1);
-		}
-		else if (pos().distanceTo(clickNESS) >= 7){
-			println("generating a path");
-			Walking.walkPath(Walking.generateStraightPath(clickNESS)); //safeSpotPath);//
-		}
-		else{
-			println("clicking minimap");
-			Walking.clickTileMM(clickNESS, 1);
-		}	
-		println("clicked, now gonna wait till I am not moving anymore");
-		waitIsMovin();
-	}
+	
 	
 	public void waitForLoot(){
 		FIGHT_STATUS = "prayerflicking";
-		while(!isLoot() && isRanging() && inSafeSpot() && !isMovin()){
+		while(!lootExists() && isRanging() && inSafeSpot() && !isMovin()){
 			
 			prayerflick();
 		}
 		turnOffPrayer();
 	}
-	
-	
-	public void prayerflick(){//RSNPC drag) {
-		
-		while (getHp() > 30 &&	Prayer.getPrayerPoints() > 5 && isRanging() && inSafeSpot() && !isLoot()) {
-			FIGHT_STATUS = "flicking now!";
-			if(!Prayer.isTabOpen()){
-				GameTab.open(TABS.PRAYERS);
-			}
-			Timer t = new Timer(1100L);
-			do {
-				if (Player.getAnimation() != 4230) {
-					sleep(250, 300);
-					Prayer.enable(PRAYERS.EAGLE_EYE);
-					//Options.setQuickPrayersOn(true);
-				} else if (Prayer.isPrayerEnabled(PRAYERS.EAGLE_EYE)){//.isQuickPrayerEnabled(PRAYERS.EAGLE_EYE)) {
-					//Options.setQuickPrayersOn(false);
-					Prayer.disable(PRAYERS.EAGLE_EYE);
-					sleep(350, 400);
-				} else {
-					sleep(400, 450);
-				}
-			} while (t.getRemaining() > 0);
-		}
-		turnOffPrayer();
-	}
-	
 
-	public void emergTele(){
-		FIGHT_STATUS = "tele tabbing";
-		RSItem[] tab = Inventory.find("Falador teleport");
-		GameTab.open(TABS.INVENTORY);
-		sleep(100, 150);
-		if(tab.length > 0){
-			if(tab[0].click("Break")){
-				sleep(General.random(4000,  5000));
-			}
-		}
-		else{
-			println("Out of f tabs");
-			SCRIPT_STATUS = false;
-		}
-	}
-	
-	public void HEAL() {
-		FIGHT_STATUS = "eating food";
-		GameTab.open(TABS.INVENTORY); sleep(100, 150);
-		RSItem[] food = Inventory.find(FOOD_IDS);
-		if (food.length > 0) {
-			if(food[0].click("Eat"))
-				sleep(300, 550);
-		}
-		else
-			emergTele();
-	}
-
-		
 	public BDK() {
 		VERSION = ((ScriptManifest) getClass().getAnnotation(
 				ScriptManifest.class)).version();

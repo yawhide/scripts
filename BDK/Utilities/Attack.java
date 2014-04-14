@@ -32,11 +32,13 @@ public class Attack {
 		RSNPC[] dragWithBaby = NPCs.findNearest(dragWithBabyArr);
 		Walking.setWalkingTimeout(1500L);
 		
-		if(Inventory.isFull() || (Inventory.getAll().length == 27 && !isLoot())){
+		if(getHp() < 50)
+			heal();
+		else if(Inventory.isFull() || (Inventory.getAll().length == 27 && !lootExists())){
 			println("Inv is full");
 			isFull();
 		}
-		else if(isLoot()){
+		else if(lootExists()){
 			println("looting...");
 			LOOT();
 		}

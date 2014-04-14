@@ -232,6 +232,9 @@ public class YawsGeneral {
 		Pray.turnOffPrayerEagle();
 		RSGroundItem[] Nests = GroundItems.findNearest(Constants.LOOT);
 
+		if(getHp() < 50)
+			heal();
+		
 		for (int i = 0; i < Nests.length; i++) {
 			Walking.setWalkingTimeout(1000L);
 			if (Nests[i].getID() == BDK.BOLTS_ID) {
