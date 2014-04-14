@@ -7,7 +7,8 @@ import org.tribot.api2007.GameTab;
 import org.tribot.api2007.Inventory;
 import org.tribot.api2007.GameTab.TABS;
 
-import scripts.Avies.Main.Avies;
+import scripts.BDK.Main.BDK;
+
 
 public class Conditionals {
 	
@@ -28,7 +29,7 @@ public class Conditionals {
     }
     
     public static void waitForEating(final int count){
-    	waitFor(count > Inventory.find(Avies.FOOD_IDS).length, 500, 1000);
+    	waitFor(count > Inventory.find(BDK.FOOD_IDS).length, 500, 1000);
     }
     
     public static void waitForTab(TABS t){

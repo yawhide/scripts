@@ -5,20 +5,13 @@ import java.awt.Polygon;
 
 import org.tribot.api.Clicking;
 import org.tribot.api.General;
-import org.tribot.api.Timing;
-import org.tribot.api.input.Mouse;
-import org.tribot.api.types.generic.Condition;
 import org.tribot.api2007.Camera;
-import org.tribot.api2007.ChooseOption;
 import org.tribot.api2007.Combat;
 import org.tribot.api2007.Equipment;
-import org.tribot.api2007.Game;
 import org.tribot.api2007.GameTab;
 import org.tribot.api2007.GroundItems;
 import org.tribot.api2007.Inventory;
 import org.tribot.api2007.Magic;
-import org.tribot.api2007.NPCChat;
-import org.tribot.api2007.Objects;
 import org.tribot.api2007.Player;
 import org.tribot.api2007.Projection;
 import org.tribot.api2007.Skills;
@@ -27,14 +20,12 @@ import org.tribot.api2007.Equipment.SLOTS;
 import org.tribot.api2007.GameTab.TABS;
 import org.tribot.api2007.Skills.SKILLS;
 import org.tribot.api2007.types.RSArea;
-import org.tribot.api2007.types.RSCharacter;
 import org.tribot.api2007.types.RSGroundItem;
 import org.tribot.api2007.types.RSItem;
 import org.tribot.api2007.types.RSModel;
 import org.tribot.api2007.types.RSNPC;
 import org.tribot.api2007.types.RSTile;
 
-import scripts.Avies.Main.Avies;
 import scripts.BDK.Data.Constants;
 import scripts.BDK.Main.BDK;
 
@@ -209,8 +200,7 @@ public class YawsGeneral {
 				}
 
 			} else if (bolts.length > 0) {
-				final int boltsCount = Equipment.getItem(SLOTS.ARROW)
-						.getStack();
+				final int boltsCount = Equipment.getItem(SLOTS.ARROW).getStack();
 				if (Clicking.click("Wield", bolts[0])) {
 					Conditionals.waitFor(Equipment.getItem(SLOTS.ARROW).getStack() > boltsCount, 400, 500);
 				}
