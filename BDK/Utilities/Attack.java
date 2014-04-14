@@ -63,7 +63,7 @@ public class Attack {
 						else{
 							General.println("attack baby dragon");
 							if(d.getPosition().isOnScreen()){
-								if (Clicking.click("Attack", d)){//clickNPC(d, "Attack")) {
+								if (YawsGeneral.clickNPC(d, "Attack")){//Clicking.click("Attack", d)){//clickNPC(d, "Attack")) {
 									final RSNPC tmp_blkdrag = d;
 									Conditionals.waitFor(Player.getAnimation() == 4230
 													|| YawsGeneral.inCombat()
@@ -126,7 +126,7 @@ public class Attack {
 							General.println("d not in combat, or is interacting with me or is in combat and interacting with me");
 							BDK.FIGHT_STATUS = "attacking dragon " + d.getID();
 							if (d.getPosition().isOnScreen()) {
-								if (Clicking.click("Attack", d)){//clickNPC(d, "Attack")) {
+								if (YawsGeneral.clickNPC(d, "Attack")){//Clicking.click("Attack", d)){//clickNPC(d, "Attack")) {
 									final RSNPC tmp_blkdrag = d;
 									Conditionals.waitFor(
 											Player.getAnimation() == 4230

@@ -6,10 +6,13 @@ import java.awt.Polygon;
 import org.tribot.api.Clicking;
 import org.tribot.api.General;
 import org.tribot.api.Timing;
+import org.tribot.api.input.Mouse;
 import org.tribot.api.types.generic.Condition;
 import org.tribot.api2007.Camera;
+import org.tribot.api2007.ChooseOption;
 import org.tribot.api2007.Combat;
 import org.tribot.api2007.Equipment;
+import org.tribot.api2007.Game;
 import org.tribot.api2007.GameTab;
 import org.tribot.api2007.GroundItems;
 import org.tribot.api2007.Inventory;
@@ -295,7 +298,7 @@ public class YawsGeneral {
 	}
 
 	
-	public void waitForDrag(RSNPC drag) {
+	public static void waitForDrag(RSNPC drag) {
 
 		while (drag.isInCombat() && inSafeSpot() && !inCombat())
 			General.sleep(1000, 1300);
@@ -314,6 +317,37 @@ public class YawsGeneral {
 			General.println("You must be at least 70 agility ");
 			BDK.SCRIPT_STATUS = false;
 		}
+	}
+	
+	public static boolean clickNPC(RSNPC npc, String option) {
+
+		RSTile loc = null;
+		if (npc != null && npc.isOnScreen()) {
+			if(npc.getID() == Constants.EAST_DRAGON_ID){
+				loc = new RSTile(npc.getPosition().getX()-1, npc.getPosition().getY()-1);
+			}
+			else{
+				loc = new RSTile(npc.getPosition().getX(), npc.getPosition().getY()-1);
+			}
+			Mouse.move(Projection.tileToScreen(loc, 10));
+			if(Game.isUptext("Walk here / 2 more options")){
+				Mouse.click(3);
+				if (ChooseOption.isOpen()) {
+					ChooseOption.select(option);
+				}
+			}
+			else if (Game.isUptext(option)) {
+				Mouse.click(1);
+				waitForDrag(npc);
+				return true;
+			} else {
+				Mouse.click(3);
+				if (ChooseOption.isOpen()) {
+					ChooseOption.select(option);
+				}
+			}
+		}
+		return false;
 	}
 	
 }

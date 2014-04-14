@@ -6,6 +6,7 @@ import org.tribot.api2007.Player;
 import org.tribot.api2007.Prayer;
 import org.tribot.api2007.GameTab.TABS;
 import org.tribot.api2007.Prayer.PRAYERS;
+import org.tribot.api2007.util.ThreadSettings;
 
 import scripts.BDK.Main.BDK;
 
@@ -34,7 +35,7 @@ public class Pray {
 	}
 	
 	public static void prayerFlick() {
-
+		
 		while (YawsGeneral.getHp() > 30 &&	Prayer.getPrayerPoints() > 5 && YawsGeneral.isRanging() && YawsGeneral.inSafeSpot() && !YawsGeneral.lootExists()) {
 			BDK.FIGHT_STATUS = "flicking now!";
 			if(!Prayer.isTabOpen()){
@@ -54,5 +55,6 @@ public class Pray {
 			} while (t.getRemaining() > 0);
 		}
 		turnOffPrayerEagle();
+		
 	}
 }

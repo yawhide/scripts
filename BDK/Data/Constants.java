@@ -102,8 +102,8 @@ public class Constants {
 	public static Positionable LOWWALL_TILE = new RSTile(2935, 3355, 0);
 	public static Positionable LOWWALL_TILE2 = new RSTile(2938, 3355, 0);
 	public static Positionable AFTER_LOWWALL_TILE = new RSTile(2934, 3355, 0);
-	public static Positionable TAV_LADDER_TILE = new RSTile(2884, 3396, 0);
-	public static Positionable TAV_LADDER_TILE2 = new RSTile(2884, 3397, 0);
+	public static Positionable TAV_LADDER_TILE = new RSTile(2884, 3397, 0);
+	//public static Positionable TAV_LADDER_TILE2 = new RSTile(2884, 3397, 0);
 	public static Positionable TAV_DUNG_LADDER_TILE = new RSTile(2884, 9798, 0);
 
 	public static Positionable SAFESPOT_TILE = new RSTile(2903, 9808, 0);
@@ -125,11 +125,10 @@ public class Constants {
 	public static RSArea NORTHEAST_SAFESPOT_AREA = new RSArea(
 			NORTHEAST_SAFESPOT_AREA_TILES);
 
-	public static final int[] BLUE_DRAGON_IDS = { 2964, 2961, 250, 247, 335,
-			332, 288, 285 }; // ids have to be used because I need specific
+	public static final int[] BLUE_DRAGON_IDS = { 5030, 5033 }; // ids have to be used because I need specific
 								// dragons, not all
-	public static final int[] DRAGON_IDS = { 332, 288, 285, 262, 261, 263 };
-	public static final int EAST_DRAGON_ID = 285; // east drag
+	public static final int[] DRAGON_IDS = { 5030, 5033, 5003, 5002, 5004 };
+	public static final int EAST_DRAGON_ID = 5033; // east drag
 	public static final int[] PRAYER_POTS = { 2434, 139, 141, 143 };
 	public static final int[] RANGE_POTS = { 169, 2444, 171, 173 };
 }
