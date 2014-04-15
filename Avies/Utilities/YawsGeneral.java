@@ -5,9 +5,7 @@ import java.awt.Polygon;
 
 import org.tribot.api.Clicking;
 import org.tribot.api.General;
-import org.tribot.api.Timing;
 import org.tribot.api.interfaces.Positionable;
-import org.tribot.api.types.generic.Condition;
 import org.tribot.api2007.Camera;
 import org.tribot.api2007.Combat;
 import org.tribot.api2007.Equipment;
@@ -90,8 +88,8 @@ public class YawsGeneral {
 				&& pos().getPlane() == 2;
 	}
 
-	public static boolean inAviesSpot() {
-		return inArea(Tiles.AVIES_AREA);
+	public static boolean inAviesArea() {
+		return inArea(Tiles.AVIES_AREA) && pos().getPlane() == 2;
 	}
 
 	public static boolean inArea(RSArea a) {
@@ -202,14 +200,14 @@ public class YawsGeneral {
 	}
 
 	public static void heal() {
-		RSItem[] food = Inventory.find(Avies.FOOD_IDS);
+		RSItem[] food = Inventory.find(Avies.foodIDs);
 		Avies.fightStatus = "eating food";
 		if (GameTab.getOpen() != TABS.INVENTORY) {
 			openTab(TABS.INVENTORY);
 		}
 
 		if (food.length > 0) {
-			final int count = Inventory.getCount(Avies.FOOD_IDS);
+			final int count = Inventory.getCount(Avies.foodIDs);
 			if (Clicking.click("Eat", food[0]))
 				Conditionals.waitForEating(count);
 		} else
@@ -240,17 +238,17 @@ public class YawsGeneral {
 				&& lootCountStack(Constants.FIRE) >= 52
 				&& lootCountStack(Constants.LAW) == 2
 				&& Inventory.find(Constants.RANGE_POT).length == 1 && Inventory
-					.find(Avies.FOOD_IDS).length == Avies.FOOD_NUMBER);
+					.find(Avies.foodIDs).length == Avies.foodNumber);
 	}
 
 	public static void isInvFull() {
-		RSItem[] food = Inventory.find(Avies.FOOD_IDS);
-		RSItem[] bolts = Inventory.find(Avies.BOLTS_ID);
+		RSItem[] food = Inventory.find(Avies.foodIDs);
+		RSItem[] bolts = Inventory.find(Avies.boltsID);
 		if (Inventory.find(Constants.JUNK).length > 0 || food.length > 0
 				|| bolts.length > 0) {
 			Avies.fightStatus = "dropping junk";
 			if (food.length > 0) {
-				final int count = Inventory.getCount(Avies.FOOD_IDS);
+				final int count = Inventory.getCount(Avies.foodIDs);
 				if (Clicking.click("Eat", food[0])) {
 					Conditionals.waitForEating(count);
 				}
@@ -281,7 +279,7 @@ public class YawsGeneral {
 
 		for (int i = 0; i < Nests.length; i++) {
 			Walking.setWalkingTimeout(1000L);
-			if (Nests[i].getID() == Avies.BOLTS_ID) {
+			if (Nests[i].getID() == Avies.boltsID) {
 				if (Nests[i].getStack() > 9) {
 					if (!Nests[i].isOnScreen()) {
 						Walking.walkPath(Walking.generateStraightPath(Nests[i]
@@ -314,7 +312,7 @@ public class YawsGeneral {
 	// TODO fix waitForLoot
 	public static void waitForLoot(RSCharacter avv) {
 		Avies.fightStatus = "prayerflicking";
-		if (!lootExists() && isRanging() && inAviesSpot() && getHp() > 30) {
+		if (!lootExists() && isRanging() && inAviesArea() && getHp() > 30) {
 			Pray.prayerFlick();
 		}
 		Pray.turnOffPrayerEagle();

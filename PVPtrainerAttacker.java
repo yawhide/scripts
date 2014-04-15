@@ -37,7 +37,7 @@ import org.tribot.script.interfaces.Painting;
 import scripts.BDK.Data.Constants;
 import scripts.BDK.Utilities.YawsGeneral;
 
-@ScriptManifest(authors = { "Yaw hide" }, category = "Combat", name = "PVPtrainerAttack", version = 1.2)
+@ScriptManifest(authors = { "Yaw hide" }, category = "Combat", name = "PVPtrainerAttack", version = 1.21)
 public class PVPtrainerAttacker extends Script implements Painting {
 
 	boolean scriptStatus = true;
@@ -101,7 +101,7 @@ public class PVPtrainerAttacker extends Script implements Painting {
 		
 	}
 
-	long la;
+	long la, currHp;
 
 	@Override
 	public void run() {
@@ -112,8 +112,18 @@ public class PVPtrainerAttacker extends Script implements Painting {
 		startLvHP = Skills.getActualLevel(SKILLS.HITPOINTS);
 		updateLA();
 		ThreadSettings.get().setAlwaysRightClick(true);
-
+		currHp = General.random(General.random(50, 55), 99);
+		
 		while (scriptStatus) {
+			
+			if (getHp() <= currHp){
+				if(ChooseOption.isOpen()){
+					ChooseOption.close();
+					sleep(200,300);
+				}
+				clickAlter();
+			}
+			
 			if (Combat.getTargetEntity() != null
 					&& Combat.getTargetEntity().getHealth() < 10)
 				Clicking.click("Walk here", Player.getRSPlayer().getPosition());
@@ -129,9 +139,9 @@ public class PVPtrainerAttacker extends Script implements Painting {
 					* 100 < General.random(20, 50)) {
 				clickAlter();
 			}
-			else if (!Prayer.isPrayerEnabled(PRAYERS.PROTECT_ITEMS) || 
+			else if (Skills.getActualLevel(SKILLS.PRAYER) >= 25 && (!Prayer.isPrayerEnabled(PRAYERS.PROTECT_ITEMS) || 
 					!Prayer.isPrayerEnabled(PRAYERS.SUPERHUMAN_STRENGTH) ||
-					!Prayer.isPrayerEnabled(PRAYERS.IMPROVED_REFLEXES)){
+					!Prayer.isPrayerEnabled(PRAYERS.IMPROVED_REFLEXES))){
 				GameTab.open(TABS.PRAYERS);
 				sleep(200);
 				Prayer.enable(PRAYERS.PROTECT_ITEMS);
@@ -141,8 +151,8 @@ public class PVPtrainerAttacker extends Script implements Painting {
 				Prayer.enable(PRAYERS.IMPROVED_REFLEXES);
 			}
 			if (Player.getRSPlayer().getInteractingCharacter() == null) {
-				if (Players.find("sortinghash").length > 0) {
-					if (clickNPC(Players.find("sortinghash")[0], "Attack")) {
+				if (checkCorrectPlayer()) {
+					if (clickNPC(findPlayer(), "Attack")) {
 						Timing.waitCondition(new Condition() {
 							public boolean active() {
 								return Player.getRSPlayer()
@@ -155,6 +165,24 @@ public class PVPtrainerAttacker extends Script implements Painting {
 
 			sleep(100);
 		}
+	}
+	
+	public boolean checkCorrectPlayer(){
+		if(Player.getRSPlayer().getName().equals("sortinghash")){
+			return Players.find("arminvanbuu2").length > 0;
+		}
+		else if (Player.getRSPlayer().getName().equals("DJadamellis")){
+			return Players.find("arminvanbuu2").length > 0;
+		}
+		else{
+			return Players.find("sortinghash").length > 0;
+		}
+	}
+	
+	public RSPlayer findPlayer(){
+		return Player.getRSPlayer().getName().equals("sortinghash") || 
+				Player.getRSPlayer().getName().equals("DJadamellis")
+				? Players.find("arminvanbuu2")[0] : Players.find("sortinghash")[0];
 	}
 
 	public void checkAntiBan() {

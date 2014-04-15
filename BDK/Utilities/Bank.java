@@ -53,7 +53,7 @@ public class Bank {
 					BDK.DHIDES_INI = 0;
 					BDK.DBONES_INI = 0;
 					
-					Banking.depositAllExcept("Falador teleport");
+					Banking.depositAllExcept(Constants.DEPOSIT_ALL_EXCEPT);
 					Conditionals.waitFor(Inventory.getAll().length == 1, 400, 500);
 					
 					withdrawPPots();

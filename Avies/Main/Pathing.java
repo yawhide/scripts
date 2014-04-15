@@ -2,17 +2,10 @@ package scripts.Avies.Main;
 
 import org.tribot.api.Clicking;
 import org.tribot.api.General;
-import org.tribot.api.interfaces.Positionable;
-import org.tribot.api2007.NPCChat;
 import org.tribot.api2007.Objects;
-import org.tribot.api2007.Skills;
 import org.tribot.api2007.Walking;
 import org.tribot.api2007.WebWalking;
-import org.tribot.api2007.Skills.SKILLS;
-import org.tribot.api2007.types.RSObject;
-import org.tribot.api2007.types.RSTile;
 
-import scripts.Avies.Data.Constants;
 import scripts.Avies.Data.Tiles;
 import scripts.Avies.Utilities.Bank;
 import scripts.Avies.Utilities.Conditionals;
@@ -98,5 +91,19 @@ public class Pathing {
 		Walking.setWalkingTimeout(1500L);
 		Walking.walkPath(Tiles.TO_AVIES);
 		YawsGeneral.waitIsMovin();
+	}
+	
+	public static void runAwayFromMonster(){
+		if (YawsGeneral.pos().distanceTo(Tiles.RANDOM_EAST_TILE) > YawsGeneral
+				.pos().distanceTo(Tiles.RANDOM_WEST_TILE)) {
+			Walking.walkPath(Walking
+					.generateStraightPath(Tiles.RANDOM_EAST_TILE));
+		} else {
+			Walking.walkPath(Walking
+					.generateStraightPath(Tiles.RANDOM_WEST_TILE));
+			
+		}
+		YawsGeneral.waitIsMovin();
+		Avies.runAwayFromMonster = false;
 	}
 }

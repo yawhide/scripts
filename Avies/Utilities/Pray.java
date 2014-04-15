@@ -37,7 +37,7 @@ public class Pray {
 	public static void prayerFlick() {
 
 		while (!Avies.runAwayFromMonster && YawsGeneral.getHp() > 30 && Skills.getCurrentLevel(SKILLS.PRAYER) > 5 && YawsGeneral.isRanging() 
-				&& YawsGeneral.inAviesSpot() && !YawsGeneral.lootExists()) {
+				&& YawsGeneral.inAviesArea() && !YawsGeneral.lootExists()) {
 			Avies.fightStatus = "flicking now!";
 			if(!Prayer.isTabOpen()){
 				GameTab.open(TABS.PRAYERS);

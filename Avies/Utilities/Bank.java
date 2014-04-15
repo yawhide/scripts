@@ -52,12 +52,12 @@ public class Bank {
 		}
 	    
 	    public static void bank(){
-	    	Avies.ADDY_COUNT += Avies.ADDY_BARS;
-			Avies.COINS_AMOUNT += Avies.COINS;
-			Avies.RANARR_COUNT += Avies.RANARRS;
-			Avies.ADDY_INI = 0;
-			Avies.COINS_INI = 0;
-			Avies.RANARR_INI = 0;
+	    	Avies.addyCount += Avies.addyBars;
+			Avies.coinsAmount += Avies.coins;
+			Avies.ranarrCount += Avies.ranarrs;
+			Avies.addyIni = 0;
+			Avies.coinsIni = 0;
+			Avies.ranarrIni = 0;
 			
 			Banking.depositAll();
 			Conditionals.waitFor(Inventory.getAll().length == 0, 400, 500);
@@ -70,7 +70,7 @@ public class Bank {
 			withdraw(10, Constants.NAT);
 			withdraw(52, Constants.FIRE);
 			withdraw(2, Constants.LAW);
-			withdraw(Avies.FOOD_NUMBER+((Combat.getMaxHP() - Combat.getHP()) / 12), Avies.FOOD_IDS);
+			withdraw(Avies.foodNumber+((Combat.getMaxHP() - Combat.getHP()) / 12), Avies.foodIDs);
 			
 			if(Avies.useHouseTab){
 				if(Inventory.getCount(Constants.HTAB) < 5){
@@ -82,19 +82,19 @@ public class Bank {
 					withdraw(10, Constants.VTAB);
 				}
 			}
-			if(YawsGeneral.getStackBolts(Avies.BOLTS_ID) < 500){
-				withdraw(1000, Avies.BOLTS_ID);
+			if(YawsGeneral.getStackBolts(Avies.boltsID) < 500){
+				withdraw(1000, Avies.boltsID);
 			}
 			
 			closeBank();
 			
-			if(Inventory.find(Avies.BOLTS_ID).length > 0){
-				Clicking.click("Equip", Inventory.find(Avies.BOLTS_ID)[0]);
+			if(Inventory.find(Avies.boltsID).length > 0){
+				Clicking.click("Equip", Inventory.find(Avies.boltsID)[0]);
 			}
 			
-			while(Inventory.find(Avies.FOOD_IDS).length > Avies.FOOD_NUMBER){
-			    final int i = Inventory.find(Avies.FOOD_IDS).length;
-				if(Clicking.click("Eat", Inventory.find(Avies.FOOD_IDS)[0]))
+			while(Inventory.find(Avies.foodIDs).length > Avies.foodNumber){
+			    final int i = Inventory.find(Avies.foodIDs).length;
+				if(Clicking.click("Eat", Inventory.find(Avies.foodIDs)[0]))
 					Conditionals.waitForEating(i);
 			}
 	    }

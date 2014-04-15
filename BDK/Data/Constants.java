@@ -2,10 +2,6 @@ package scripts.BDK.Data;
 
 import java.util.HashMap;
 
-import org.tribot.api.interfaces.Positionable;
-import org.tribot.api2007.types.RSArea;
-import org.tribot.api2007.types.RSTile;
-
 public class Constants {
 	// loot
 	public static int[] JUNK = { 886, 1539, 9003, 229, 1623, 1355, 440, 7767,
@@ -59,7 +55,9 @@ public class Constants {
 			"Uncut diamond", "Uncut ruby", "Adamant full helm", "Rune dagger",
 			"Rune bar", "Nature talisman", "Herb", "Herb", "Herb", "Herb",
 			"Herb", "Herb", "Herb", "Herb", "Herb", "Herb",
-			"Clue scroll (hard)" };
+			"Clue scroll (hard)" },
+			
+			DEPOSIT_ALL_EXCEPT = {"Falador teleport"};
 
 	public static final int[] BLUE_DRAGON_IDS = { 5030, 5033 }, // ids have to
 																// be used
@@ -73,5 +71,6 @@ public class Constants {
 					171, 173 };
 
 	public static final int EAST_DRAGON_ID = 5033; // east drag
+
 
 }

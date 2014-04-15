@@ -30,7 +30,7 @@ public class PVPtrainerTank extends Script implements Painting{
 	boolean scriptStatus = true;
 	RSTile t = new RSTile(3426, 2930, 0);
 	ABCUtil abc_util = null;
-	
+	int currHp;
 	
 	@Override
 	public void run() {
@@ -39,12 +39,13 @@ public class PVPtrainerTank extends Script implements Painting{
 		ThreadSettings.get().setAlwaysRightClick(true);
 		sleep(200);
 		abc_util = new ABCUtil();
-				
+		currHp = General.random(80, 99);		
+		
 		while(scriptStatus){
 			if(getHp() > 99){
 				checkAntiBan();
 			}
-			else if (getHp() <= 99){
+			else if (getHp() <= currHp){
 				if(ChooseOption.isOpen()){
 					ChooseOption.close();
 					sleep(200,300);
@@ -77,12 +78,12 @@ public class PVPtrainerTank extends Script implements Painting{
 			if(altar2[0].isOnScreen()){
 				Clicking.click("Pray-at", altar2[0]);
 				sleep(200);
+				currHp = General.random(80, 99);
 				Timing.waitCondition(new Condition() {
 					public boolean active() {
 						return getHp() >= 100;
 					}
 				}, General.random(1000, 2000));
-				Clicking.hover(altar2[0]);
 			}
 			else{
 				Walking.walkPath(Walking.generateStraightPath(t));
@@ -99,6 +100,7 @@ public class PVPtrainerTank extends Script implements Painting{
 		if(altar2.length > 0){
 			drawModel(altar2[0].getModel(), g, false);			
 		}
+		g.drawString(currHp + "", 5, 100);
 	}
 	
 	public void drawModel(RSModel model, Graphics g, boolean fill) {
