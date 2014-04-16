@@ -37,7 +37,7 @@ public class Pray {
 	public static void prayerFlick() {
 
 		while (!Avies.runAwayFromMonster && YawsGeneral.getHp() > 30 && Skills.getCurrentLevel(SKILLS.PRAYER) > 5 && YawsGeneral.isRanging() 
-				&& YawsGeneral.inAviesArea() && !YawsGeneral.lootExists()) {
+				&& YawsGeneral.inAviesArea() && !Looting.lootExists()) {
 			Avies.fightStatus = "flicking now!";
 			if(!Prayer.isTabOpen()){
 				GameTab.open(TABS.PRAYERS);
@@ -57,5 +57,17 @@ public class Pray {
 		}
 
 		Pray.turnOffPrayerEagle();
+	}
+	
+	public static void disableAllPrayers(){
+		PRAYERS[] p = Prayer.getCurrentPrayers();
+		if (!Prayer.isTabOpen()) {
+			YawsGeneral.openTab(TABS.PRAYERS);
+		}
+		for (int i = 0; i < p.length; i++) {
+			final PRAYERS currentPrayer = p[i];
+			Prayer.disable(currentPrayer);
+			Conditionals.waitFor(!Prayer.isPrayerEnabled(currentPrayer), 400, 500);
+		}
 	}
 }

@@ -1,4 +1,4 @@
-package scripts.slayer;
+package scripts;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -119,7 +119,7 @@ public class BlkDK extends Script implements Painting, Pausing {
 			"Nature rune", "Law rune", "Adamantite bar", "Shield left half",
 			"Silver ore", "Nature talisman", "Tooth half of key", "Loop half of key",
 			"Runite bar", "Uncut diamond", "Uncut ruby", "Air orb",
-			"Draconic visage", "Clue scroll" };
+			"Draconic visage", "Clue scroll (hard)" };
 
 	public void putMap() {
 		for (int i = 0; i < loot.length; i++) {
@@ -486,14 +486,11 @@ public class BlkDK extends Script implements Painting, Pausing {
 				}
 				return State.GOTO_BANKZ;
 			}
-			else if (Inventory.getCount(foodID) == 0 && Inventory.getCount(junk) < 2 
-					&& !lootIsOnGround()) {
-
-				println("INV is full");
-				return State.GOTO_BANKZ;
+			else if (Inventory.getCount(foodID) > 0 || Inventory.getCount(junk) > 0) {
+				return State.DROPJUNK;
 			} 
 			else {
-				return State.DROPJUNK;
+				return State.GOTO_BANKZ;
 			}
 
 		}
@@ -1058,7 +1055,9 @@ public class BlkDK extends Script implements Painting, Pausing {
 		return junks.length == 0;
 	}
 
-	public boolean isFull() { return (Inventory.find(junk).length == 0 && (Inventory.isFull() || Inventory.getAll().length == 27));	}
+	public boolean isFull() { return (Inventory.find(junk).length == 0 && 
+			Inventory.find(foodIDs).length == 0 &&
+			(Inventory.isFull() || Inventory.getAll().length == 27));	}
 
 	public void cameraDrag() {	Camera.setCameraRotation(General.random(88, 92));}
 

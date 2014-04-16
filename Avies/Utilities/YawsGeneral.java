@@ -144,32 +144,6 @@ public class YawsGeneral {
 		}
 	}
 
-	public static void drawTile(RSTile tile, Graphics g, boolean fill) {
-		if (tile.getPosition().isOnScreen()) {
-			if (fill) {
-				g.fillPolygon(Projection.getTileBoundsPoly(tile, 0));
-			} else {
-				g.drawPolygon(Projection.getTileBoundsPoly(tile, 0));
-			}
-		}
-	}
-
-	public static void drawModel(RSModel model, Graphics g, boolean fill) {
-		if (model.getAllVisiblePoints().length != 0) {
-			if (fill) {
-				// fill triangles
-				for (Polygon p : model.getTriangles()) {
-					g.fillPolygon(p);
-				}
-			} else {
-				// draw triangles
-				for (Polygon p : model.getTriangles()) {
-					g.drawPolygon(p);
-				}
-			}
-		}
-	}
-
 	public static void alc(int[] loot) {
 		RSItem[] l = Inventory.find(loot);
 		openTab(TABS.MAGIC);
@@ -263,71 +237,6 @@ public class YawsGeneral {
 			Inventory.drop(Constants.JUNK);
 		} else {
 			emergTele();
-		}
-	}
-
-	public static boolean lootExists() {
-		RSGroundItem[] Nests = GroundItems.findNearest(Constants.LOOT_WITHOUT_ARROWS);
-		return Nests.length > 0
-				&& Tiles.AVIES_AREA.contains(Nests[0].getPosition());
-	}
-
-	public static void loot() {
-		Avies.fightStatus = "looting";
-		Pray.turnOffPrayerEagle();
-		RSGroundItem[] Nests = GroundItems.findNearest(Constants.LOOT);
-
-		for (int i = 0; i < Nests.length; i++) {
-			Walking.setWalkingTimeout(1000L);
-			if (Nests[i].getID() == Avies.boltsID) {
-				if (Nests[i].getStack() > 9) {
-					if (!Nests[i].isOnScreen()) {
-						Walking.walkPath(Walking.generateStraightPath(Nests[i]
-								.getPosition()));
-						Camera.turnToTile(Nests[i].getPosition());
-						Camera.setCameraAngle(General.random(90, 100));
-						waitIsMovin();
-					}
-					String str = Constants.LOOT_MAPPING.get(Nests[i].getID());
-					final int tmpCount = Inventory.getCount(Nests[i].getID());
-					if (Nests[i].click("Take " + str))
-						Conditionals.waitForItem(Nests[i].getID(), tmpCount);
-				}
-			} else {
-				if (!Nests[i].isOnScreen()) {
-					Walking.walkPath(Walking.generateStraightPath(Nests[i]
-							.getPosition()));
-					Camera.turnToTile(Nests[i].getPosition());
-					Camera.setCameraAngle(General.random(90, 100));
-					waitIsMovin();
-				}
-				String str = Constants.LOOT_MAPPING.get(Nests[i].getID());
-				final int tmpCount = Inventory.getCount(Nests[i].getID());
-				if (Nests[i].click("Take " + str))
-					Conditionals.waitForItem(Nests[i].getID(), tmpCount);
-			}
-		}
-	}
-
-	// TODO fix waitForLoot
-	public static void waitForLoot(RSCharacter avv) {
-		Avies.fightStatus = "prayerflicking";
-		if (!lootExists() && isRanging() && inAviesArea() && getHp() > 30) {
-			Pray.prayerFlick();
-		}
-		Pray.turnOffPrayerEagle();
-	}
-
-	public static void drinkPotion(int[] pot) {
-		if (Skills.getCurrentLevel(SKILLS.RANGED) < Skills
-				.getActualLevel(SKILLS.RANGED) + 2) {
-			Inventory.open();
-			RSItem[] potion = Inventory.find(pot);
-			if (potion.length > 0) {
-				if (Clicking.click("Drink", potion[0])) {
-					Conditionals.waitFor(Skills.getCurrentLevel(SKILLS.RANGED) > Skills.getActualLevel(SKILLS.RANGED), 1000, 1200);
-				}
-			}
 		}
 	}
 	

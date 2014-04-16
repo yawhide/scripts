@@ -2,6 +2,7 @@ package scripts.Avies.Utilities;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Polygon;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -13,9 +14,11 @@ import org.tribot.api2007.Game;
 import org.tribot.api2007.GroundItems;
 import org.tribot.api2007.Inventory;
 import org.tribot.api2007.NPCs;
+import org.tribot.api2007.Projection;
 import org.tribot.api2007.Skills;
 import org.tribot.api2007.types.RSGroundItem;
 import org.tribot.api2007.types.RSItem;
+import org.tribot.api2007.types.RSModel;
 import org.tribot.api2007.types.RSNPC;
 import org.tribot.api2007.types.RSTile;
 
@@ -37,7 +40,7 @@ public class PaintUtil {
 				double xp_per_hour = Math
 						.round(((Skills.getXP(PaintHelper.skillSKILL[i]) - PaintHelper.skillXP[i]))
 								/ PaintHelper.hoursRan), nextLv = Skills
-						.getXPToLevel(PaintHelper.skillSKILL[i], NXT_LVL), hours = (nextLv / xp_per_hour);	
+						.getXPToLevel(PaintHelper.skillSKILL[i], NXT_LVL), hours = (nextLv / xp_per_hour);
 
 				if (!PaintHelper.HIDE_ZONE.contains(Mouse.getPos())) {
 					g.setColor(new Color(0, 0, 0));
@@ -67,8 +70,8 @@ public class PaintUtil {
 			}
 		}
 	}
-	
-	public static void showPaint(Graphics g){
+
+	public static void showPaint(Graphics g) {
 		g.setColor(Color.GREEN);
 		if (!PaintHelper.HIDE_ZONE.contains(Mouse.getPos())) {
 			g.setColor(new Color(60, 60, 60));
@@ -76,34 +79,46 @@ public class PaintUtil {
 
 			g.setColor(Color.WHITE);
 			g.drawString("Yawhide's BDK", 345, 385);
+			g.drawString("Version :" + PaintHelper.version + "   Curr world: "
+					+ Game.getCurrentWorld(), 345, 405);
 			g.drawString(
-					"Version :" + PaintHelper.version + "   Curr world: "
-							+ Game.getCurrentWorld(), 345, 405);
-			g.drawString("Running for: " + Timing.msToString(PaintHelper.timeRan), 345, 420);
-			g.drawString("Total XP ganed: " + PaintHelper.xpGained + " (" + PaintHelper.xpPerHour
-					+ "/h)", 345, 435);
+					"Running for: " + Timing.msToString(PaintHelper.timeRan),
+					345, 420);
+			g.drawString("Total XP ganed: " + PaintHelper.xpGained + " ("
+					+ PaintHelper.xpPerHour + "/h)", 345, 435);
 			g.drawString("State: " + Avies.fightStatus, 345, 450);
-			g.drawString("Addy bars: " + PaintHelper.dh + "       GP: " + PaintHelper.db / 1000 + " K",
-					345, 465);
-			g.drawString("Gp/hr: " + calcProfit() + " K   Total: "	+ calcRevenue()	+ " K", 345, 480);
+			g.drawString("Addy bars: " + PaintHelper.dh + "       GP: "
+					+ PaintHelper.db / 1000 + " K", 345, 465);
+			g.drawString("Gp/hr: " + calcProfit() + " K   Total: "
+					+ calcRevenue() + " K", 345, 480);
 
 		}
 	}
-	
-	public static int calcProfit(){
-		return (int) ((PaintHelper.dh * Avies.addyZybezPrice + PaintHelper.db + PaintHelper.ran * Avies.ranarrZybezPrice)
+
+	public static int calcProfit() {
+		return (int) ((PaintHelper.dh * Avies.addyZybezPrice + PaintHelper.db + PaintHelper.ran
+				* Avies.ranarrZybezPrice)
 				/ PaintHelper.hoursRan / 1000);
 	}
-	
-	public static int calcRevenue(){
-		return (int) ((PaintHelper.dh * Avies.addyZybezPrice + PaintHelper.db + PaintHelper.ran * Avies.ranarrZybezPrice) / 1000);
-	}
-	
-	public static void drawMisc(Graphics g){
-		g.setColor(Color.CYAN);
 
+	public static int calcRevenue() {
+		return (int) ((PaintHelper.dh * Avies.addyZybezPrice + PaintHelper.db + PaintHelper.ran
+				* Avies.ranarrZybezPrice) / 1000);
+	}
+
+	public static void drawMisc(Graphics g) {
+
+		drawItemsInInv(g);
+		drawGroundItems(g);
+		drawAvies(g);
+		g.drawString(Combat.getTargetEntity().getName(), 5, 50);
+	}
+
+	public static void drawItemsInInv(Graphics g) {
+		g.setColor(Color.CYAN);
 		Map<Integer, Integer> items = new HashMap<Integer, Integer>();
 		RSItem[] item = Inventory.getAll();
+
 		for (int i = 0; i < item.length; i++) {
 			int count = items.containsKey(item[i].getID()) ? items.get(item[i]
 					.getID()) : 0;
@@ -120,23 +135,53 @@ public class PaintUtil {
 			it.remove(); // avoids a ConcurrentModificationException
 			k += 15;
 		}
+	}
+
+	public static void drawGroundItems(Graphics g) {
 		RSGroundItem[] Nests = GroundItems
 				.findNearest(Constants.LOOT_WITHOUT_ARROWS);
 		for (int i = 0; i < Nests.length; i++) {
 			if (Tiles.AVIES_AREA.contains(Nests[i].getPosition())) {
 				RSTile t = Nests[i].getPosition();
-				YawsGeneral.drawTile(t, g, false);
+				drawTile(t, g, false);
 			}
 		}
+	}
 
+	public static void drawAvies(Graphics g) {
 		g.setColor(Color.RED);
 		RSNPC[] avv = NPCs.findNearest("Aviansie");
 		for (RSNPC a : avv) {
 			if (a.getCombatLevel() == 69 || a.getCombatLevel() == 71
 					|| a.getCombatLevel() == 83)
-				YawsGeneral.drawTile(a.getPosition(), g, false);
+				drawTile(a.getPosition(), g, false);
 		}
-		g.drawString(Combat.getTargetEntity().getName(), 5, 50);
 	}
 	
+	public static void drawTile(RSTile tile, Graphics g, boolean fill) {
+		if (tile.getPosition().isOnScreen()) {
+			if (fill) {
+				g.fillPolygon(Projection.getTileBoundsPoly(tile, 0));
+			} else {
+				g.drawPolygon(Projection.getTileBoundsPoly(tile, 0));
+			}
+		}
+	}
+
+	public static void drawModel(RSModel model, Graphics g, boolean fill) {
+		if (model.getAllVisiblePoints().length != 0) {
+			if (fill) {
+				// fill triangles
+				for (Polygon p : model.getTriangles()) {
+					g.fillPolygon(p);
+				}
+			} else {
+				// draw triangles
+				for (Polygon p : model.getTriangles()) {
+					g.drawPolygon(p);
+				}
+			}
+		}
+	}
+
 }
