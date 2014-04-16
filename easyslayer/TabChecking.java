@@ -1,4 +1,4 @@
-package scripts.slayer;
+package scripts.easyslayer;
 
 import org.tribot.api.Clicking;
 import org.tribot.api2007.Banking;

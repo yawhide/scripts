@@ -1,4 +1,4 @@
-package scripts.slayer;
+package scripts;
 
 public class chickenBuyer {
 

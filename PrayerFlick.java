@@ -1,4 +1,4 @@
-package scripts.slayer;
+package scripts;
 
 import org.tribot.api.General;
 import org.tribot.api.Timing;

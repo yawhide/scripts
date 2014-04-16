@@ -45,10 +45,10 @@ import org.tribot.script.interfaces.Painting;
 import org.tribot.script.interfaces.Pausing;
 
 
-@ScriptManifest(authors = { "Yaw hide" }, version = 2.0, category = "Ranged", name = "Yawhide's BlkDK", description = "Welcome to my first black dragon script!")
+@ScriptManifest(authors = { "Yaw hide" }, version = 2.02, category = "Ranged", name = "Yawhide's BlkDK", description = "Welcome to my first black dragon script!")
 public class BlkDK extends Script implements Painting, Pausing {
 	
-	private int[] foodIDs  = { 333, 329, 379, 385, 7946, 1897 };
+	private int[] foodIDs  = { 333, 329, 379, 385, 7946 };
 	int foodID;
 	int[] ppot = { 2434, 139, 141, 143 }; 
 	
@@ -453,29 +453,25 @@ public class BlkDK extends Script implements Painting, Pausing {
 				&& Inventory.getCount(loot) < 3 && forcebank == false)
 			return State.GOTO_SAFEZ;
 
-		else if (getHp() <= 70) {
+		else if (getHp() <= 50) {
 			if (Inventory.getCount(foodID) == 0) {
-				if (getHp() <= 50) {
-
-					println("Out of food and low hp, getting the hell out of here");
-					forcebank = true;
-					if (inDragArea())
-						return State.GOTO_BANKZ;
-					else if (pos().distanceTo(zbanktile) <= 7)
-						return State.BANKZ;
-					else
-						return State.GOTO_BANKZ;
-				}
+				
+				println("Out of food and low hp, getting the hell out of here");
+				forcebank = true;
+				if (inDragArea())
+					return State.GOTO_BANKZ;
+				else if (pos().distanceTo(zbanktile) <= 7)
+					return State.BANKZ;
+				else
+					return State.GOTO_BANKZ;
 			} 
 			else if (inDragArea()){
-				if (!lootIsOnGround() && getHp() <= 50) {
-					return State.GOTO_SAFEZ;
-				}
 				return State.HEAL;
 			}
+			else if (pos().distanceTo(zbanktile) <= 7)
+				return State.BANKZ;
 			else
-				return State.HEAL;
-			
+				return State.GOTO_BANKZ;
 		}
 		else if (isFull()) {
 			if (pos().distanceTo(zbanktile) <= 7)
@@ -488,7 +484,7 @@ public class BlkDK extends Script implements Painting, Pausing {
 			}
 			else if (Inventory.getCount(foodID) > 0 || Inventory.getCount(junk) > 0) {
 				return State.DROPJUNK;
-			} 
+			}
 			else {
 				return State.GOTO_BANKZ;
 			}
@@ -978,41 +974,15 @@ public class BlkDK extends Script implements Painting, Pausing {
 			}
 			sleep(80, 100);
 		}
-		GameTab.open(org.tribot.api2007.GameTab.TABS.INVENTORY);
+		GameTab.open(GameTab.TABS.INVENTORY);
 		sleep(150, 200);
 		RSItem[] junks = Inventory.find(junk);
 		RSItem[] food = Inventory.find(foodID);
 		RSItem[] bolts = Inventory.find(9142);
-		RSItem[] cake = Inventory.find(1897);
-		RSItem[] cake2 = Inventory.find(1899);
-		RSItem[] cake3 = Inventory.find(1901);
 		RSItem[] coinstack = Inventory.find(995);
 		if (bolts.length > 0) {
 			bolts[0].click("Wield");
 			sleep(200, 250);
-		}
-
-		if (cake.length > 0) {
-			if (getHp() == 100)
-				Inventory.drop(cake[0].getID());
-			else{
-			cake[0].click("Eat");
-			}
-			sleep(650, 700);
-		}
-		if (cake2.length > 0) {
-			if (getHp() == 100)
-				Inventory.drop(cake2[0].getID());
-			else
-				cake2[0].click("Eat");
-			sleep(650, 700);
-		}
-		if (cake3.length > 0) {
-			if (getHp() == 100)
-				Inventory.drop(cake3[0].getID());
-			else
-				cake3[0].click("Eat");
-			sleep(650, 700);
 		}
 		if (food.length > 0) {
 			if (getHp() == 100)
@@ -1029,7 +999,6 @@ public class BlkDK extends Script implements Painting, Pausing {
 			Inventory.drop(995);
 			sleep(100, 150);
 		}
-
 		return junks.length == 0;
 	}
 
@@ -1055,9 +1024,7 @@ public class BlkDK extends Script implements Painting, Pausing {
 		return junks.length == 0;
 	}
 
-	public boolean isFull() { return (Inventory.find(junk).length == 0 && 
-			Inventory.find(foodIDs).length == 0 &&
-			(Inventory.isFull() || Inventory.getAll().length == 27));	}
+	public boolean isFull() { return Inventory.isFull() || Inventory.getAll().length == 27;	}
 
 	public void cameraDrag() {	Camera.setCameraRotation(General.random(88, 92));}
 

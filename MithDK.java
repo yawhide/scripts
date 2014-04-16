@@ -1,4 +1,4 @@
-package scripts.slayer;
+package scripts;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -55,6 +55,8 @@ import org.tribot.script.interfaces.Ending;
 import org.tribot.script.interfaces.MessageListening07;
 import org.tribot.script.interfaces.Painting;
 import org.tribot.util.Util;
+
+import scripts.easyslayer.Timer;
 
 @ScriptManifest(authors = { "Yaw hide" }, category = "Combat", name = "Yaw hide's MithDK", version = 1.0)
 public class MithDK extends Script implements MessageListening07, Painting, Ending{

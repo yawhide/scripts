@@ -1,4 +1,4 @@
-package scripts.slayer;
+package scripts;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -14,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Locale;
+
 import org.tribot.api.interfaces.Positionable;
 import org.tribot.api.DynamicClicking;
 import org.tribot.api.General;
@@ -61,6 +62,9 @@ import org.tribot.script.interfaces.Painting;
 import org.tribot.script.interfaces.EventBlockingOverride;
 import org.tribot.script.interfaces.Pausing;
 import org.tribot.api2007.ext.Doors;
+
+import scripts.easyslayer.Timer;
+import scripts.easyslayer.YawhideHelper;
 
 
 @ScriptManifest(authors = { "Yaw hide" }, version = 1.14, category = "Combat", name = "MinotaurSlayer")
@@ -1248,7 +1252,7 @@ public class Minotaur extends Script implements Painting, Ending, Pausing{
 				} 
 				else if (rightClick) {
 					Mouse.click(3);
-					scripts.slayer.Timer t = new Timer(500);
+					scripts.easyslayer.Timer t = new Timer(500);
 					while (t.isRunning() && !ChooseOption.isOpen())
 						sleep(50, 100);
 					if (!ChooseOption.isOpen())

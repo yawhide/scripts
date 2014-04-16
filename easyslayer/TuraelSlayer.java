@@ -1,4 +1,4 @@
-package scripts.slayer;
+package scripts.easyslayer;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -14,7 +14,6 @@ import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import org.tribot.api.interfaces.Positionable;
-import org.tribot.api.Clicking;
 import org.tribot.api.DynamicClicking;
 import org.tribot.api.General;
 import org.tribot.api.Timing;
@@ -55,7 +54,6 @@ import org.tribot.api2007.types.RSPlayer;
 import org.tribot.api2007.types.RSTile;
 import org.tribot.script.Script;
 import org.tribot.script.ScriptManifest;
-import org.tribot.script.interfaces.Ending;
 import org.tribot.script.interfaces.MessageListening07;
 import org.tribot.script.interfaces.Painting;
 import org.tribot.api2007.ext.Doors;
@@ -129,10 +127,6 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 			5321
 	};
 	
-	
-	
-	
-	
 	HashMap<Integer, String> map = new HashMap<Integer, String>(loot.length);
 	
 	//slayer items
@@ -188,9 +182,7 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 	public void run() {
 		println("before onstart");
 		onStart();
-		
-		
-		
+				
 		if(currTask.equals("None")){
 			
 			if(pos().distanceTo(turaelT) <=5){
@@ -340,7 +332,6 @@ public class TuraelSlayer extends Script implements MessageListening07, Painting
 		Walking.setWalkingTimeout(5000L);
 		putMap();
 		sleep(200, 250);
-		
 		
 		TabChecking.checkMagicLevel();
 		sleep(100, 150);

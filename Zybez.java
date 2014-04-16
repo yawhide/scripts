@@ -1,4 +1,4 @@
-package scripts.slayer;
+package scripts;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
