@@ -1,4 +1,4 @@
-package scripts;
+package scripts.MDK.Main;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -58,131 +58,10 @@ import org.tribot.util.Util;
 
 import scripts.easyslayer.Timer;
 
-@ScriptManifest(authors = { "Yaw hide" }, category = "Combat", name = "Yaw hide's MithDK", version = 1.0)
+@ScriptManifest(authors = { "Yaw hide" }, category = "Ranged", name = "Yaw hide's MithDK", version = 1.0)
 public class MithDK extends Script implements MessageListening07, Painting, Ending{
 
-	/**** RSTiles ****/
-	RSTile afterStepsDown = new RSTile(1772, 5366, 0);
-	RSTile trapDoorToChest = new RSTile(2309, 3215, 0);
-	RSTile[] churchBoundaries = { new RSTile(3238, 3211, 0), new RSTile(3240, 3211, 0), new RSTile(3240, 3215, 0),
-			new RSTile(3247, 3215, 0), new RSTile(3247, 3204, 0), new RSTile(3240, 3204), new RSTile(3240, 3209, 0),
-			new RSTile(3238, 3209, 0) };
-	RSTile[] toMith = { new RSTile(1775, 5361, 0), new RSTile(1777, 5355, 0), new RSTile(1778, 5346, 0) };
 	
-	/**** Paths ****/
-	RSTile[] toChest = { new RSTile(3213, 9620, 0), new RSTile(3218, 9623, 0) };
-	RSTile[] toAltar = { new RSTile(3241, 3210, 0), new RSTile(3242, 3207, 0) };
-	RSTile[] toWhirlpool = { new RSTile(2518, 3563, 0), new RSTile(2518, 3555, 0), 
-			new RSTile(2517, 3546, 0), new RSTile(2516, 3537, 0), new RSTile(2514, 3530, 0), 
-			new RSTile(2514, 3524, 0), new RSTile(2511, 3518, 0), new RSTile(2511, 3512, 0) };
-	
-	/**** areas because RSArea doesn't work with plane ****/
-	RSTile[] afterWhirlpool2 = {new RSTile(1763, 5367, 1), new RSTile(1768, 5365, 1)};
-	RSTile[] greenDragArea2 = {new RSTile(1767, 5367, 0), new RSTile(1782, 5341, 0)};
-	RSTile[] mithDragSpawn12 = {new RSTile(1776, 5348, 1), new RSTile(1784, 5338, 1)};
-	RSTile[] lumbyArea2 = {new RSTile(3190, 3240, 0), new RSTile(3255, 3187, 0)};
-	RSTile[] toWhirlpoolA2 = {new RSTile(2505, 3575, 0), new RSTile(2526, 3510, 0)};
-	
-	
-	/**** Positionables ****/
-	Positionable stepsDownToGD = new RSTile(1769, 5365, 1);
-	Positionable stepsUpToMD = new RSTile(1778, 5344, 0);
-	Positionable trapDoor = new RSTile(3209, 3216, 0);
-	Positionable chest = new RSTile(3219, 9623, 0);
-	Positionable altar = new RSTile(3243, 3207, 0);
-	Positionable churchDoor = new RSTile(3238, 3210, 0);
-	Positionable whirlpool = new RSTile(2512, 3511);
-	Positionable whirlpoolT = new RSTile(2512, 3508);
-	Positionable safeSpotSpawn1P = new RSTile(1777, 5345, 1);
-	Positionable afterWhirlpoolT = new RSTile(1763, 5365, 1);
-	
-	RSTile[] safeSpot = {new RSTile(1776, 5346, 1), new RSTile(1777, 5344, 1)};
-	/**** RSArea ****/
-	RSArea afterWhirlpool = new RSArea(new RSTile(1762, 5368, 1), new RSTile(1769, 5364, 1));
-	RSArea greenDragArea = new RSArea(new RSTile(1767, 5367, 0), new RSTile(1782, 5341, 0));
-	RSArea mithDragSpawn1 = new RSArea(new RSTile(1776, 5348, 1), new RSTile(1784, 5338, 1));
-	RSArea safeSpotSpawn1 = new RSArea(safeSpot);
-	RSArea lumbyArea = new RSArea(new RSTile(3190, 3240, 0), new RSTile(3255, 3187, 0));
-	RSArea churchA = new RSArea(churchBoundaries);
-	RSArea toWhirlpoolA = new RSArea(new RSTile(2505, 3575, 0), new RSTile(2526, 3510, 0));
-	
-	
-	
-	RSArea chestA = new RSArea(new RSTile(3219, 9624, 0), new RSTile(3208, 9615, 0));
-	
-	/**** Item Ids ****/
-	int[] foodIDs = { 385, 7946 };
-	int[] rangePot = { 2444, 169, 171, 173 };
-	int[] defencePot = { 2442, 163, 165, 167 };
-	int[] prayerPot = { 2434, 139, 141, 143 };
-	int[] antifirePot = {2452, 2454, 2456, 2458 };
-	int diamondEBolt = 9243;
-	int rubyEBolt = 9242;
-	int addyBolt = 9143;
-	boolean useSpecialBolts = true;
-	int[] gamesNecklace = { 3867, 3855, 3857, 3859, 3861, 3863, 3865, 3853 };
-	int ringOfLife = 2570;
-	int antiDragonFireShield = 1540;
-	int[] junk = { 886, 1539, 9003, 229, 1623, 1355, 440, 7767, 117,
-			6963, 554, 556, 829, 1971, 687, 464, 1973, 1917, 808, 1454, 6180,
-			6965, 1969, 6183, 6181, 6962, 865, 41 };
-	int varTab = 8007;
-	int lumTab = 8008;
-	//int[] depositAllExcept = { 3867, 3855, 3857, 3859, 3861, 3863, 3865, 3853, varTab, lumTab };
-	int mbar = 2359;
-	int dbone = 536;
-	
-	/**** Monster Ids ****/
-	String bgd = "Brutal green dragon"; // 2399
-	String md = "Mithril dragon"; //2400
-	String wf = "Waterfiend";
-	int[] mithDrag = {};
-	
-	/**** looting ****/
-	int[] loot = {      
-			11335, 11286, diamondEBolt, rubyEBolt, addyBolt, 11338, 1615, 1631, 1149, 
-			1249, 2366,  
-			1319, 1201, 985, 987, 1373, 1163,  
-			1147, 566, 565, 561,  1601, 1617, 2363,			
-			1432, 1247, 868,  9144
-			};
-	int[] badLoot = {443, 1462,
-			892, 811, 817, };
-	int[] conditionalLoot = { 385, 11497, 11499, 11465, 
-			11467, 11465, 11467 };
-	int[] clue = {2722, 2723, 2725, 2727, 2729, 2731, 2733, 2725, 2737, 2739, 2741,
-			2743, 2745, 2747, 2773, 2774, 2776, 2778, 2780, 2782, 2783, 2785,
-			2786, 2788, 2790, 2792, 2793, 2794, 2796, 2797, 2799, 3520, 3522,
-			3524, 3525, 3526, 3528, 3530, 3532, 3534, 3536, 3538, 3540, 3542,
-			3544, 3546, 3548, 3560, 3562, 3564, 3566, 3568, 3570, 3272, 3573,
-			3574, 3575, 3577, 3579, 3580, 7239, 7241, 7243, 7245, 7247, 7248,
-			7249, 7250, 7251, 7252, 7253, 7254, 7255, 7256, 7258, 7260, 7262,
-			7264, 7266, 7268, 7270, 7272, 10234, 10236, 10238, 10240, 10242,
-			10244, 10426, 10428, 40250, 10252, 13010, 13012, 13014, 13016,
-			13018, 13020, 13022, 13024, 13026, 13028, 13030, 13032, 13034,
-			13036, 13038, 13040, 13041, 13042, 13044, 13046, 13048, 13049};
-	
-	String[] names = {     
-"Dragon full helm", "Draconic visage", "Diamond bolts (e)", "Ruby bolts (e)", "Adamant bolts", "Chewed bones", "Dragon med helm", "Dragon spear", "Shield left half",  
-			"Rune 2h sword", "Rune kiteshield", 
-			"Dragonstone", "Uncut dragonstone", "Half of a key", "Half of a key", "Rune battleaxe", "Rune full helm", 
-			"Rune med helm", "Soul rune", "Blood rune", "Nature rune",  "Diamond", "Uncut diamond", "Runite bar", 
-			"Rune mace", "Rune spear", "Rune knife",  "Runite bolts"};
-	String[] badNames = {		  
-			 "Silver ore", "Nature talisman", 
-			 "Rune arrow", "Rune dart", "Rune dart(p)" };
-	
-	String[] conditionNames = { "Shark", "Super defence mix(2)", "Super defence mix(1)", "Prayer mix(2)",
-			"Prayer mix(1)", "Restore prayer mix(2)", "Restore prayer mix(1)" };
-	
-	
-	String[] clueStr = {"Clue scroll"};
-	String[] priorityLoot = { "Dragon full helm", "Draconic visage" };
-	
-	HashMap<Integer, String> map = new HashMap<Integer, String>(loot.length);
-	HashMap<Integer, String> mapBad = new HashMap<Integer, String>(badLoot.length);
-	HashMap<Integer, String> mapConditional = new HashMap<Integer, String>(conditionalLoot.length);
-	HashMap<Integer, String> mapClue = new HashMap<Integer, String>(clue.length);
 	
 	public void putMap() {
 		for (int i = 0; i < loot.length; i++) {
@@ -199,7 +78,7 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 		}
 	}
 	
-	
+	boolean useSpecialBolts = true;
 	boolean pottedAntiFire = true;
 	boolean bankStatus = true;
 	boolean scriptStatus = true;
