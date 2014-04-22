@@ -166,6 +166,7 @@ public class YawsGeneral {
 		if (tab.length > 0) {
 			if (Clicking.click("Break", tab[0])) {
 				Conditionals.waitFor(inArea(Tiles.FALLY_AREA), 2500, 3000);
+				General.sleep(2000, 3000);
 			}
 		} else {
 			General.println("Out of tabs");

@@ -68,7 +68,7 @@ public class Bank {
 					closeBank();
 					
 					if(Inventory.find(BDK.BOLTS_ID).length > 0){
-						Clicking.click("Equip", Inventory.find(BDK.BOLTS_ID)[0]);
+						Clicking.click("Wield", Inventory.find(BDK.BOLTS_ID)[0]);
 					}
 					
 					while(Inventory.find(BDK.FOOD_IDS).length > BDK.NUM_FOOD_TO_WITHDRAW){
@@ -115,7 +115,7 @@ public class Bank {
 					if (Banking.openBankBanker()) {
 						Conditionals.waitFor(Banking.isBankScreenOpen(), 400, 500);
 						
-						Banking.depositAll();
+						Banking.depositAllExcept(Constants.DEPOSIT_ALL_EXCEPT);
 						Conditionals.waitFor(Inventory.getAll().length == 0, 400, 500);
 					}
 				}

@@ -56,28 +56,12 @@ import org.tribot.script.interfaces.MessageListening07;
 import org.tribot.script.interfaces.Painting;
 import org.tribot.util.Util;
 
+import scripts.MDK.Utilities.Looting;
 import scripts.easyslayer.Timer;
 
 @ScriptManifest(authors = { "Yaw hide" }, category = "Ranged", name = "Yaw hide's MithDK", version = 1.0)
 public class MithDK extends Script implements MessageListening07, Painting, Ending{
 
-	
-	
-	public void putMap() {
-		for (int i = 0; i < loot.length; i++) {
-			map.put(loot[i], names[i]);
-		}
-		for (int j = 0; j < conditionalLoot.length; j++) {
-			mapConditional.put(conditionalLoot[j], conditionNames[j]);
-		}
-		for (int k = 0; k < clue.length; k++) {
-			mapClue.put(clue[k], clueStr[0]);
-		}
-		for (int l = 0; l < badLoot.length; l++) {
-			mapBad.put(badLoot[l], badNames[l]);
-		}
-	}
-	
 	boolean useSpecialBolts = true;
 	boolean pottedAntiFire = true;
 	boolean bankStatus = true;
@@ -86,18 +70,13 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 	
 	@Override
 	public void run() {
-		// TODO run
-		putMap();
-		sleep(100,150);
 		
+		Looting.putMap();		
 		Mouse.setSpeed(General.random(120,140));
 		Walking.setWalkingTimeout(3000L);
 		Walking.setControlClick(true);
 		WebWalking.setUseRun(true);
 		
-		useSpecialBolts = false;
-		addyBolt = 11875; // broad bolts
-		diamondEBolt = 11875;
 		
 		if((!lumbyArea.contains(pos()) || !chestA.contains(pos())) && haveGear()){
 			bankStatus = false;
@@ -106,7 +85,6 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 		
 		if(Equipment.find(SLOTS.WEAPON).length == 0)
 			scriptStatus = false;
-			//stopScript();
 		
 		while(scriptStatus){
 			
@@ -875,12 +853,6 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 					waitForInv(Nests[0].getID());
 					if(!str.equals("Adamant bolts"))
 						lastDrop = str;
-					/*try {
-						writeToFile(Nests[0].getID());
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}*/
 				}
 			} 
 			else if (Nests2.length > 0) {
@@ -888,12 +860,6 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 				if (Nests2[0].click("Take " + str)){
 					waitForInv(Nests2[0].getID());
 					lastDrop = str;
-					/*try {
-						writeToFile(Nests2[0].getID());
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}*/
 				}
 			} 
 			else if (Nests3.length > 0) {
@@ -901,12 +867,6 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 				if (Nests3[0].click("Take " + str)){
 					waitForInv(Nests3[0].getID());
 					lastDrop = str;
-					/*try {
-						writeToFile(Nests3[0].getID());
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}*/
 				}
 			}
 			else if (dbone.length > 0){

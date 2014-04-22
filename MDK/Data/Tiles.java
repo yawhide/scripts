@@ -7,7 +7,6 @@ import org.tribot.api2007.types.RSTile;
 public class Tiles {
 	/**
 	 * RSTiles
-	 * 
 	 */
 	public static RSTile afterStepsDown = new RSTile(1772, 5366, 0),
 
@@ -26,7 +25,6 @@ public class Tiles {
 
 	/**
 	 * Paths
-	 * 
 	 */
 	public static RSTile[] toChest = { new RSTile(3213, 9620, 0),
 			new RSTile(3218, 9623, 0) },
@@ -40,7 +38,6 @@ public class Tiles {
 
 	/**
 	 * areas because RSArea doesn't work with plane
-	 * 
 	 */
 	public static RSTile[] afterWhirlpool2 = { new RSTile(1763, 5367, 1),
 			new RSTile(1768, 5365, 1) },
@@ -55,7 +52,6 @@ public class Tiles {
 
 	/**
 	 * Positionables
-	 * 
 	 */
 	public static Positionable stepsDownToGD = new RSTile(1769, 5365, 1),
 
@@ -79,7 +75,6 @@ public class Tiles {
 
 	/**
 	 * RSArea
-	 * 
 	 */
 	public static RSArea afterWhirlpool = new RSArea(new RSTile(1762, 5368, 1),
 			new RSTile(1769, 5364, 1)),
@@ -92,14 +87,14 @@ public class Tiles {
 
 	safeSpotSpawn1 = new RSArea(safeSpot),
 
-			lumbyArea = new RSArea(new RSTile(3190, 3240, 0), new RSTile(3255,
+	lumbyArea = new RSArea(new RSTile(3190, 3240, 0), new RSTile(3255,
 					3187, 0)),
 
-			churchA = new RSArea(churchBoundaries),
+	churchA = new RSArea(churchBoundaries),
 
-			toWhirlpoolA = new RSArea(new RSTile(2505, 3575, 0), new RSTile(
+	toWhirlpoolA = new RSArea(new RSTile(2505, 3575, 0), new RSTile(
 					2526, 3510, 0)),
 
-			chestA = new RSArea(new RSTile(3219, 9624, 0), new RSTile(3208,
+	chestA = new RSArea(new RSTile(3219, 9624, 0), new RSTile(3208,
 					9615, 0));
 }

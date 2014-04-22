@@ -31,8 +31,9 @@ public class Pathing {
 		}
 		else if (YawsGeneral.inArea(Tiles.FALLY_AREA)){
 			Walking.setWalkingTimeout(1000L);
-			if(Inventory.find(BDK.FOOD_IDS).length == BDK.NUM_FOOD_TO_WITHDRAW && Inventory.find("Falador teleport").length > 0
-					&& Inventory.find(Constants.LOOT).length == 0 && Inventory.find(Constants.RANGE_POTS).length > 0) {
+			if(Inventory.find(BDK.FOOD_IDS).length == BDK.NUM_FOOD_TO_WITHDRAW && Inventory.getCount("Falador teleport") > 0
+					&& Inventory.getCount(Constants.LOOT) == 0 && Inventory.getCount(Constants.RANGE_POTS) > 0 &&
+					Inventory.getCount(Constants.PRAYER_POTS) == 0) {
 				BDK.FIGHT_STATUS = "walking to low wall";
 				WebWalking.walkTo(Tiles.LOWWALL_TILE);
 				YawsGeneral.waitIsMovin();

@@ -33,7 +33,7 @@ import scripts.BDK.Utilities.Pray;
 import scripts.BDK.Utilities.YawsGeneral;
 import scripts.BDK.Utilities.Zybez;
 
-@ScriptManifest(authors = { "Yaw hide" }, category = "ranged", name = "Yaw hide's BDK", version = 1.0, description = "Local version")
+@ScriptManifest(authors = { "Yaw hide" }, category = "ranged", name = "Yaw hide's BDK", version = 1.04, description = "Local version")
 public class BDK extends Script implements Painting, Pausing {
 
 	// Variables
@@ -85,7 +85,7 @@ public class BDK extends Script implements Painting, Pausing {
 			SCRIPT_STATUS = false;
 		}
 
-		boolean devmode = true;
+		boolean devmode = false;
 
 		if (devmode) {
 			NUM_FOOD_TO_WITHDRAW = 2;
@@ -128,7 +128,7 @@ public class BDK extends Script implements Painting, Pausing {
 				SCRIPT_STATUS = false;
 			}
 
-			if (Equipment.getItem(SLOTS.ARROW).getStack() < 100) {
+			if (Equipment.getItem(SLOTS.ARROW).getStack() < 100 && !YawsGeneral.inArea(Tiles.FALLY_AREA)) {
 				println("Ran out of bolts");
 				YawsGeneral.emergTele();
 				SCRIPT_STATUS = false;
