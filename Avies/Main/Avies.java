@@ -61,7 +61,6 @@ public class Avies extends Script implements Painting, Pausing,
 	public static boolean runAwayFromMonster = false, useHouseTab = true,
 			waitForGuiToFinish = true;
 
-
 	@Override
 	public void run() {
 

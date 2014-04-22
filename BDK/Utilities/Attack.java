@@ -169,7 +169,7 @@ public class Attack {
 
 		RSTile loc = null;
 		if (npc != null && npc.isOnScreen()) {
-			loc = new RSTile(npc.getID() == Constants.EAST_DRAGON_ID ? npc.getPosition().getX()-1 : npc.getPosition().getX(), npc.getPosition().getY()-1);
+			loc = new RSTile((npc.getID() != Constants.EAST_DRAGON_ID ? npc.getPosition().getX()-1 : npc.getPosition().getX()), npc.getPosition().getY()-1);
 			
 			Mouse.move(Projection.tileToScreen(loc, 10));
 			if(Game.isUptext("Walk here / 2 more options")){

@@ -1,4 +1,4 @@
-package scripts.Avies.Utilities;
+package scripts.MDK.Utilities;
 
 import org.tribot.api.General;
 import org.tribot.api.Timing;
@@ -27,6 +27,14 @@ public class Conditionals {
     	waitFor(Inventory.getCount(id) > count, 500, 1000);
     }
     
+    public static void waitForItem(String id, int count) {
+    	waitFor(Inventory.getCount(id) > count, 500, 1000);
+	}
+    
+    public static void waitForItem(String[] id, int count) {
+    	waitFor(Inventory.getCount(id) > count, 500, 1000);
+	}
+    
     public static void waitForEating(final int count){
     	waitFor(count > Inventory.find(Avies.foodIDs).length, 500, 1000);
     }
@@ -34,5 +42,6 @@ public class Conditionals {
     public static void waitForTab(TABS t){
 		final TABS tab = t;
 		waitFor(GameTab.getOpen() == tab, 500, 1000);
-	}	
+	}
+
 }

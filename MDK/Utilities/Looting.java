@@ -2,6 +2,16 @@ package scripts.MDK.Utilities;
 
 import java.util.HashMap;
 
+import org.tribot.api.General;
+import org.tribot.api.input.Mouse;
+import org.tribot.api2007.Camera;
+import org.tribot.api2007.Combat;
+import org.tribot.api2007.GroundItems;
+import org.tribot.api2007.Inventory;
+import org.tribot.api2007.Walking;
+import org.tribot.api2007.types.RSGroundItem;
+import org.tribot.api2007.types.RSItem;
+
 import scripts.MDK.Data.Constants;
 
 public class Looting {
@@ -73,4 +83,182 @@ public class Looting {
 			BAD_LOOT_MAP.put(BAD_LOOT[l], BAD_LOOT_NAMES[l]);
 		}
 	}
+	
+	public boolean checkRare() {
+		RSGroundItem[] priority = GroundItems.findNearest(priorityLoot);
+		if (priority.length > 0) {
+			if (!priority[0].isOnScreen()) {
+				Walking.clickTileMM(priority[0].getPosition(), 1);
+				sleep(100, 150);
+				Camera.turnToTile(priority[0].getPosition());
+				sleep(200, 300);
+				waitIsMovin();
+			}
+			String str = map.get(priority[0].getID());
+			if(priority[0].click("Take " + str)){
+			waitForInv(priority[0].getID());
+			return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean checkLootInArea(RSGroundItem g){
+		if(Tiles.mithDragSpawn1.contains(g.getPosition()))
+			return true;
+		return false;
+	}
+	
+	public boolean isLoot(){
+		RSGroundItem[] p1 = GroundItems.findNearest(loot);
+		RSGroundItem[] p2 = GroundItems.findNearest(badLoot);
+		RSGroundItem[] p3 = GroundItems.findNearest(clue);
+		RSGroundItem[] dbone = GroundItems.findNearest(536);
+		RSGroundItem[] mbar = GroundItems.findNearest(2359);
+		return !(p1.length == 0 && p2.length == 0 && p3.length == 0
+				&& dbone.length == 0 && mbar.length == 0);
+	}
+	
+	public boolean makeRoomForDrop(){
+		RSItem[] food = Inventory.find(foodIDs);
+		RSItem[] dbone = Inventory.find("Dragon bones");		
+		
+		if((Combat.getMaxHP() - Combat.getHP()) > 15) {
+			if(food.length > 0){
+				if(food[0].click("Eat")){
+					sleep(General.random(800, 1000));
+					return true;
+				}
+			}
+		}
+		else if (Inventory.isFull() && dbone.length > 0){
+			if(dbone[0].click("Bury")){
+				sleep(General.random(800, 1000));
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
+	
+	public boolean gotRareDrop(){
+		RSItem[] RARE = Inventory.find(priorityLoot);
+		if(RARE.length > 0){
+			emergTele();
+			sleep(3000,4000);
+			println("You just got a visage or a dragon full helm YOU LUCKY BITCH!!!!!!!!");
+			println("Please take a screenshot and post it on my thread! ty");
+			println("Stopping the script so you can get a nice surprice when you login");
+			
+			scriptStatus = false;
+			return true;
+		}
+		return false;
+	}
+	//TODO lootOrder
+	public void lootOrder(){
+		RSGroundItem[] Nests = GroundItems.findNearest(loot);
+		RSGroundItem[] Nests2 = GroundItems.findNearest(clue);
+		RSGroundItem[] Nests3 = GroundItems.findNearest(badLoot);
+		RSGroundItem[] dbone = GroundItems.findNearest(536);
+		RSGroundItem[] mbar = GroundItems.findNearest(2359);
+		
+		
+		Mouse.setSpeed(General.random(200, 230));
+		Inventory.drop(junk);
+		sleep(100,150);
+		Mouse.setSpeed(General.random(120,140));
+		
+		lootBolts();
+		
+		makeRoomForDrop();
+				
+		if(!Inventory.isFull()){
+			if (Nests.length > 0) {
+				String str = map.get(Nests[0].getID());
+				if (Nests[0].click("Take " + str)){
+					waitForInv(Nests[0].getID());
+					if(!str.equals("Adamant bolts"))
+						lastDrop = str;
+				}
+			} 
+			else if (Nests2.length > 0) {
+				String str = mapClue.get(Nests2[0].getID());
+				if (Nests2[0].click("Take " + str)){
+					waitForInv(Nests2[0].getID());
+					lastDrop = str;
+				}
+			} 
+			else if (Nests3.length > 0) {
+				String str = mapBad.get(Nests3[0].getID());
+				if (Nests3[0].click("Take " + str)){
+					waitForInv(Nests3[0].getID());
+					lastDrop = str;
+				}
+			}
+			else if (dbone.length > 0){
+				if (dbone[0].click("Take Dragon bones"))
+					waitForInv(536);
+				}
+			else if (mbar.length > 0){
+				if (mbar[0].click("Take Mithril bar"))
+					waitForInv(2359);
+			}
+		}
+		
+	}
+	
+	//TODO lootBolts
+	public void lootBolts(){
+		RSItem[] ruby = Inventory.find(rubyEBolt);
+		RSGroundItem[] rubyG = GroundItems.findNearest(rubyEBolt);
+		RSGroundItem[] diaG = GroundItems.findNearest(diamondEBolt);
+		
+		RSItem[] addy = Inventory.find(addyBolt);
+		RSGroundItem[] addyG = GroundItems.findNearest(addyBolt);
+		
+		if (useSpecialBolts) {
+			if (rubyG.length > 0) {
+				if (!rubyG[0].isOnScreen()) {
+					Walking.blindWalkTo(rubyG[0].getPosition());
+					waitIsMovin();
+				}
+				if (rubyG[0].click("Take Ruby bolts (e)")) {
+					waitForInv(rubyEBolt);
+					sleep(100, 120);
+					ruby = Inventory.find(rubyEBolt);
+				}
+			}
+			ruby = Inventory.find(rubyEBolt);
+			if (rubyG.length == 0 && ruby.length > 0) {
+				if (ruby[0].click("Wield"))
+					sleep(100, 150);
+			}
+			if (diaG.length > 0) {
+				if (diaG[0].click("Take Diamond bolts (e)")) {
+					waitForInv(diamondEBolt);
+					sleep(100, 120);
+				}
+			}
+		}
+		else{
+			if(addyG.length > 0){
+				if (!addyG[0].isOnScreen()) {
+					Walking.blindWalkTo(addyG[0].getPosition());
+					waitIsMovin();
+				}
+				if (addyG[0].click("Take Adamant bolts")) {
+					waitForInv(addyBolt);
+					sleep(100, 120);
+					ruby = Inventory.find(addyBolt);
+				}
+			}
+			ruby = Inventory.find(addyBolt);
+			if(addy.length > 0) {
+				if (addy[0].click("Wield"))
+					sleep(100, 150);
+			}
+		}
+}
 }
