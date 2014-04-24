@@ -20,23 +20,23 @@ public class Conditionals {
 	}
 	
 	public static void waitForItem(final int[] id, final int count){
-		waitFor(Inventory.getCount(id) > count, 500, 1000);
+		waitFor(Inventory.getCount(id) != count, 1000, 2000);
     }
     
     public static void waitForItem(final int id, final int count){
-    	waitFor(Inventory.getCount(id) > count, 500, 1000);
+    	waitFor(Inventory.getCount(id) != count, 1000, 2000);
     }
     
     public static void waitForItem(String id, int count) {
-    	waitFor(Inventory.getCount(id) > count, 500, 1000);
+    	waitFor(Inventory.getCount(id) != count, 1000, 2000);
 	}
     
     public static void waitForItem(String[] id, int count) {
-    	waitFor(Inventory.getCount(id) > count, 500, 1000);
+    	waitFor(Inventory.getCount(id) != count, 1000, 2000);
 	}
     
     public static void waitForEating(final int count){
-    	waitFor(count > Inventory.find(Avies.foodIDs).length, 500, 1000);
+    	waitFor(count != Inventory.find(Avies.foodIDs).length, 1000, 2000);
     }
     
     public static void waitForTab(TABS t){

@@ -47,6 +47,8 @@ public class Tiles {
 	mithDragSpawn12 = { new RSTile(1776, 5348, 1), new RSTile(1784, 5338, 1) },
 
 	lumbyArea2 = { new RSTile(3190, 3240, 0), new RSTile(3255, 3187, 0) },
+	
+	varrockAreaTiles = { new RSTile(3176, 3448, 0), new RSTile(3255, 3386, 0) },
 
 	toWhirlpoolA2 = { new RSTile(2505, 3575, 0), new RSTile(2526, 3510, 0) };
 
@@ -95,6 +97,8 @@ public class Tiles {
 	toWhirlpoolA = new RSArea(new RSTile(2505, 3575, 0), new RSTile(
 					2526, 3510, 0)),
 
+	varrockArea = new RSArea(varrockAreaTiles[0], varrockAreaTiles[1]),
+					
 	chestA = new RSArea(new RSTile(3219, 9624, 0), new RSTile(3208,
 					9615, 0));
 }

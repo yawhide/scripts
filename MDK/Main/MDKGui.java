@@ -214,7 +214,7 @@ public class MDKGui extends javax.swing.JPanel {
 		String bolt = jComboBox2.getSelectedItem().toString();
 		switch (bolt) {
 		case "Broad Bolts":
-			boltsUsing = new int[] { Constants.BRAOD_BOLT };
+			boltsUsing = new int[] { Constants.BROAD_BOLT };
 			break;
 		case "Adamant Bolts":
 			boltsUsing = new int[] { Constants.ADDY_BOLT };

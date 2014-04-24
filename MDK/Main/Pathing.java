@@ -20,6 +20,7 @@ import org.tribot.api2007.Skills.SKILLS;
 import org.tribot.api2007.types.RSObject;
 
 import scripts.MDK.Data.Tiles;
+import scripts.MDK.Utilities.Utils;
 
 public class Pathing {
 	public void checkStatus(){
@@ -222,23 +223,22 @@ public class Pathing {
 	
 	public void gotoChest(){
 		Walking.walkPath(Tiles.toChest);
-			waitIsMovin();
+		Utils.waitIsMovin();
 	}
 	
 	public void gotoAltar(){
 		Walking.walkPath(Tiles.toAltar);
-			waitIsMovin();
+		Utils.waitIsMovin();
 	}
 	
 	public void gotoWhirlpool(){
 		Walking.walkPath(Tiles.toWhirlpool);
-			waitIsMovin();
+		Utils.waitIsMovin();
 	}
 	
 	public void gotoMith(){
-		
 		Walking.walkPath(Tiles.toMith);
-		waitIsMovin();
+		Utils.waitIsMovin();
 	}
 	
 	public void useWhirpool(){

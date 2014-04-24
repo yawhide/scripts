@@ -63,11 +63,10 @@ import scripts.easyslayer.Timer;
 public class MithDK extends Script implements MessageListening07, Painting, Ending{
 
 	static boolean useSpecialBolts = true;
-	static boolean pottedAntiFire = true;
-	static boolean bankStatus = true;
+	public static boolean pottedAntiFire = true;
+	public static boolean bankStatus = true;
 	public static boolean mainLoopStatus = true;
-	static long antiFireT;
-	
+	public static long antiFireT;
 	String preMsg = "", prePreMsg = "";
 	
 	@Override

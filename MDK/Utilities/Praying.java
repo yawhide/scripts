@@ -1,5 +1,8 @@
 package scripts.MDK.Utilities;
 
+import org.tribot.api.Clicking;
+import org.tribot.api.General;
+import org.tribot.api2007.Equipment;
 import org.tribot.api2007.GameTab;
 import org.tribot.api2007.Inventory;
 import org.tribot.api2007.Player;
@@ -11,86 +14,80 @@ import org.tribot.api2007.Skills.SKILLS;
 import org.tribot.api2007.types.RSItem;
 import org.tribot.api2007.types.RSNPC;
 
-import scripts.easyslayer.Timer;
+import scripts.MDK.Data.Constants;
+import scripts.MDK.Main.MDKGui;
+import scripts.MDK.Main.MithDK;
 
 public class Praying {
-	public void prayerflick(RSNPC drag) {
+	
+	public void prayflick(RSNPC drag) {
 
-		openPrayers();
-		
-		while (drag != null && drag.isInteractingWithMe() && getHp() > 50 &&
-				Skills.getCurrentLevel(SKILLS.PRAYER) > 10 && pottedAntiFire
+		while (drag != null && drag.isInteractingWithMe() && Utils.getHp() > 50 &&
+				Skills.getCurrentLevel(SKILLS.PRAYER) > 10 && MithDK.pottedAntiFire
 				&& Player.getRSPlayer().getInteractingCharacter() != null) {
-			
-			if(mithAtHalf(drag)){
-				equipDiamondBolts();
+			openPrayerBook();
+			if(Attack.mithAtHalf(drag) && Equipment.isEquipped(MDKGui.boltsUsing)){
+				Utils.equipBolts(MDKGui.boltsUsing);
 			}
 			
 			Timer t = new Timer(1100L);
 			do {
 				if (Player.getAnimation() != 4230) {
-					sleep(250, 300);
+					General.sleep(250, 300);
 					Prayer.enable(PRAYERS.EAGLE_EYE);
-					//Options.setQuickPrayersOn(true);
-				} else if (Prayer.isPrayerEnabled(PRAYERS.EAGLE_EYE)){//.isQuickPrayerEnabled(PRAYERS.EAGLE_EYE)) {
-					//Options.setQuickPrayersOn(false);
+				} else if (Prayer.isPrayerEnabled(PRAYERS.EAGLE_EYE)){
 					Prayer.disable(PRAYERS.EAGLE_EYE);
-					sleep(350, 400);
+					General.sleep(350, 400);
 				} else {
-					sleep(400, 450);
+					General.sleep(400, 450);
 				}
 			} while (t.getRemaining() > 0);
 		}
 		
-		turnOffPrayerEagle();
+		turnOffPrayer(PRAYERS.EAGLE_EYE);
 	}
 	
-	public void turnOffPrayerEagle(){
-		if (Prayer.isPrayerEnabled(PRAYERS.EAGLE_EYE)){//.isQuickPrayerEnabled(PRAYERS.EAGLE_EYE)){
-			//Options.setQuickPrayersOn(false);
-			if(!Prayer.isTabOpen()) GameTab.open(TABS.PRAYERS);
-			sleep(200,250);
-			Prayer.disable(PRAYERS.EAGLE_EYE);
-			sleep(800,1000);
-		}
+	public void activatePrayer(PRAYERS prayer){
+		openPrayerBook();
+		if(Prayer.enable(prayer))
+			Conditionals.waitFor(Prayer.isPrayerEnabled(prayer), 1000, 2000);
 	}
 	
-	public void activateProtectMage(){
-		openPrayers();
-		Prayer.enable(PRAYERS.PROTECT_FROM_MAGIC);
-		sleep(200,300);
+	public static void openPrayerBook(){
+		Utils.openTab(TABS.PRAYERS);
 	}
 	
-	public void openPrayers(){
-		if(!Prayer.isTabOpen()){
-			GameTab.open(TABS.PRAYERS);
-			sleep(200,250);
-		}
-	}
-	
-	public void activateProtectRanged(){
-		openPrayers();
-		Prayer.enable(PRAYERS.PROTECT_FROM_MISSILES);
-		sleep(200,300);
-	}
-	
-	public void reactivatePrayer(int option){
-		
-		RSItem[] pPot = Inventory.find(prayerPot);
-		gotoTab(GameTab.TABS.INVENTORY);
+	public void reactivatePrayer(PRAYERS prayer){
+		RSItem[] pPot = Inventory.find(Constants.PRAYER_POT);
+		Utils.openTab(TABS.INVENTORY);
 		if(pPot.length > 0){
-			println("Potting prayer");
-			if(pPot[0].click("Drink")){
-				sleep(1200,1250);
-				if(option == 0)
-					activateProtectMage();
-				else
-					activateProtectRanged();
+			final int prayPoints = Skills.getCurrentLevel(SKILLS.PRAYER);
+			if(Clicking.click("DrinK", pPot)){
+				Conditionals.waitFor(Skills.getCurrentLevel(SKILLS.PRAYER) > prayPoints, 1000, 2000);
+				activatePrayer(prayer);
 			}
 		}
 		else{
-			if(getHp() < 50)
-				emergTele();
+			if(Utils.getHp() < 50)
+				Utils.emergTele();
+		}
+	}
+	
+	public static void turnOffPrayer(PRAYERS prayer){
+		if (Prayer.isPrayerEnabled(prayer)){
+			openPrayerBook();			
+			if(Prayer.disable(prayer))
+				Conditionals.waitFor(!Prayer.isQuickPrayerEnabled(prayer), 1000, 2000);
+		}
+	}
+		
+	public static void disableAllPrayers(){
+		PRAYERS[] p = Prayer.getCurrentPrayers();
+		openPrayerBook();
+		for (int i = 0; i < p.length; i++) {
+			final PRAYERS currentPrayer = p[i];
+			if(Prayer.disable(currentPrayer))
+				Conditionals.waitFor(!Prayer.isPrayerEnabled(currentPrayer), 1000, 2000);
 		}
 	}
 }

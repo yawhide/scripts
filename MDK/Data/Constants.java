@@ -15,7 +15,7 @@ public class Constants {
 	ANTIFIRE_POT = { 2452, 2454, 2456, 2458 };
 	
 	public static int DIAMOND_E_BOLT = 9243, RUBY_E_BOLT = 9242, ADDY_BOLT = 9143,
-			BRAOD_BOLT = 11875;
+			BROAD_BOLT = 11875;
 
 	public static String[] GAMES_NECKLACE = { "Games necklace(8)",
 			"Games necklace(7)", "Games necklace(6)", "Games necklace(5)",

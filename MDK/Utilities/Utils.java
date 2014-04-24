@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.tribot.api.Clicking;
 import org.tribot.api.General;
 import org.tribot.api.Timing;
 import org.tribot.api.input.Mouse;
@@ -21,6 +22,8 @@ import org.tribot.api2007.GroundItems;
 import org.tribot.api2007.Interfaces;
 import org.tribot.api2007.Inventory;
 import org.tribot.api2007.Magic;
+import org.tribot.api2007.NPCChat;
+import org.tribot.api2007.Objects;
 import org.tribot.api2007.Player;
 import org.tribot.api2007.Prayer;
 import org.tribot.api2007.Projection;
@@ -30,6 +33,7 @@ import org.tribot.api2007.GameTab.TABS;
 import org.tribot.api2007.Prayer.PRAYERS;
 import org.tribot.api2007.Skills.SKILLS;
 import org.tribot.api2007.ext.Doors;
+import org.tribot.api2007.types.RSArea;
 import org.tribot.api2007.types.RSGroundItem;
 import org.tribot.api2007.types.RSInterface;
 import org.tribot.api2007.types.RSItem;
@@ -38,7 +42,9 @@ import org.tribot.api2007.types.RSObject;
 import org.tribot.api2007.types.RSTile;
 import org.tribot.util.Util;
 
+import scripts.MDK.Data.Constants;
 import scripts.MDK.Data.Tiles;
+import scripts.MDK.Main.MDKGui;
 import scripts.MDK.Main.MithDK;
 
 public class Utils {
@@ -50,12 +56,8 @@ public class Utils {
 		return Combat.getHPRatio();
 	}
 	
-	public void waitIsMovin(){
-		
-		for(int i = 0; i < 57; i++, sleep(30, 40)){
-			if (!Player.isMoving())
-				break;
-		}
+	public static void waitIsMovin(){
+		Conditionals.waitFor(!Player.isMoving(), 3000, 4000);
 	}
 	
 	public boolean openDoor(Positionable doorTile){
@@ -79,70 +81,23 @@ public class Utils {
 		return true;
 	}
 	
-	public void turnOffAllPrayers(){
-		while (Prayer.getCurrentPrayers().length > 0){
-			Prayer.disable(Prayer.getCurrentPrayers()[0]);
-			sleep(200,300);
-		}
-	}
-	
 	public void useGameNeck(){
-		gotoTab(GameTab.TABS.INVENTORY);
-		sleep(200,300);
-		
-		RSItem[] gamesNeck = Inventory.find(gamesNecklace);
+		openTab(TABS.INVENTORY);
+		RSItem[] gamesNeck = Inventory.find(Constants.GAMES_NECKLACE);
 		if (gamesNeck.length > 0){
-			
-			if (gamesNeck[0].click("Rub")){
-				sleep(3500,4750);
-				RSInterface gamebox = Interfaces.get(230, 2);
-				if (gamebox != null){
-					gamebox.click("Continue");
-					sleep(5200,5250);
-				}
+			if (Clicking.click("Rub", gamesNeck)){
+				NPCChat.selectOption("Barbarian Outpost.", true);
+				Conditionals.waitFor(inArea(Tiles.toWhirlpoolA), 4000, 5000);
 			}
 		}
 	}
 	
-	public boolean mithAtHalf(RSNPC drag){
-		if(drag != null && drag.isInteractingWithMe())
-			return drag.getHealth() <= 127 && drag.getHealth() > 0;
-		return false;
-	}
-	
-	public boolean equipDiamondBolts(){
-		RSItem[] bolt = Inventory.find(diamondEBolt);
-		
+	public static boolean equipBolts(int[] bolts){
+		RSItem[] bolt = Inventory.find(bolts);
 		if(bolt.length > 0){
-			gotoTab(GameTab.TABS.INVENTORY);
-			if(bolt[0].click("Wield")){
-				sleep(100,150);
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public boolean equipRubyBolts(){
-		RSItem[] bolt = Inventory.find(rubyEBolt);
-		
-		if(bolt.length > 0){
-			gotoTab(GameTab.TABS.INVENTORY);
-			if(bolt[0].click("Wield")){
-				sleep(100,150);
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public boolean equipAddyBolts(){
-		RSItem[] bolt = Inventory.find(addyBolt);
-		
-		if(bolt.length > 0){
-			gotoTab(GameTab.TABS.INVENTORY);
-			if(bolt[0].click("Wield")){
-				sleep(100,150);
+			Utils.openTab(TABS.INVENTORY);
+			if(Clicking.click("Wield", bolt)){
+				Conditionals.waitFor(Inventory.getCount(bolts) == 0, 1000, 2000);
 				return true;
 			}
 		}
@@ -150,13 +105,11 @@ public class Utils {
 	}
 	
 	public boolean drinkAntiFire(){
-		RSItem[] pot = Inventory.find(antifirePot);
-		gotoTab(TABS.INVENTORY);
+		RSItem[] pot = Inventory.find(Constants.ANTIFIRE_POT);
+		Utils.openTab(TABS.INVENTORY);
 		if(pot.length > 0){
-			if(pot[0].click("Drink")){
-				sleep(1200,1250);
-				pottedAntiFire = true;
-				antiFireT = System.currentTimeMillis();
+			if(Clicking.click("Drink", pot)){
+				General.sleep(1000,1200);
 				return true;
 			}
 		}
@@ -166,48 +119,47 @@ public class Utils {
 	}
 	
 	public void checkToPotAntiFire(){
-		if(!pottedAntiFire && System.currentTimeMillis() - antiFireT > 360000){
-			println("potting antifire");
-			drinkAntiFire();
+		if(!MithDK.pottedAntiFire && System.currentTimeMillis() - MithDK.antiFireT > 360000){
+			General.println("potting antifire");
+			if(drinkAntiFire()){
+				MithDK.pottedAntiFire = true;
+				MithDK.antiFireT = System.currentTimeMillis();
+			}
 		}
 	}
 	
 	public void checkToPot(){
-		RSItem[] pPot = Inventory.find(prayerPot);
-		RSItem[] dPot = Inventory.find(defencePot);
-		RSItem[] rPot = Inventory.find(rangePot);
+		RSItem[] pPot = Inventory.find(Constants.PRAYER_POT),
+				dPot = Inventory.find(Constants.DEFENSE_POT),
+				rPot = Inventory.find(Constants.RANGE_POT);
 		
 		if(Skills.getCurrentLevel(SKILLS.PRAYER) < 10){
-			println("Potting prayer");
-			
 			if(pPot.length > 0){
-				if(pPot[0].click("Drink")){
-					gotoTab(GameTab.TABS.INVENTORY);
-					sleep(1200,1250);
+				openTab(TABS.INVENTORY);
+				final int pPotCount = Inventory.getCount(Constants.PRAYER_POT);
+				if(Clicking.click("Drink", pPot)){
+					Conditionals.waitForItem(Constants.PRAYER_POT, pPotCount);
 				}
 			}
-			else{
-				if(getHp() < 30)
+			else if(getHp() < 40){
 					emergTele();
 			}
 		}
 		if(Skills.getCurrentLevel(SKILLS.RANGED) <= Skills.getActualLevel(SKILLS.RANGED) + 4){
-			println("Potting range");
-			//gotoTab(GameTab.TABS.INVENTORY);
 			if(rPot.length > 0){
-				gotoTab(GameTab.TABS.INVENTORY);
-				if(rPot[0].click("Drink")){
-					sleep(1200,1250);
+				openTab(TABS.INVENTORY);
+				final int rPotCount = Inventory.getCount(Constants.RANGE_POT);
+				if(Clicking.click("Drink", rPot)){
+					Conditionals.waitForItem(Constants.RANGE_POT, rPotCount);
 				}
 			}
 		}
 		if(Skills.getCurrentLevel(SKILLS.DEFENCE) <= Skills.getActualLevel(SKILLS.DEFENCE) + 4){
-			println("Potting defence");
-			//gotoTab(GameTab.TABS.INVENTORY);
 			if(dPot.length > 0){
-				gotoTab(GameTab.TABS.INVENTORY);
-				if(dPot[0].click("Drink")){
-					sleep(1200,1250);
+				openTab(TABS.INVENTORY);
+				final int dPotCount = Inventory.getCount(Constants.DEFENSE_POT);
+				if(Clicking.click("Drink", dPot)){
+					Conditionals.waitForItem(Constants.DEFENSE_POT, dPotCount);
 				}
 			}
 		}
@@ -223,19 +175,12 @@ public class Utils {
 		}
 	}
 	
-	private void waitForInv(int lootID) {
-		int k = 0;
-		while (k < 100	&& Player.isMoving()) {
-			sleep(50);
-			k++;
-		}
-	}
-		
-	public void eatFood(){
-		RSItem[] food = Inventory.find(foodIDs);
+	public static void eatFood(){
+		RSItem[] food = Inventory.find(MDKGui.foodIDs);
 		if(food.length > 0){
-			if(food[0].click("Eat"))
-				sleep(200,250);
+			final int foodCount = Inventory.getCount(MDKGui.foodIDs);
+			if(Clicking.click("Eat", food))
+				Conditionals.waitForItem(MDKGui.foodIDs, foodCount);
 		}
 		else{
 			emergTele();
@@ -364,7 +309,7 @@ public class Utils {
 		return true;
 	}
 	
-	private boolean clickNPC(RSNPC npc, String option) {
+	private static boolean clickNPC(RSNPC npc, String option) {
 		RSTile loc = null;
 		if (npc != null && npc.isOnScreen()) {
 			loc = new RSTile(npc.getPosition().getX(), npc.getPosition().getY() -1);
@@ -382,12 +327,10 @@ public class Utils {
 		return false;
 	}
 	
-	public void moveCamera(RSNPC n){
-		if(!n.isOnScreen()){
-			Camera.turnToTile(n.getAnimablePosition());
-			sleep(100,120);
+	public void moveCamera(RSNPC npc){
+		if(!npc.isOnScreen()){
+			Camera.turnToTile(npc.getAnimablePosition());
 			Camera.setCameraAngle(General.random(45, 55));
-			sleep(100,120);
 		}
 	}
 	
@@ -396,23 +339,17 @@ public class Utils {
 		double x = p.getX();
 		double y = p.getY();
 		
-		Mouse.setSpeed(General.random(100, 110));
 		if(x > 40 && x < 485 && y > 40 && y < 315){
-			Walking.walkScreenPath(new RSTile[] {Tiles.safeSpotSpawn1P.getPosition()});
-			waitIsMovin();
+			Walking.walkScreenPath(Walking.generateStraightPath(Tiles.safeSpotSpawn1P.getPosition()));
+			Conditionals.waitFor(inArea(Tiles.safeSpot), 4000, 5000);
 		}
 		else if (Walking.clickTileMM(Tiles.safeSpotSpawn1P, 1)) {
-
-			Timing.waitCondition(new Condition() {
-				;
-				@Override
-				public boolean active() {
-					return inArea(Tiles.safeSpot);
-				}
-			}, General.random(3000, 3500));
-			sleep(1000, 1200);
+			Conditionals.waitFor(inArea(Tiles.safeSpot), 4000, 5000);
 		}
-		Mouse.setSpeed(General.random(120, 140));
+	}
+	
+	public static boolean isAttacking() {
+		return Combat.getAttackingEntities().length > 0;
 	}
 	
 	public boolean inArea(RSTile nw, RSTile se) {
@@ -434,11 +371,7 @@ public class Utils {
 		return false;
 	}
 	
-	public static boolean isAttacking() {
-		return Combat.getAttackingEntities().length > 0;
-	}
-	
-	public boolean inArea(RSTile[] t) {
+	public static boolean inArea(RSTile[] t) {
 		RSTile pos = pos();
 		int posX = pos.getX();
 		int posY = pos.getY();
@@ -458,55 +391,46 @@ public class Utils {
 		return false;
 	}
 	
-	public void emergTele(){
-		RSItem[] LUM_TAB = Inventory.find(lumTab);
-		if(LUM_TAB.length > 0){
-			gotoTab(GameTab.TABS.INVENTORY);
-			if(LUM_TAB[0].click("Break")){
-				sleep(3000,3500);
-				bankStatus = true;
+	public static boolean inArea(RSArea a) {
+		return a.contains(pos());
+	}
+	
+	public static void emergTele(){
+		RSItem[] houseTab = Inventory.find("Teleport to house");
+		if(houseTab.length > 0){
+			openTab(TABS.INVENTORY);
+			if(Clicking.click("Break", houseTab)){
+				Conditionals.waitFor(isInsideOurHouse(), 4000, 5000);
+				MithDK.bankStatus = true;
 			}
-		}
-		else{
-			gotoTab(GameTab.TABS.MAGIC);
-			Magic.selectSpell("Lumbridge Home Teleport");
-			sleep(10000,12000);
-			bankStatus = true;
 		}
 	}
 	
-	public void gotoTab(GameTab.TABS tab){
-		if(GameTab.getOpen() != tab){
-			tab.open();
-			sleep(200,300);
-		}
+	public static boolean isInsideOurHouse(){
+		return !inArea(Tiles.varrockArea)
+				&& Objects.findNearest(50, "Portal").length > 0;
 	}
-	
-	public void timeToTab(RSNPC drag){
-		RSGroundItem[] Nests = GroundItems.findNearest(loot);
-		RSGroundItem[] Nests2 = GroundItems.findNearest(clue);
-		RSGroundItem[] Nests3 = GroundItems.findNearest(badLoot);
-		RSItem[] food = Inventory.find(foodIDs);
-		RSItem[] dbone2 = Inventory.find(536);
-		RSItem[] mbar2 = Inventory.find(2359);
-		boolean tele = false;
 		
-		//if(drag == null){
-			if(Inventory.isFull()){
-				if (Nests.length == 0 && Nests2.length == 0 && Nests3.length == 0
-					&& (food.length == 0 || (getHp() < 60 && food.length == 1)))
-					tele = true;
-			}
-			else{
-				if (Nests.length == 0 && Nests2.length == 0 && Nests3.length == 0
-						&& (food.length == 0 || (getHp() < 60 && food.length == 1))
-						&& dbone2.length == 0 && mbar2.length == 0)
-						tele = true;
-			}
-		//}
+	public static boolean timeToTab(RSNPC drag) {
+		RSGroundItem[] mainLoot = GroundItems.findNearest(Looting.LOOT_IDS),
+				clueLoot = GroundItems.findNearest(Looting.CLUE_NAME),
+				badLoot = GroundItems.findNearest(Looting.BAD_LOOT);
+		RSItem[] food = Inventory.find(MDKGui.foodIDs),
+				dBone = Inventory.find(536),
+				mithBar = Inventory.find(2359);
+
+		if (Inventory.isFull()) {
+			if (mainLoot.length == 0 && clueLoot.length == 0 && badLoot.length == 0
+					&& (food.length == 0 || (getHp() < 70 && food.length == 1)))
+				return true;
+		} else {
+			if (mainLoot.length == 0 && clueLoot.length == 0 && badLoot.length == 0
+					&& (food.length == 0 || (getHp() < 70 && food.length == 1))
+					&& dBone.length == 0 && mithBar.length == 0)
+				return true;
+		}
+		return false;
 		
-		if (tele)
-			emergTele();
 	}
 	
 	public static void checkStats(){
@@ -522,5 +446,10 @@ public class Utils {
 			General.println("You do not have 50 con for varrock portal focus, you must use varrock teletabs");
 			MithDK.mainLoopStatus = false;
 		}
+	}
+	
+	public static void openTab(TABS t) {
+		GameTab.open(t);
+		Conditionals.waitForTab(t);
 	}
 }
