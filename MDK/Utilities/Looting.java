@@ -4,14 +4,17 @@ import java.util.HashMap;
 
 import org.tribot.api.Clicking;
 import org.tribot.api.General;
+import org.tribot.api.types.generic.Filter;
 import org.tribot.api2007.Camera;
 import org.tribot.api2007.Combat;
 import org.tribot.api2007.GameTab.TABS;
 import org.tribot.api2007.GroundItems;
 import org.tribot.api2007.Inventory;
+import org.tribot.api2007.PathFinding;
 import org.tribot.api2007.Walking;
 import org.tribot.api2007.types.RSGroundItem;
 import org.tribot.api2007.types.RSItem;
+import org.tribot.api2007.types.RSItemDefinition;
 
 import scripts.MDK.Data.Constants;
 import scripts.MDK.Data.Tiles;
@@ -25,7 +28,7 @@ public class Looting {
 			1149, 1249, 2366, 1319, 1201, 985, 987, 1373, 1163, 1147, 566, 565,
 			561, 1601, 1617, 2363, 1432, 1247, 868, 9144 },
 
-	BAD_LOOT = { 443, 1462, 892, 811, 817, },
+	BAD_LOOT = { 443, 892, 811, 817, },
 
 	CONDITIONAL_LOOT = { 385, 11497, 11499, 11465, 11467, 11465, 11467 },
 
@@ -43,7 +46,7 @@ public class Looting {
 
 	JUNK = { 886, 1539, 9003, 229, 1623, 1355, 440, 7767, 117, 6963, 554, 556,
 			829, 1971, 687, 464, 1973, 1917, 808, 1454, 6180, 6965, 1969, 6183,
-			6181, 6962, 865, 41 };
+			6181, 6962, 865, 41, 1462 };
 
 	public static String[] LOOT_NAMES = { "Dragon full helm",
 			"Draconic visage", "Diamond bolts (e)", "Ruby bolts (e)",
@@ -55,7 +58,7 @@ public class Looting {
 			"Diamond", "Uncut diamond", "Runite bar", "Rune mace",
 			"Rune spear", "Rune knife", "Runite bolts" },
 
-	BAD_LOOT_NAMES = { "Silver ore", "Nature talisman", "Rune arrow",
+	BAD_LOOT_NAMES = { "Silver ore", "Rune arrow",
 			"Rune dart", "Rune dart(p)" },
 
 	CONDITIONAL_LOOT_NAMES = { "Shark", "Super defence mix(2)",
@@ -72,6 +75,8 @@ public class Looting {
 			CONDITIONAL_LOOT_MAP = new HashMap<Integer, String>(
 					CONDITIONAL_LOOT.length),
 			CLUE_MAP = new HashMap<Integer, String>(CLUE.length);
+	
+	public static String lootStatus = "";
 
 	public static void putMap() {
 		for (int i = 0; i < LOOT_IDS.length; i++) {
@@ -90,6 +95,7 @@ public class Looting {
 	}
 
 	public static boolean checkRare() {
+		lootStatus = "Checking for rares";
 		RSGroundItem[] priority = GroundItems.findNearest(PRIORITY_LOOT_NAMES);
 		if (priority.length > 0) {
 			if (!priority[0].isOnScreen()) {
@@ -109,40 +115,49 @@ public class Looting {
 		return false;
 	}
 
-	public boolean checkLootInArea(RSGroundItem g) {
-		if (Tiles.mithDragSpawn1.contains(g.getPosition()))
+	public static boolean checkLootInArea(RSGroundItem g) {
+		if (Tiles.mithDragSpawn1.contains(g.getPosition()) && g.getPosition().getPlane() == Utils.pos().getPlane())
 			return true;
+		return false;
+	}
+	
+	public static boolean checkLootInArea(RSGroundItem[] g) {
+		for(int i = 0; i < g.length; i++){
+			if(checkLootInArea(g[i]))
+				return true;
+		}
 		return false;
 	}
 
 	public static boolean lootExists(){
-		int regLoot =  GroundItems.findNearest(LOOT_NAMES).length,
-				badLoot = GroundItems.findNearest(BAD_LOOT).length,
-				clueLoot = GroundItems.findNearest(CLUE_NAME).length,
-				condLoot = GroundItems.findNearest(CONDITIONAL_LOOT).length,
-				dboneLoot = GroundItems.findNearest(536).length,
-				mithBarLoot = GroundItems.findNearest(2359).length;
-		
-//		if (Inventory.isFull()) {
-//			if (regLoot > 0 || badLoot > 0 || clueLoot > 0 || condLoot > 0
-//					|| dboneLoot > 0)
-//				return true;
-//		}
-		return (regLoot > 0 || badLoot > 0 || clueLoot > 0 || condLoot > 0
-				|| dboneLoot > 0 || (Inventory.isFull() ? false : mithBarLoot > 0));
+		RSGroundItem[] regLoot =  GroundItems.findNearest(LOOT_NAMES),
+				badLoot = GroundItems.findNearest(BAD_LOOT),
+				clueLoot = GroundItems.findNearest(CLUE_NAME),
+				condLoot = GroundItems.findNearest(CONDITIONAL_LOOT),
+				dboneLoot = GroundItems.findNearest(536),
+				mithBarLoot = GroundItems.findNearest(2359);
+		return ((regLoot.length > 0 && checkLootInArea(regLoot)) || 
+				(badLoot.length > 0 && checkLootInArea(badLoot)) || 
+				(clueLoot.length > 0 && checkLootInArea(clueLoot)) || 
+				(condLoot.length > 0 && checkLootInArea(condLoot)) || 
+				(dboneLoot.length > 0 && checkLootInArea(dboneLoot)) || 
+				(Inventory.isFull() ? false : (mithBarLoot.length > 0 && checkLootInArea(mithBarLoot))));
 	}
 
 	public static boolean makeRoomForDrop() {
-		RSItem[] food = Inventory.find(MDKGui.foodIDs);
-		RSItem[] dbone = Inventory.find("Dragon bones");
-		RSItem[] mbar = Inventory.find("Mithril bar");
+		lootStatus = "making room for drops...";
+		RSItem[] food = Inventory.find(MDKGui.foodID),
+				dbone = Inventory.find("Dragon bones"),
+				mbar = Inventory.find("Mithril bar");
 		int regLoot =  GroundItems.findNearest(LOOT_NAMES).length,
 				badLoot = GroundItems.findNearest(BAD_LOOT).length,
 				clueLoot = GroundItems.findNearest(CLUE_NAME).length;
+		
 		Utils.openTab(TABS.INVENTORY);
-		if ((Combat.getMaxHP() - Combat.getHP()) > 15) {
+		if ((Combat.getMaxHP() - Combat.getHP()) > (MDKGui.foodID == 385 ? 20 : 16)) {
 			if (food.length > 0) {
-				final int foodCount = food.length;
+				final int foodCount = Inventory.getCount(MDKGui.foodID);
+				General.println("food count: " + foodCount);
 				if (Clicking.click("Eat", food)) {
 					Conditionals.waitForEating(foodCount);
 					return true;
@@ -151,15 +166,18 @@ public class Looting {
 		} else if (Inventory.isFull()) {
 			if (dbone.length > 0) {
 				final int dboneCount = Inventory.getCount("Dragon bones");
+				General.println("dbone count: " + dboneCount);
 				if (Clicking.click("Bury", dbone)) {
 					Conditionals.waitForItem("Dragon bones", dboneCount);
 					return true;
 				}
 			}
 			else if (regLoot > 0 || badLoot > 0 || clueLoot > 0){
-				food = Inventory.find(MDKGui.foodIDs);
+				food = Inventory.find(MDKGui.foodID);
 				final int mithBarsCount = Inventory.getCount("Mithril bar"),
-						foodCount = food.length;
+						foodCount = Inventory.getCount(MDKGui.foodID);
+				General.println("mbar count: " + mithBarsCount);
+				General.println("food count: " + foodCount);
 				if(mithBarsCount > 0){
 					Inventory.drop(mbar[General.random(0, mithBarsCount-1)]);
 					Conditionals.waitForItem("Mithril bar", mithBarsCount);
@@ -197,40 +215,47 @@ public class Looting {
 
 	// TODO lootBolts
 	public static void lootBolts() {
-		RSItem[] invRubyBolts = Inventory.find(Constants.RUBY_E_BOLT);
-		RSGroundItem[] groundRubyBolts = GroundItems.findNearest(Constants.RUBY_E_BOLT);
-		//RSGroundItem[] groundDiaBolts = GroundItems.findNearest(diamondEBolt);
+		lootStatus = "looting bolts";
+		//RSItem[] invRubyBolts = Inventory.find(Constants.RUBY_E_BOLT);
+		RSGroundItem[] groundRubyBolts = GroundItems.findNearest(lootFilterRubyBolts);
 
-		RSItem[] invMainBolts = Inventory.find(MDKGui.boltsUsing);
-		RSGroundItem[] groundMainBolts = GroundItems.findNearest(MDKGui.boltsUsing);
+		//RSItem[] invMainBolts = Inventory.find(MDKGui.boltsUsing);
+		RSGroundItem[] groundMainBolts = GroundItems.findNearest(lootFilterMainBolts);
 
 		if (MDKGui.useRubyBolts) {
-			if (groundRubyBolts.length > 0) {
+			for(int i = 0; i < groundRubyBolts.length; i++){
+				groundRubyBolts = GroundItems.findNearest(lootFilterRubyBolts);
 				if (!groundRubyBolts[0].isOnScreen()) {
-					Walking.blindWalkTo(groundRubyBolts[0].getPosition());
+					Walking.walkTo(groundRubyBolts[0].getPosition());
 					Conditionals.waitFor(Utils.pos() == groundRubyBolts[0].getPosition(), 3000, 4000);
 				}
 				final int rubyCount = Inventory.getCount(Constants.RUBY_E_BOLT);
-				if (Clicking.click("Take Ruby bolts (e)", groundRubyBolts[0])) {
-					Conditionals.waitForItem(groundRubyBolts[0].getID(), rubyCount);
-					Utils.openTab(TABS.INVENTORY);
-					if(Clicking.click("Wield", Inventory.find(Constants.RUBY_E_BOLT))){
-						Conditionals.waitFor(Inventory.getCount(Constants.RUBY_E_BOLT) == 0, 1000, 1200);
-					}
+				if (Clicking.click("Take Ruby bolts (e)", groundRubyBolts)) {
+					Conditionals.waitForItem(Constants.RUBY_E_BOLT, rubyCount);
 				}
 			}
-		} 
-		
-		else if (groundMainBolts.length > 0) {
-			if (!groundMainBolts[0].isOnScreen()) {
-				Walking.blindWalkTo(groundMainBolts[0].getPosition());
-				Conditionals.waitFor(Utils.pos() == groundMainBolts[0].getPosition(), 3000, 4000);
+			if(Inventory.getCount(Constants.RUBY_E_BOLT) > 0){
+				Utils.openTab(TABS.INVENTORY);
+				if(Clicking.click("Wield", Inventory.find(Constants.RUBY_E_BOLT))){
+					Conditionals.waitFor(Inventory.getCount(Constants.RUBY_E_BOLT) == 0, 1000, 1200);
+				}
 			}
-			final int mainBoltsCount = Inventory.getCount(MDKGui.boltsUsing);
-			if (Clicking.click("Take "+
-			(MDKGui.boltsUsing[0] == Constants.ADDY_BOLT ? "Adamant bolts" : "Broad bolts")
-					+" bolts", groundMainBolts[0])) {
-				Conditionals.waitForItem(groundMainBolts[0].getID(), mainBoltsCount);
+		}
+		if (groundMainBolts.length > 0) {
+			for(int i = 0; i < groundMainBolts.length; i++){
+				groundMainBolts = GroundItems.findNearest(lootFilterMainBolts);
+				if (!groundMainBolts[0].isOnScreen()) {
+					Walking.walkTo(groundMainBolts[0].getPosition());
+					Conditionals.waitFor(Utils.pos() == groundMainBolts[0].getPosition(), 3000, 4000);
+				}
+				final int mainBoltsCount = Inventory.getCount(MDKGui.boltsUsing);
+				if (Clicking.click("Take "+
+				(MDKGui.boltsUsing == Constants.ADDY_BOLT ? "Adamant bolts" : "Broad bolts")
+						, groundMainBolts)) {
+					Conditionals.waitForItem(MDKGui.boltsUsing, mainBoltsCount);
+				}
+			}
+			if(!MDKGui.useRubyBolts && Inventory.getCount(MDKGui.boltsUsing) > 0){
 				Utils.openTab(TABS.INVENTORY);
 				if(Clicking.click("Wield", Inventory.find(MDKGui.boltsUsing))){
 					Conditionals.waitFor(Inventory.getCount(MDKGui.boltsUsing) == 0, 1000, 1200);
@@ -238,15 +263,37 @@ public class Looting {
 			}
 		}
 	}
+	
+	private static Filter<RSGroundItem> lootFilterRubyBolts = new Filter<RSGroundItem>() {
+		@Override
+		public boolean accept(RSGroundItem arg0) {
+			RSItemDefinition def = arg0.getDefinition();
+			String name = def != null ? def.getName() : null;
+			return name != null && name.equals("Ruby bolts (e)")
+					&& PathFinding.canReach(arg0.getPosition(), true)
+					&& checkLootInArea(arg0);
+		}
+	};
+	
+	private static Filter<RSGroundItem> lootFilterMainBolts = new Filter<RSGroundItem>() {
+		@Override
+		public boolean accept(RSGroundItem arg0) {
+			RSItemDefinition def = arg0.getDefinition();
+			String name = def != null ? def.getName() : null;
+			return name != null && (name.equals("Broad bolts") || name.equals("Adamant bolts"))
+					&& PathFinding.canReach(arg0.getPosition(), true)
+					&& checkLootInArea(arg0);
+		}
+	};
 
 	public static int dropJunk() {
+		lootStatus = "dropping junk";
 		Utils.openTab(TABS.INVENTORY);
-		//final int junkCount = Inventory.getCount(JUNK);
 		return Inventory.drop(JUNK);
-			//Conditionals.waitForItem(JUNK, junkCount);
 	}
 	
 	public static void lootValuables(){
+		lootStatus = "looting drops...";
 		RSGroundItem[] regLoot = GroundItems.findNearest(LOOT_NAMES), 
 				badLoot = GroundItems.findNearest(BAD_LOOT), 
 				clueLoot = GroundItems.findNearest(CLUE_NAME), 

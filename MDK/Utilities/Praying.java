@@ -1,17 +1,12 @@
 package scripts.MDK.Utilities;
 
-import org.tribot.api.Clicking;
 import org.tribot.api.General;
-import org.tribot.api2007.Equipment;
-import org.tribot.api2007.GameTab;
-import org.tribot.api2007.Inventory;
 import org.tribot.api2007.Player;
 import org.tribot.api2007.Prayer;
 import org.tribot.api2007.Skills;
 import org.tribot.api2007.GameTab.TABS;
 import org.tribot.api2007.Prayer.PRAYERS;
 import org.tribot.api2007.Skills.SKILLS;
-import org.tribot.api2007.types.RSItem;
 import org.tribot.api2007.types.RSNPC;
 
 import scripts.MDK.Data.Constants;
@@ -20,16 +15,20 @@ import scripts.MDK.Main.MithDK;
 
 public class Praying {
 	
-	public void prayflick(RSNPC drag) {
+	public static void prayFlick(RSNPC drag) {
 
 		while (drag != null && drag.isInteractingWithMe() && Utils.getHp() > 50 &&
 				Skills.getCurrentLevel(SKILLS.PRAYER) > 10 && MithDK.pottedAntiFire
 				&& Player.getRSPlayer().getInteractingCharacter() != null) {
-			openPrayerBook();
-			if(Attack.mithAtHalf(drag) && Equipment.isEquipped(MDKGui.boltsUsing)){
-				Utils.equipBolts(MDKGui.boltsUsing);
-			}
 			
+			if (MDKGui.useRubyBolts) {
+				if (Attack.mithAtHalf(drag)) {
+					Utils.equipBolts(MDKGui.boltsUsing);
+				} else {
+					Utils.equipBolts(Constants.RUBY_E_BOLT);
+				}
+			}
+			openPrayerBook();
 			Timer t = new Timer(1100L);
 			do {
 				if (Player.getAnimation() != 4230) {
@@ -47,7 +46,7 @@ public class Praying {
 		turnOffPrayer(PRAYERS.EAGLE_EYE);
 	}
 	
-	public void activatePrayer(PRAYERS prayer){
+	public static void activatePrayer(PRAYERS prayer){
 		openPrayerBook();
 		if(Prayer.enable(prayer))
 			Conditionals.waitFor(Prayer.isPrayerEnabled(prayer), 1000, 2000);
@@ -57,20 +56,10 @@ public class Praying {
 		Utils.openTab(TABS.PRAYERS);
 	}
 	
-	public void reactivatePrayer(PRAYERS prayer){
-		RSItem[] pPot = Inventory.find(Constants.PRAYER_POT);
+	public static void reactivatePrayer(PRAYERS prayer){
 		Utils.openTab(TABS.INVENTORY);
-		if(pPot.length > 0){
-			final int prayPoints = Skills.getCurrentLevel(SKILLS.PRAYER);
-			if(Clicking.click("DrinK", pPot)){
-				Conditionals.waitFor(Skills.getCurrentLevel(SKILLS.PRAYER) > prayPoints, 1000, 2000);
-				activatePrayer(prayer);
-			}
-		}
-		else{
-			if(Utils.getHp() < 50)
-				Utils.emergTele();
-		}
+		Utils.potUp("prayer");
+		activatePrayer(prayer);
 	}
 	
 	public static void turnOffPrayer(PRAYERS prayer){

@@ -1,7 +1,6 @@
 package scripts.Avies.Main;
 
 import org.tribot.api.Clicking;
-import org.tribot.api.General;
 import org.tribot.api2007.Objects;
 import org.tribot.api2007.Walking;
 import org.tribot.api2007.WebWalking;
@@ -71,7 +70,6 @@ public class Pathing {
 			
 		} else if (YawsGeneral.inArea(Tiles.VARROCK_AREA)) {
 			checkEquipment();
-			
 		}
 		YawsGeneral.waitIsMovin();
 		return false;

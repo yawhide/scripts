@@ -6,14 +6,11 @@ import java.awt.Polygon;
 import org.tribot.api.Clicking;
 import org.tribot.api.General;
 import org.tribot.api.Timing;
-import org.tribot.api.input.Mouse;
 import org.tribot.api.types.generic.Condition;
 import org.tribot.api.util.ABCUtil;
 import org.tribot.api2007.Camera;
 import org.tribot.api2007.ChooseOption;
 import org.tribot.api2007.Combat;
-import org.tribot.api2007.Inventory;
-import org.tribot.api2007.NPCChat;
 import org.tribot.api2007.Objects;
 import org.tribot.api2007.Walking;
 import org.tribot.api2007.types.RSModel;
@@ -21,7 +18,6 @@ import org.tribot.api2007.types.RSObject;
 import org.tribot.api2007.types.RSTile;
 import org.tribot.api2007.util.ThreadSettings;
 import org.tribot.script.Script;
-import org.tribot.script.ScriptManifest;
 import org.tribot.script.interfaces.Painting;
 
 

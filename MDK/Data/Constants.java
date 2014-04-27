@@ -17,10 +17,10 @@ public class Constants {
 	public static int DIAMOND_E_BOLT = 9243, RUBY_E_BOLT = 9242, ADDY_BOLT = 9143,
 			BROAD_BOLT = 11875;
 
-	public static String[] GAMES_NECKLACE = { "Games necklace(8)",
-			"Games necklace(7)", "Games necklace(6)", "Games necklace(5)",
-			"Games necklace(4)", "Games necklace(3)", "Games necklace(2)",
-			"Games necklace(1)" };
+	public static String[] GAMES_NECKLACE = { "Games necklace(1)",
+			"Games necklace(2)", "Games necklace(3)", "Games necklace(4)",
+			"Games necklace(5)", "Games necklace(6)", "Games necklace(7)",
+			"Games necklace(8)" };
 	public static String RING_OF_LIFE = "Ring of life",
 			ANTI_DRAGON_SHIELD = "Anti-dragon shield";
 

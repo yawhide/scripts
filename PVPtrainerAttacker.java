@@ -116,7 +116,7 @@ public class PVPtrainerAttacker extends Script implements Painting {
 		
 		while (scriptStatus) {
 			
-			if (getHp() <= currHp){
+			if (getHp() <= currHp && !Player.getRSPlayer().getName().equals("DJadamellis")){
 				if(ChooseOption.isOpen()){
 					ChooseOption.close();
 					sleep(200,300);

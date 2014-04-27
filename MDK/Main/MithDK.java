@@ -3,71 +3,42 @@ package scripts.MDK.Main;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Locale;
 
-import org.tribot.api.DynamicClicking;
 import org.tribot.api.General;
 import org.tribot.api.Timing;
 import org.tribot.api.input.Mouse;
-import org.tribot.api.interfaces.Positionable;
-import org.tribot.api.types.generic.Condition;
-import org.tribot.api2007.Banking;
-import org.tribot.api2007.Camera;
-import org.tribot.api2007.ChooseOption;
-import org.tribot.api2007.Combat;
 import org.tribot.api2007.Equipment;
 import org.tribot.api2007.Equipment.SLOTS;
-import org.tribot.api2007.Game;
-import org.tribot.api2007.GameTab;
 import org.tribot.api2007.GroundItems;
-import org.tribot.api2007.Interfaces;
-import org.tribot.api2007.Magic;
 import org.tribot.api2007.NPCs;
-import org.tribot.api2007.Prayer;
-import org.tribot.api2007.Prayer.PRAYERS;
-import org.tribot.api2007.Projection;
-import org.tribot.api2007.GameTab.TABS;
-import org.tribot.api2007.Inventory;
-import org.tribot.api2007.Objects;
-import org.tribot.api2007.Player;
 import org.tribot.api2007.Skills;
 import org.tribot.api2007.Skills.SKILLS;
-import org.tribot.api2007.Walking;
-import org.tribot.api2007.WebWalking;
-import org.tribot.api2007.ext.Doors;
-import org.tribot.api2007.types.RSArea;
 import org.tribot.api2007.types.RSGroundItem;
-import org.tribot.api2007.types.RSInterface;
-import org.tribot.api2007.types.RSItem;
 import org.tribot.api2007.types.RSNPC;
-import org.tribot.api2007.types.RSObject;
 import org.tribot.api2007.types.RSTile;
 import org.tribot.script.Script;
 import org.tribot.script.ScriptManifest;
 import org.tribot.script.interfaces.Ending;
 import org.tribot.script.interfaces.MessageListening07;
 import org.tribot.script.interfaces.Painting;
-import org.tribot.util.Util;
 
+import scripts.MDK.Data.Constants;
+import scripts.MDK.Data.Tiles;
 import scripts.MDK.Utilities.Looting;
-import scripts.easyslayer.Timer;
+import scripts.MDK.Utilities.Utils;
 
-@ScriptManifest(authors = { "Yaw hide" }, category = "Ranged", name = "Yaw hide's MithDK", version = 1.0)
+@ScriptManifest(authors = { "Yaw hide" }, category = "Ranged", name = "Yaw hide's MithDK", version = 1.02)
 public class MithDK extends Script implements MessageListening07, Painting, Ending{
 
 	static boolean useSpecialBolts = true;
 	public static boolean pottedAntiFire = true;
-	public static boolean bankStatus = true;
+	public static boolean needToBank = true;
 	public static boolean mainLoopStatus = true;
 	public static long antiFireT;
 	String preMsg = "", prePreMsg = "";
+	double version = 1.04;
 	
 	@Override
 	public void run() {
@@ -75,7 +46,8 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 		MDKGui.onstart();
 		
 		while(mainLoopStatus){
-			
+			Mouse.setSpeed(General.random(120, 140));
+			Pathing.checkStatus();
 			sleep(50,70);
 		}
 		
@@ -90,7 +62,7 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 			Skills.getActualLevel(SKILLS.PRAYER), Skills.getActualLevel(SKILLS.HITPOINTS) };
 	String lastDrop;
 	
-	public void lastDrops(Graphics2D graph){
+	public void lastDrops(Graphics graph){
 		RSGroundItem[] g = GroundItems.findNearest(2359);
 		RSTile drop = null;
 		
@@ -101,8 +73,7 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 		for(RSGroundItem gr : GroundItems.getAt(drop)){
 			int i = gr.getID();
 			if(i != 536 && i != 2359 && 
-					i != rubyEBolt && i != diamondEBolt
-					&& i != addyBolt){
+					i != Constants.RUBY_E_BOLT && i != MDKGui.boltsUsing){
 				graph.drawString(gr.getDefinition().getName(), 5, y);
 				y+= 15;
 			}				
@@ -110,32 +81,34 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 	}
 	
 	@Override
-	public void onPaint(Graphics arg0) {
+	public void onPaint(Graphics g) {
 		// TODO onPaint
-		Graphics2D g = (Graphics2D)arg0;
 		RSNPC[] drag = NPCs.findNearest("Mithril dragon");
 		if (drag.length > 0) {
-			drawTile(drag[0].getAnimablePosition(), g, false);
-			g.drawString("Anim: " + drag[0].getAnimation(), 5, 185);
-			g.drawString("HP: " + drag[0].getHealth(), 5, 200);
+			Utils.drawTile(drag[0].getAnimablePosition(), g, false);
+			g.drawString("Loot status: " + Looting.lootStatus, 5, 170);
+			g.drawString("Mith Anim: " + drag[0].getAnimation(), 5, 185);
+			g.drawString("Mith HP: " + drag[0].getHealth(), 5, 200);
 		}
 		if(useSpecialBolts){
-			g.drawString("Bolts: "+ (Equipment.getItem(SLOTS.ARROW).getID() == rubyEBolt ? 
-				"Ruby Bolts e" : "Diamond Bolts e"), 5, 215);
+			g.drawString("Bolts: "+ (Equipment.getItem(SLOTS.ARROW).getID() == Constants.RUBY_E_BOLT ? 
+				"Ruby Bolts e" : "Main bolts"), 5, 215);
 		}
 		
-		g.drawString("Last drop: " + lastDrop, 5,  260);
-		long time = (360000 - System.currentTimeMillis() - antiFireT) / 60000;
+		g.drawString("Version " + version, 420, 470);
+		long time = (360000 - System.currentTimeMillis() + antiFireT);
 		g.drawString("AntiFire Status: " + (pottedAntiFire ? "Potted" : "Unpotted") + ", time to pot: "
-				+ (time > 0 ? time : null), 5, 275);
-				
+				+ (time > 0 ? Timing.msToString(time) : null), 5, 275);
+		g.drawString(Mouse.getSpeed() +"", 5, 260);
 		long timeRan = getRunningTime();
 		double secondsRan = (int) (timeRan/1000);
 		double hoursRan = secondsRan/3600;
 		
+		for(int i = 0; i < Tiles.safeSpot.length; i++){
+			Utils.drawTile(Tiles.safeSpot[i], g, false);
+		}
 		
-		
-		g.drawString("Gear status: " + (haveGear() ? true : false), 5, 230);
+		g.drawString("Gear status: " + (Utils.haveGear() ? true : false), 5, 230);
 		g.drawString("Time running: " + Timing.msToString(timeRan) , 5, 245);
 		
 		int x = 5, y = 337;
@@ -183,9 +156,10 @@ public class MithDK extends Script implements MessageListening07, Painting, Endi
 	public void serverMessageReceived(String arg0) {
 		// TODO serverMessageReceived
 		
-		if((!arg0.equals("Your potion protects you from the heat of the dragon's breath!") 
+		if(arg0.equals("Your antifire potion has expired.") || 
+				((!arg0.equals("Your potion protects you from the heat of the dragon's breath!") 
 				|| arg0.equals("Your dragonfire shield is already fully charged.")) 
-				&& preMsg.equals("Your shield absorbs most of the dragon fire!")){
+				&& preMsg.equals("Your shield absorbs most of the dragon fire!"))){
 			pottedAntiFire = false;
 		}
 		preMsg = arg0;

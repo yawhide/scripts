@@ -53,7 +53,7 @@ public class BlkDK extends Script implements Painting, Pausing {
 	int[] ppot = { 2434, 139, 141, 143 }; 
 	
 	private int chicken = 2138;
-	private int[] dragz = { 642, 640, 4018, 4016, 2875, 2873, 1258, 1256, 5017, 5019 };
+	private int[] dragz = { 5978, 5980 };
 	private int boltsID = 9142;
 
 	RSTile[] toShrinePath = { new RSTile(2386, 4457, 0), new RSTile(2394, 4454, 0), new RSTile(2402, 4453, 0), new RSTile(2409, 4453, 0), new RSTile(2414, 4455, 0), new RSTile(2420, 4455, 0), new RSTile(2426, 4457, 0), new RSTile(2433, 4456, 0), new RSTile(2441, 4454, 0), new RSTile(2447, 4456, 0), new RSTile(2452, 4459, 0), new RSTile(2453, 4468, 0), new RSTile(2453, 4476, 0) };

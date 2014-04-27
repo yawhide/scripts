@@ -12,20 +12,19 @@ import scripts.MDK.Utilities.Utils;
 
 public class MDKGui extends javax.swing.JPanel {
 
-	public static  int[] foodIDs, boltsUsing;
+	public static int foodID, boltsUsing, foodAmount;
 	public static boolean useRubyBolts;
-	public static  int foodAmount;
+	public static String foodUsing;
 	
 	public static  boolean waitForGuiToClose = true;
-	public static  boolean devmode = false;
+	public static  boolean devmode = true;
 	
 	public static void onstart() {
 		General.useAntiBanCompliance(true);
 		Walking.setWalkingTimeout(3000L);
 		Walking.setControlClick(true);
 		
-		Looting.putMap();		
-//		Mouse.setSpeed(General.random(120,140));
+		Looting.putMap();
 		WebWalking.setUseRun(true);
 		
 		if(Equipment.find(SLOTS.WEAPON).length == 0){
@@ -35,8 +34,12 @@ public class MDKGui extends javax.swing.JPanel {
 		Utils.checkStats();
 
 		if (devmode) {
-			foodAmount = 10;
-			foodIDs = new int[] { 385 };
+			foodAmount = 17;
+			foodID = 385;
+			boltsUsing = Constants.BROAD_BOLT;
+			useRubyBolts = true;
+			foodUsing = "Shark";
+			
 		} else {
 			MDKGui g = new MDKGui();
 			g.setVisible(true);
@@ -205,19 +208,19 @@ public class MDKGui extends javax.swing.JPanel {
     	String food = jComboBox1.getSelectedItem().toString();
 		switch (food) {
 		case "Monkfish":
-			foodIDs = new int[] { 7946 };
+			foodID = 7946;
 			break;
 		case "Shark":
-			foodIDs = new int[] { 385 };
+			foodID = 385;
 			break;
 		}
 		String bolt = jComboBox2.getSelectedItem().toString();
 		switch (bolt) {
 		case "Broad Bolts":
-			boltsUsing = new int[] { Constants.BROAD_BOLT };
+			boltsUsing = Constants.BROAD_BOLT;
 			break;
 		case "Adamant Bolts":
-			boltsUsing = new int[] { Constants.ADDY_BOLT };
+			boltsUsing = Constants.ADDY_BOLT;
 			break;
 		}
 		foodAmount = Integer.parseInt(jTextField1.getText());

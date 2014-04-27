@@ -73,7 +73,9 @@ public class Tiles {
 
 	safeSpotSpawn1P = new RSTile(1777, 5345, 1),
 
-	afterWhirlpoolT = new RSTile(1763, 5365, 1);
+	afterWhirlpoolT = new RSTile(1763, 5365, 1),
+	
+	bankTile = new RSTile(3185, 3438, 0);
 
 	/**
 	 * RSArea
@@ -87,7 +89,7 @@ public class Tiles {
 	mithDragSpawn1 = new RSArea(new RSTile(1776, 5348, 1), new RSTile(1784,
 			5338, 1)),
 
-	safeSpotSpawn1 = new RSArea(safeSpot),
+	safeSpotSpawn1 = new RSArea(safeSpot[0], safeSpot[1]),
 
 	lumbyArea = new RSArea(new RSTile(3190, 3240, 0), new RSTile(3255,
 					3187, 0)),
