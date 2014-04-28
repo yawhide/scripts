@@ -8,6 +8,8 @@ import java.awt.Polygon;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
+
+import org.tribot.api.Clicking;
 import org.tribot.api.General;
 import org.tribot.api.Timing;
 import org.tribot.api.input.Keyboard;
@@ -45,7 +47,7 @@ import org.tribot.script.interfaces.Painting;
 import org.tribot.script.interfaces.Pausing;
 
 
-@ScriptManifest(authors = { "Yaw hide" }, version = 2.02, category = "Ranged", name = "Yawhide's BlkDK", description = "Welcome to my first black dragon script!")
+@ScriptManifest(authors = { "Yaw hide" }, version = 2.03, category = "Ranged", name = "Yawhide's BlkDK", description = "Welcome to my first black dragon script!")
 public class BlkDK extends Script implements Painting, Pausing {
 	
 	private int[] foodIDs  = { 333, 329, 379, 385, 7946 };
@@ -954,10 +956,10 @@ public class BlkDK extends Script implements Painting, Pausing {
 
 	public void HEAL() {
 		fightstate = "Healing up";
-		GameTab.open(org.tribot.api2007.GameTab.TABS.INVENTORY);
+		GameTab.open(TABS.INVENTORY);
 		if (Inventory.getCount(foodID) > 0) {
-			Inventory.find(foodID)[0].click(new String[] { "Eat" });
-			sleep(300, 550);
+			if(Clicking.click("Eat", Inventory.find(foodID)))
+				sleep(300, 550);
 		} else {
 			forcebank = true;
 			println("forcebank = true");

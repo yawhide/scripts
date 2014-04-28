@@ -71,7 +71,7 @@ public class Tiles {
 
 	whirlpoolT = new RSTile(2512, 3508),
 
-	safeSpotSpawn1P = new RSTile(1777, 5345, 1),
+	safeSpotSpawn1P = new RSTile(1776, 5345, 1),
 
 	afterWhirlpoolT = new RSTile(1763, 5365, 1),
 	

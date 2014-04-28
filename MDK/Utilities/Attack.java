@@ -118,6 +118,7 @@ public class Attack {
 			Mouse.move(Projection.tileToScreen(loc, 10));
 			if (Game.isUptext(option)) {
 				Mouse.click(1);
+				General.sleep(400,500);
 				return true;
 			} else {
 				Mouse.click(3);

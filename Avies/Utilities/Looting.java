@@ -56,7 +56,8 @@ public class Looting {
 		}
 		String str = Constants.LOOT_MAPPING.get(item.getID());
 		final int tmpCount = Inventory.getCount(item.getID());
-		if (Clicking.click("Take" + str, item))
+		General.println(str);
+		if (Clicking.click("Take " + str, item))
 			Conditionals.waitForItem(item.getID(), tmpCount);
 	}
 }

@@ -33,7 +33,7 @@ public class AvieGUI extends javax.swing.JFrame {
 		Avies.boltsID = Equipment.getItem(SLOTS.ARROW).getID();
 		YawsGeneral.checkStats();
 
-		boolean devmode = false;
+		boolean devmode = true;
 
 		if (devmode) {
 			Avies.foodNumber = 9;

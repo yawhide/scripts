@@ -108,10 +108,10 @@ public class Bank {
 							: 16))), MDKGui.foodID);
 			needToOpenBankTwice = true;
 		}
-
+		General.println("need to open the bank again: " + needToOpenBankTwice);
 		if (needToOpenBankTwice && closeBank()) {
 			Conditionals.waitFor(!Banking.isBankScreenOpen(), 2000, 3000);
-
+			General.println("Bank is open");
 			if (MDKGui.useRubyBolts)
 				if (Inventory.getCount(Constants.RUBY_E_BOLT) > 0) {
 					Clicking.click("Wield",
@@ -129,13 +129,18 @@ public class Bank {
 				if (Clicking.click("Eat", Inventory.find(MDKGui.foodID)))
 					Conditionals.waitForEating(i);
 			}
-
+			General.println("Opening bank again");
 			if (Banking.openBank()) {
 				Conditionals.waitFor(Banking.isBankScreenOpen(), 2000, 3000);
+				General.println("Bank is open again");
 				General.println(MDKGui.foodAmount + " " + MDKGui.foodID);
 				withdraw(20, MDKGui.foodUsing);
 				Banking.close();
 			}
+		}
+		else{
+			withdraw(20, MDKGui.foodUsing);
+			Banking.close();
 		}
 	}
 
